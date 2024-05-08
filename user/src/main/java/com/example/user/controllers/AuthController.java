@@ -1,8 +1,9 @@
 package com.example.user.controllers;
 
 import com.example.user.dtos.request.UserSignInRequest;
-import com.example.user.models.User;
+import com.example.user.dtos.response.UserResponse;
 import com.example.user.services.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,7 @@ public class AuthController {
      * @return The authenticated user object.
      */
     @PostMapping("login")
-    public User login(@RequestBody UserSignInRequest userSignInRequest){
+    public UserResponse login(@Valid @RequestBody UserSignInRequest userSignInRequest){
         return authService.login(userSignInRequest);
     }
 }

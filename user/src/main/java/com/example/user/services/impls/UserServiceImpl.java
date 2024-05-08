@@ -1,6 +1,10 @@
 package com.example.user.services.impls;
 
+import com.example.user.dtos.request.UserInformationUpdateRequest;
 import com.example.user.dtos.request.UserRegistrationRequest;
+import com.example.user.dtos.response.UserResponse;
+import com.example.user.exceptions.ResourceConflict;
+import com.example.user.exceptions.ResourceNotFound;
 import com.example.user.models.User;
 import com.example.user.models.enums.ERole;
 import com.example.user.repositories.UserRepositories;
@@ -12,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Implementation of the UserService interface.
@@ -30,45 +33,67 @@ public class UserServiceImpl implements UserService {
 
     /** {@inheritDoc} */
     @Override
-    public List<User> getAllUser() {
+    public List<UserResponse> getAllUser() {
         List<User> users = userRepositories.findAll();
-        return users;
+        List<UserResponse> userResponses = users.stream().map(this::getUserResponse).toList();
+        return userResponses;
     }
 
     /** {@inheritDoc} */
     @Override
-    public User getUserById(String id) {
-        Optional<User> user = userRepositories.findById(id);
-        return user.orElse(null);
+    public UserResponse getUserById(String id) {
+        User user = userRepositories.findById(id).orElseThrow(
+                ()->new ResourceNotFound("User not found!")
+        );
+        return this.getUserResponse(user);
     }
 
     /** {@inheritDoc} */
     @Override
-    public User createUserById(UserRegistrationRequest userRegistrationRequest) {
+    public UserResponse createUserById(UserRegistrationRequest userRegistrationRequest) {
+        boolean uniqueEmail = userRepositories.existsByEmail(userRegistrationRequest.getEmail());
+        if(uniqueEmail){
+            throw new ResourceConflict("Email already exits!");
+        }
+
         User user = modelMapper.map(userRegistrationRequest, User.class);
         user.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
         user.setRole(ERole.User);
         user.setEnabled(true);
         user.setLocked(false);
         userRepositories.save(user);
-        return user;
+        return this.getUserResponse(user);
     }
 
     /** {@inheritDoc} */
     @Override
-    public User updateUserById() {
+    public UserResponse updateUser(UserInformationUpdateRequest userInformationUpdateRequest) {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public User changeUserPassword() {
+    public UserResponse changeUserPassword() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public void deleteById(String id) {
+        boolean exists = userRepositories.existsById(id);
+        if(!exists){
+            throw new ResourceNotFound("User not found!");
+        }
         userRepositories.deleteById(id);
+    }
+
+    /**
+     * This method convert user to user response dto.
+     *
+     * @param user object user want to convert
+     * @return user response converted
+     */
+    public UserResponse getUserResponse(User user){
+        return modelMapper.map(user,UserResponse.class);
     }
 }

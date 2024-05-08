@@ -1,6 +1,7 @@
 package com.example.user.services.impls;
 
 import com.example.user.dtos.request.UserSignInRequest;
+import com.example.user.dtos.response.UserResponse;
 import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.AuthService;
@@ -29,11 +30,11 @@ public class AuthServiceImpl implements AuthService {
 
     /** {@inheritDoc} */
     @Override
-    public User login(UserSignInRequest userSignInRequest) {
+    public UserResponse login(UserSignInRequest userSignInRequest) {
         User user = userRepositories.findByEmail(userSignInRequest.getEmail()).orElse(null);
         if(! passwordEncoder.matches(userSignInRequest.getPassword(), user.getPassword())){
             return null;
         }
-        return user;
+        return modelMapper.map(user, UserResponse.class);
     }
 }
