@@ -15,9 +15,4 @@ import java.util.List;
 public class ListCardController {
     private final ListCardService listCardService;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ListCardResponse createListCard(@RequestBody ListCardCreationRequest listCardCreationRequest) {
-        return listCardService.createListCard(listCardCreationRequest);
-    }
 }

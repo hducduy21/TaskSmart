@@ -48,6 +48,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     public ProjectGeneralResponse createProject(String workSpaceId, ProjectRequest projectRequest) {
+        if (!workSpaceRepository.existsById(workSpaceId)){
+            return null;
+        }
         Project project = modelMapper.map(projectRequest, Project.class);
         project.setWorkSpaceId(workSpaceId);
         return projectService.saveProject(project);
@@ -67,7 +70,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     public void deleteWorkSpace(String workSpaceId) {
-
+        if(workSpaceRepository.existsById(workSpaceId)){
+            workSpaceRepository.deleteById(workSpaceId);
+        }
     }
 
     @Override

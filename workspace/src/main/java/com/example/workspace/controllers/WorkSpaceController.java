@@ -37,9 +37,9 @@ public class WorkSpaceController {
         return  workSpaceService.createWorkSpace(workSpaceRequest);
     }
 
-    @PostMapping("{workSpaceId}/${url_project}")
+    @PostMapping("{workSpaceId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectGeneralResponse createProject(@PathVariable String workSpaceId, ProjectRequest projectRequest){
+    public ProjectGeneralResponse createProject(@PathVariable String workSpaceId, @RequestBody ProjectRequest projectRequest){
         return workSpaceService.createProject(workSpaceId, projectRequest);
     }
 

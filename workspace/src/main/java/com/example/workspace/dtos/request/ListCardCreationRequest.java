@@ -10,9 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class ListCardCreationRequest {
-    /** The unique identifier for the ListCard. */
-    private String id;
-
     /** The name of the ListCard. */
     private String name;
 
@@ -22,6 +19,4 @@ public class ListCardCreationRequest {
     /** The collapse status of the ListCard. */
     private boolean isCollapse;
 
-    /** The list of Cards associated with the ListCard. */
-    private List<String> cardIds;
 }

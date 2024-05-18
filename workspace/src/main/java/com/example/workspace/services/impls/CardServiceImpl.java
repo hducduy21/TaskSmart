@@ -37,8 +37,9 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public CardResponse createCard(CardCreationRequest cardCreationRequest){
+    public CardResponse createCard(String listCardId, CardCreationRequest cardCreationRequest){
         Card card = modelMapper.map(cardCreationRequest, Card.class);
+        card.setListCardId(listCardId);
         cardRepository.save(card);
         return getCardResponse(card);
     }

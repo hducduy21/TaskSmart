@@ -1,6 +1,10 @@
 package com.example.workspace.services;
 
+import com.example.workspace.dtos.request.CardCreationRequest;
+import com.example.workspace.dtos.request.ListCardCreationRequest;
 import com.example.workspace.dtos.request.ProjectRequest;
+import com.example.workspace.dtos.response.CardResponse;
+import com.example.workspace.dtos.response.ListCardResponse;
 import com.example.workspace.dtos.response.ProjectGeneralResponse;
 import com.example.workspace.dtos.response.ProjectResponse;
 import com.example.workspace.models.Project;
@@ -51,6 +55,20 @@ public interface ProjectService {
     ProjectGeneralResponse createPersonalProject(ProjectRequest projectRequest);
 
     /**
+     * Creates a new List Card.
+     *
+     * @return the created List Card.
+     */
+    ListCardResponse createListCard(String projectId, ListCardCreationRequest listCardCreationRequest);
+
+    /**
+     * Creates a new Card.
+     *
+     * @return the created List Card.
+     */
+    CardResponse createCard(String projectId, String listCardId, CardCreationRequest cardCreationRequest);
+
+    /**
      * Edits an existing Project.
      *
      * @return the edited Project.
@@ -60,5 +78,5 @@ public interface ProjectService {
     /**
      * Deletes a Project.
      */
-    void deleteProject();
+    void deleteProject(String projectId);
 }

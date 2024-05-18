@@ -1,5 +1,6 @@
 package com.example.workspace.services.impls;
 
+import com.example.workspace.dtos.request.CardCreationRequest;
 import com.example.workspace.dtos.request.ListCardCreationRequest;
 import com.example.workspace.dtos.response.CardResponse;
 import com.example.workspace.dtos.response.ListCardResponse;
@@ -32,10 +33,23 @@ public class ListCardServiceImpl implements ListCardService {
     }
 
     @Override
-    public ListCardResponse createListCard(ListCardCreationRequest listCardCreationRequest) {
+    public ListCardResponse createListCard(String projectId, ListCardCreationRequest listCardCreationRequest) {
         ListCard listCard = modelMapper.map(listCardCreationRequest, ListCard.class);
+        listCard.setProjectId(projectId);
         listCardRepository.save(listCard);
         return getListCardResponse(listCard);
+    }
+
+    @Override
+    public CardResponse createCard(String projectId, String listCardId, CardCreationRequest cardCreationRequest) {
+        ListCard listCard = listCardRepository.findById(listCardId).orElse(null);
+        if(listCard == null){
+            return null;
+        }
+        if(!listCard.getProjectId().equals(projectId)){
+            return null;
+        }
+        return cardService.createCard(listCardId, cardCreationRequest);
     }
 
     @Override

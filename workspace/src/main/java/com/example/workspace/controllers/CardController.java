@@ -19,9 +19,4 @@ public class CardController {
         return cardService.getCardById(cardId);
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CardResponse createCard(@RequestBody CardCreationRequest cardCreationRequest) {
-        return cardService.createCard(cardCreationRequest);
-    }
 }

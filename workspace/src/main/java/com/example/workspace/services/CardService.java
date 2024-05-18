@@ -37,7 +37,7 @@ public interface CardService {
      *
      * @return the created Card.
      */
-    CardResponse createCard(CardCreationRequest cardCreationRequest);
+    CardResponse createCard(String listCardId, CardCreationRequest cardCreationRequest);
 
     /**
      * Edits an existing Card.

@@ -1,6 +1,8 @@
 package com.example.workspace.services;
 
+import com.example.workspace.dtos.request.CardCreationRequest;
 import com.example.workspace.dtos.request.ListCardCreationRequest;
+import com.example.workspace.dtos.response.CardResponse;
 import com.example.workspace.dtos.response.ListCardResponse;
 
 import java.util.List;
@@ -31,7 +33,14 @@ public interface ListCardService {
      *
      * @return the created List Card.
      */
-    ListCardResponse createListCard(ListCardCreationRequest listCardCreationRequest);
+    ListCardResponse createListCard(String projectId, ListCardCreationRequest listCardCreationRequest);
+
+    /**
+     * Creates a new Card in a List Card.
+     *
+     * @return the created Card.
+     */
+    CardResponse createCard(String projectId, String listCardId, CardCreationRequest cardCreationRequest);
 
     /**
      * Edits an existing List Card.
