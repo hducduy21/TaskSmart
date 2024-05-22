@@ -1,6 +1,7 @@
 package com.example.user.services;
 
 import com.example.user.dtos.request.UserSignInRequest;
+import com.example.user.dtos.response.AuthResponse;
 import com.example.user.dtos.response.UserResponse;
 import com.example.user.models.User;
 
@@ -11,5 +12,7 @@ public interface AuthService {
      * @param userSignInRequest The request object containing user sign-in credentials.
      * @return The authenticated user object if successful, otherwise null.
      */
-    UserResponse login(UserSignInRequest userSignInRequest);
+    AuthResponse login(UserSignInRequest userSignInRequest);
+
+    AuthResponse refresh(String auth);
 }

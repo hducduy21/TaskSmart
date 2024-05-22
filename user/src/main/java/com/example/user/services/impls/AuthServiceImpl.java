@@ -1,14 +1,25 @@
 package com.example.user.services.impls;
 
 import com.example.user.dtos.request.UserSignInRequest;
+import com.example.user.dtos.response.AuthResponse;
+import com.example.user.dtos.response.UserGeneralResponse;
 import com.example.user.dtos.response.UserResponse;
 import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.AuthService;
+import com.example.user.utils.JWTUtil;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * Implementation of the AuthService interface.
@@ -28,13 +39,25 @@ public class AuthServiceImpl implements AuthService {
     /** Encoder instance for hashing and verifying passwords. */
     private final PasswordEncoder passwordEncoder;
 
+    private final JWTUtil jwtUtil;
+
     /** {@inheritDoc} */
     @Override
-    public UserResponse login(UserSignInRequest userSignInRequest) {
+    public AuthResponse login(UserSignInRequest userSignInRequest) {
         User user = userRepositories.findByEmail(userSignInRequest.getEmail()).orElse(null);
         if(! passwordEncoder.matches(userSignInRequest.getPassword(), user.getPassword())){
             return null;
         }
-        return modelMapper.map(user, UserResponse.class);
+        UserGeneralResponse userGeneralResponse = modelMapper.map(user, UserGeneralResponse.class);
+        return AuthResponse.builder()
+                .user(userGeneralResponse)
+                .accessToken(jwtUtil.generateToken(user, 600))
+                .refreshToken("refresh")
+                .build();
     }
+
+    public AuthResponse refresh(String auth){
+        return null;
+    }
+
 }
