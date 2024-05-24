@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Set;
+
 /**
  * This class indicate the User model.
  *
@@ -36,7 +38,7 @@ public class User {
     private String email;
 
     /** This is the storage field for the user's role. */
-    private ERole role;
+    private Set<ERole> role;
 
     /** This is the storage field for the user's avatar image. */
     private String profileImageId;

@@ -12,10 +12,15 @@ import com.example.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.Role;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of the UserService interface.
@@ -34,6 +39,13 @@ public class UserServiceImpl implements UserService {
     /** {@inheritDoc} */
     @Override
     public List<UserResponse> getAllUser() {
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+
+        log.info("Get all user: {}", auth.getName());
+        auth.getAuthorities().forEach(authority -> {
+            log.info("Authority: {}", authority.getAuthority());
+        });
+
         List<User> users = userRepositories.findAll();
         List<UserResponse> userResponses = users.stream().map(this::getUserResponse).toList();
         return userResponses;
@@ -56,9 +68,12 @@ public class UserServiceImpl implements UserService {
             throw new ResourceConflict("Email already exits!");
         }
 
+        HashSet<ERole> roles = new HashSet<>();
+        roles.add(ERole.USER);
+
         User user = modelMapper.map(userRegistrationRequest, User.class);
         user.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
-        user.setRole(ERole.User);
+        user.setRole(roles);
         user.setEnabled(true);
         user.setLocked(false);
         userRepositories.save(user);

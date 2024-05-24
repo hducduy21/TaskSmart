@@ -6,6 +6,10 @@ import com.example.user.dtos.response.UserResponse;
 import com.example.user.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/${url_base}/${url_user}")
+@Slf4j
 public class UserController {
     /** Service instance for performing user operations. */
     private final UserService userService;
@@ -28,6 +33,7 @@ public class UserController {
      *
      * @return A list of all users.
      */
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public List<UserResponse> getAllUser(){
         return userService.getAllUser();
@@ -52,6 +58,7 @@ public class UserController {
      */
     @PostMapping
     public UserResponse createUser(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest){
+        log.info("Create user");
         return userService.createUserById(userRegistrationRequest);
     }
 

@@ -3,6 +3,8 @@ package com.example.user.dtos.response;
 import com.example.user.models.enums.ERole;
 import lombok.*;
 
+import java.util.Set;
+
 /**
  * This class indicate the dto of user response.
  *
@@ -26,7 +28,7 @@ public class UserResponse {
     private String email;
 
     /** This is the storage field for the user's role. */
-    private ERole role;
+    private Set<ERole> role;
 
     /** This is the storage field for the user's avatar image. */
     private String profileImageId;

@@ -4,6 +4,8 @@ import com.example.user.dtos.request.UserSignInRequest;
 import com.example.user.dtos.response.AuthResponse;
 import com.example.user.dtos.response.UserGeneralResponse;
 import com.example.user.dtos.response.UserResponse;
+import com.example.user.exceptions.BadRequest;
+import com.example.user.exceptions.ResourceNotFound;
 import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.AuthService;
@@ -44,10 +46,14 @@ public class AuthServiceImpl implements AuthService {
     /** {@inheritDoc} */
     @Override
     public AuthResponse login(UserSignInRequest userSignInRequest) {
-        User user = userRepositories.findByEmail(userSignInRequest.getEmail()).orElse(null);
+        User user = userRepositories.findByEmail(userSignInRequest.getEmail()).orElseThrow(
+                () -> new ResourceNotFound("User not found!")
+        );
+
         if(! passwordEncoder.matches(userSignInRequest.getPassword(), user.getPassword())){
-            return null;
+            throw new BadRequest("Invalid password!");
         }
+
         UserGeneralResponse userGeneralResponse = modelMapper.map(user, UserGeneralResponse.class);
         return AuthResponse.builder()
                 .user(userGeneralResponse)

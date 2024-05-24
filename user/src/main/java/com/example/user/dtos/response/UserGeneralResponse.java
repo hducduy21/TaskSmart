@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 /**
  * This class indicate the dto of user general response.
  *
@@ -29,5 +31,5 @@ public class UserGeneralResponse {
     private String email;
 
     /** This is the storage field for the user's role. */
-    private ERole role;
+    private Set<ERole> role;
 }
