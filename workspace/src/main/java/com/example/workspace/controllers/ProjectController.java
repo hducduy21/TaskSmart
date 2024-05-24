@@ -8,6 +8,8 @@ import com.example.workspace.dtos.response.ListCardResponse;
 import com.example.workspace.dtos.response.ProjectGeneralResponse;
 import com.example.workspace.dtos.response.ProjectResponse;
 import com.example.workspace.services.ProjectService;
+import com.tasksmart.sharedLibrary.configs.AppConstant;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -48,14 +50,14 @@ public class ProjectController {
     @PutMapping("{projectId}")
     @ResponseStatus(HttpStatus.OK)
     public ProjectGeneralResponse editProject(@PathVariable String projectId,
-                                              @RequestBody ProjectRequest projectRequest){
+                                              @Valid @RequestBody ProjectRequest projectRequest){
         return projectService.editProject(projectId, projectRequest);
     }
 
     @PostMapping("{projectId}")
     @ResponseStatus(HttpStatus.CREATED)
     public ListCardResponse createListCard(@PathVariable String projectId,
-                                           @RequestBody ListCardCreationRequest listCardCreationRequest){
+                                           @Valid @RequestBody ListCardCreationRequest listCardCreationRequest){
         return projectService.createListCard(projectId, listCardCreationRequest);
     }
 
@@ -63,7 +65,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public CardResponse createCard(@PathVariable String projectId,
                                    @PathVariable String listCardId,
-                                   @RequestBody CardCreationRequest cardCreationRequest){
+                                   @Valid @RequestBody CardCreationRequest cardCreationRequest){
         return projectService.createCard(projectId, listCardId, cardCreationRequest);
     }
 

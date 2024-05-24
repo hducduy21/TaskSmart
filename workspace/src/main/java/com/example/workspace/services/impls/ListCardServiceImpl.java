@@ -8,10 +8,12 @@ import com.example.workspace.models.ListCard;
 import com.example.workspace.repositories.ListCardRepository;
 import com.example.workspace.services.CardService;
 import com.example.workspace.services.ListCardService;
+import com.tasksmart.sharedLibrary.exceptions.ResourceConflict;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.lang.module.ResolutionException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -42,12 +44,11 @@ public class ListCardServiceImpl implements ListCardService {
 
     @Override
     public CardResponse createCard(String projectId, String listCardId, CardCreationRequest cardCreationRequest) {
-        ListCard listCard = listCardRepository.findById(listCardId).orElse(null);
-        if(listCard == null){
-            return null;
-        }
+        ListCard listCard = listCardRepository.findById(listCardId).orElseThrow(
+                ()->new ResolutionException("ListCard not found!")
+        );
         if(!listCard.getProjectId().equals(projectId)){
-            return null;
+            throw new ResourceConflict("ListCard not belong to this project!");
         }
         return cardService.createCard(listCardId, cardCreationRequest);
     }

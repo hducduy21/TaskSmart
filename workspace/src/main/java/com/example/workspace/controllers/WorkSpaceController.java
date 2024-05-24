@@ -5,8 +5,9 @@ import com.example.workspace.dtos.request.WorkSpaceRequest;
 import com.example.workspace.dtos.response.ProjectGeneralResponse;
 import com.example.workspace.dtos.response.WorkSpaceGeneralResponse;
 import com.example.workspace.dtos.response.WorkSpaceResponse;
-import com.example.workspace.services.ProjectService;
 import com.example.workspace.services.WorkSpaceService;
+import com.tasksmart.sharedLibrary.configs.AppConstant;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class WorkSpaceController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<WorkSpaceGeneralResponse> getAllWorkSpace(){
+        System.out.println(AppConstant.CHECK);
         return workSpaceService.getAllWorkSpace();
     }
 
@@ -33,13 +35,13 @@ public class WorkSpaceController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public WorkSpaceGeneralResponse createWorkSpace(@RequestBody WorkSpaceRequest workSpaceRequest){
+    public WorkSpaceGeneralResponse createWorkSpace(@Valid @RequestBody WorkSpaceRequest workSpaceRequest){
         return  workSpaceService.createWorkSpace(workSpaceRequest);
     }
 
     @PostMapping("{workSpaceId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectGeneralResponse createProject(@PathVariable String workSpaceId, @RequestBody ProjectRequest projectRequest){
+    public ProjectGeneralResponse createProject(@Valid @PathVariable String workSpaceId, @RequestBody ProjectRequest projectRequest){
         return workSpaceService.createProject(workSpaceId, projectRequest);
     }
 

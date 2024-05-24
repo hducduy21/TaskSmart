@@ -1,5 +1,6 @@
 package com.example.workspace.dtos.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ProjectRequest {
     /** The name of the Project. */
+    @NotBlank(message = "Project's name cannot be blank")
     private String name;
 
     /** The background of the Project. */

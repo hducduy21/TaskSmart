@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AppConstant {
-
+    public static final String CHECK = "check";
 }
 

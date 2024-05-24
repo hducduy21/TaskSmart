@@ -11,6 +11,7 @@ import com.example.workspace.models.Project;
 import com.example.workspace.repositories.ProjectRepository;
 import com.example.workspace.services.ListCardService;
 import com.example.workspace.services.ProjectService;
+import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -49,10 +50,9 @@ public class ProjectServiceImpl implements ProjectService {
     /** {@inheritDoc} */
     @Override
     public ProjectResponse getProjectById(String projectId) {
-        Project project = projectRepository.findById(projectId).orElse(null);
-        if(project == null){
-            return null;
-        }
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
         return getProjectResponse(project);
     }
 
@@ -72,10 +72,9 @@ public class ProjectServiceImpl implements ProjectService {
     /** {@inheritDoc} */
     @Override
     public ProjectGeneralResponse editProject(String projectId, ProjectRequest projectRequest) {
-        Project project = projectRepository.findById(projectId).orElse(null);
-        if(project == null){
-            return null;
-        }
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
         project.setName(projectRequest.getName());
         project.setDescription(projectRequest.getDescription());
         project.setBackground(projectRequest.getBackground());
@@ -87,30 +86,31 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ListCardResponse createListCard(String projectId, ListCardCreationRequest listCardCreationRequest){
         boolean isProjectExist = projectRepository.existsById(projectId);
-        if(isProjectExist){
-            //check authorization
-            return listCardService.createListCard(projectId, listCardCreationRequest);
+        if(!isProjectExist){
+            throw new ResourceNotFound("Project not found!");
         }
-        return null;
+        //check authorization
+        return listCardService.createListCard(projectId, listCardCreationRequest);
     }
 
     /** {@inheritDoc} */
     @Override
     public CardResponse createCard(String projectId, String listCardId, CardCreationRequest cardCreationRequest){
         boolean isProjectExist = projectRepository.existsById(projectId);
-        if(isProjectExist){
-            //check authorization
-            return listCardService.createCard(projectId, listCardId, cardCreationRequest);
+        if(!isProjectExist){
+            throw new ResourceNotFound("Project not found!");
         }
-        return null;
+        //check authorization
+        return listCardService.createCard(projectId, listCardId, cardCreationRequest);
     }
 
     /** {@inheritDoc} */
     @Override
     public void deleteProject(String projectId) {
-        if(projectRepository.existsById(projectId)){
-            projectRepository.deleteById(projectId);
+        if(!projectRepository.existsById(projectId)){
+            throw new ResourceNotFound("Project not found!");
         }
+        projectRepository.deleteById(projectId);
     }
 
     /**

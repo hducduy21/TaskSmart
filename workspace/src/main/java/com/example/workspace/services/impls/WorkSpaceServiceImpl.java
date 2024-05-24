@@ -11,6 +11,7 @@ import com.example.workspace.models.enums.EWorkSpaceType;
 import com.example.workspace.repositories.WorkSpaceRepository;
 import com.example.workspace.services.ProjectService;
 import com.example.workspace.services.WorkSpaceService;
+import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -31,10 +32,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     public WorkSpaceResponse getWorkSpaceById(String Id) {
-        WorkSpace workSpace = workSpaceRepository.findById(Id).orElse(null);
-        if(workSpace == null){
-            return null;
-        }
+        WorkSpace workSpace = workSpaceRepository.findById(Id).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
         return getWorkSpaceResponse(workSpace);
     }
 
@@ -49,7 +49,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     @Override
     public ProjectGeneralResponse createProject(String workSpaceId, ProjectRequest projectRequest) {
         if (!workSpaceRepository.existsById(workSpaceId)){
-            return null;
+            throw new ResourceNotFound("WorkSpace not found!");
         }
         Project project = modelMapper.map(projectRequest, Project.class);
         project.setWorkSpaceId(workSpaceId);
@@ -58,10 +58,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     public WorkSpaceGeneralResponse editWorkSpace(String workSpaceId,WorkSpaceRequest workSpaceRequest) {
-        WorkSpace workSpace = workSpaceRepository.findById(workSpaceId).orElse(null);
-        if(workSpace == null){
-            return null;
-        }
+        WorkSpace workSpace = workSpaceRepository.findById(workSpaceId).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
         workSpace.setName(workSpaceRequest.getName());
         workSpace.setDescription(workSpaceRequest.getDescription());
         workSpaceRepository.save(workSpace);
@@ -71,8 +70,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     @Override
     public void deleteWorkSpace(String workSpaceId) {
         if(workSpaceRepository.existsById(workSpaceId)){
-            workSpaceRepository.deleteById(workSpaceId);
+            throw new ResourceNotFound("WorkSpace not found!");
         }
+        workSpaceRepository.deleteById(workSpaceId);
     }
 
     @Override

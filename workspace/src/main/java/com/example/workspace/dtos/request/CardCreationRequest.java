@@ -3,6 +3,7 @@ package com.example.workspace.dtos.request;
 import com.example.workspace.models.Card;
 import com.example.workspace.models.enums.ELevel;
 import com.example.workspace.models.enums.EStatus;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.List;
 @Data
 public class CardCreationRequest {
     /** The name of the Card. */
+    @NotBlank(message = "Card's name cannot be blank")
     public String name;
 
     /** The color of the Card. */

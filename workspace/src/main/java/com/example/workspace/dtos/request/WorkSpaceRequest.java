@@ -1,6 +1,6 @@
 package com.example.workspace.dtos.request;
 
-import com.example.workspace.models.enums.EWorkSpaceType;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class WorkSpaceRequest {
     /** The name of the WorkSpace. */
+    @NotBlank(message = "Workspace's name cannot be blank")
     private String name;
 
     /** The description of the WorkSpace. */
