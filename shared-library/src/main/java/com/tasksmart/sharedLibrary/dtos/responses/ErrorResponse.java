@@ -1,4 +1,4 @@
-package com.example.user.dtos.response;
+package com.tasksmart.sharedLibrary.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

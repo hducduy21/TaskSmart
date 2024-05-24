@@ -1,4 +1,4 @@
-package com.example.user.exceptions;
+package com.tasksmart.sharedLibrary.exceptions;
 
 /**
  * Custom RuntimeException subclass representing a resource conflict.

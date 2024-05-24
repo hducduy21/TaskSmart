@@ -24,13 +24,4 @@ public class AppConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * Bean for providing a ModelMapper instance.
-     *
-     * @return A ModelMapper instance.
-     */
-    @Bean
-    public ModelMapper modelMapper(){
-        return new ModelMapper();
-    }
 }

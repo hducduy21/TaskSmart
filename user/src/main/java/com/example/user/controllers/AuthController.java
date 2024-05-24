@@ -6,6 +6,7 @@ import com.example.user.dtos.response.UserResponse;
 import com.example.user.services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/${url_base}/${url_auth}")
+@Slf4j
 public class AuthController {
     /** Service instance for handling authentication operations. */
     private final AuthService authService;

@@ -3,25 +3,16 @@ package com.example.user.services.impls;
 import com.example.user.dtos.request.UserSignInRequest;
 import com.example.user.dtos.response.AuthResponse;
 import com.example.user.dtos.response.UserGeneralResponse;
-import com.example.user.dtos.response.UserResponse;
-import com.example.user.exceptions.BadRequest;
-import com.example.user.exceptions.ResourceNotFound;
 import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.AuthService;
 import com.example.user.utils.JWTUtil;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.Date;
+import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
+import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 
 /**
  * Implementation of the AuthService interface.

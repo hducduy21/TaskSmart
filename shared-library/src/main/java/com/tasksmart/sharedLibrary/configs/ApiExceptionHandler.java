@@ -1,10 +1,10 @@
-package com.example.user.configs;
+package com.tasksmart.sharedLibrary.configs;
 
-import com.example.user.dtos.response.ErrorFieldValidationResponse;
-import com.example.user.dtos.response.ErrorResponse;
-import com.example.user.exceptions.BadRequest;
-import com.example.user.exceptions.ResourceConflict;
-import com.example.user.exceptions.ResourceNotFound;
+import com.tasksmart.sharedLibrary.dtos.responses.ErrorFieldValidationResponse;
+import com.tasksmart.sharedLibrary.dtos.responses.ErrorResponse;
+import com.tasksmart.sharedLibrary.exceptions.BadRequest;
+import com.tasksmart.sharedLibrary.exceptions.ResourceConflict;
+import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -47,6 +48,7 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorFieldValidationResponse handleValidationExceptions(MethodArgumentNotValidException methodArgumentNotValidException) {
         List<ErrorFieldValidationResponse.FieldValidationError> errors = new ArrayList<>();
+
         methodArgumentNotValidException.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
@@ -56,7 +58,7 @@ public class ApiExceptionHandler {
                     .build());
         });
 
-        String message = errors.getLast().getMessage();
+        String message = errors.isEmpty() ? "" : errors.get(errors.size() - 1).getMessage();
 
         return ErrorFieldValidationResponse.builder()
                 .errors(errors)

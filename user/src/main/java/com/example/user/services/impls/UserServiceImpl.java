@@ -3,8 +3,6 @@ package com.example.user.services.impls;
 import com.example.user.dtos.request.UserInformationUpdateRequest;
 import com.example.user.dtos.request.UserRegistrationRequest;
 import com.example.user.dtos.response.UserResponse;
-import com.example.user.exceptions.ResourceConflict;
-import com.example.user.exceptions.ResourceNotFound;
 import com.example.user.models.User;
 import com.example.user.models.enums.ERole;
 import com.example.user.repositories.UserRepositories;
@@ -16,11 +14,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.tasksmart.sharedLibrary.exceptions.ResourceConflict;
+import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 
-import javax.management.relation.Role;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Implementation of the UserService interface.

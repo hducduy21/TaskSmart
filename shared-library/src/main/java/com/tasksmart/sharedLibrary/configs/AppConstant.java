@@ -1,4 +1,4 @@
-package com.example.user.configs;
+package com.tasksmart.sharedLibrary.configs;
 
 import org.springframework.stereotype.Component;
 
@@ -11,10 +11,5 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppConstant {
 
-    /** Prefix for API URLs. */
-    public static final String URL_PREFIX = "api";
-
-    /** URL path for user-related API endpoints. */
-    public static final String URL_USER = "users";
 }
 
