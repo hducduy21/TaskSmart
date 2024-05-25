@@ -1,17 +1,16 @@
-package com.example.user.configs;
+package com.example.workspace.configs;
 
 import com.tasksmart.sharedLibrary.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -20,15 +19,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
-    private static final String[] PERMIT_ALL_ENDPOINTS = {
-            "/api/auth/**"
-    };
-
-    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {
-            "/api/users"
-    };
-
+//    private static final String[] PERMIT_ALL_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {};
+//    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PUT_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PATCH_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_DELETE_ENDPOINTS = {};
@@ -39,13 +32,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.requestMatchers(PERMIT_ALL_ENDPOINTS).permitAll()
-
-                                //method level security
-                                .requestMatchers(HttpMethod.POST, PERMIT_ONLY_POST_ENDPOINTS).permitAll()
-
-                                .anyRequest().authenticated())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
         ;
 
         httpSecurity.oauth2ResourceServer(oauth2ResourceServer ->
@@ -60,3 +47,4 @@ public class SecurityConfig {
     }
 
 }
+

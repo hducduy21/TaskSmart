@@ -1,6 +1,5 @@
-package com.example.user.utils;
+package com.tasksmart.sharedLibrary.utils;
 
-import com.example.user.models.User;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -19,6 +18,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Set;
 import java.util.StringJoiner;
 
 @Component
@@ -38,14 +38,14 @@ public class JWTUtil {
         return jwtAuthenticationConverter;
     }
 
-    public String generateToken(User user, long millis){
-        log.info(secretKey);
+    public String generateToken(String name, String username, String email, Set<String> roles, long millis){
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getName())
-                .claim("email", user.getEmail())
-                .claim("scope", buildScope(user))
+                .subject(name)
+                .claim("email", email)
+                .claim("username", username)
+                .claim("scope", buildScope(roles))
                 .issuer("tasksmark.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
@@ -74,10 +74,10 @@ public class JWTUtil {
                 .build();
     }
 
-    public String buildScope(User user){
+    public String buildScope(Set<String> roles){
         StringJoiner joiner = new StringJoiner(" ");
-        if (!CollectionUtils.isEmpty(user.getRole()))
-            user.getRole().forEach(role -> joiner.add(role.name()));
+        if (!CollectionUtils.isEmpty(roles))
+            roles.forEach(joiner::add);
 
         return joiner.toString();
     }

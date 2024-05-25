@@ -33,7 +33,6 @@ public class UserController {
      *
      * @return A list of all users.
      */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public List<UserResponse> getAllUser(){
         return userService.getAllUser();
@@ -42,12 +41,12 @@ public class UserController {
     /**
      * Retrieves a user by their ID.
      *
-     * @param userId The ID of the user to retrieve.
+     * @param userIdOrUsername The ID of the user to retrieve.
      * @return The user object corresponding to the provided ID, or null if not found.
      */
-    @GetMapping("{userId}")
-    public UserResponse getUserById(@PathVariable String userId){
-        return userService.getUserById(userId);
+    @GetMapping("{userIdOrUsername}")
+    public UserResponse getUserById(@PathVariable String userIdOrUsername){
+        return userService.getUserByIdOrUsername(userIdOrUsername);
     }
 
     /**

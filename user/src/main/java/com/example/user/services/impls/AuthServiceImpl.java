@@ -6,9 +6,13 @@ import com.example.user.dtos.response.UserGeneralResponse;
 import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.AuthService;
-import com.example.user.utils.JWTUtil;
+import com.tasksmart.sharedLibrary.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
@@ -22,6 +26,7 @@ import com.tasksmart.sharedLibrary.exceptions.BadRequest;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     /** Repository instance for accessing user data. */
     private final UserRepositories userRepositories;
@@ -37,9 +42,22 @@ public class AuthServiceImpl implements AuthService {
     /** {@inheritDoc} */
     @Override
     public AuthResponse login(UserSignInRequest userSignInRequest) {
-        User user = userRepositories.findByEmail(userSignInRequest.getEmail()).orElseThrow(
-                () -> new ResourceNotFound("User not found!")
-        );
+        log.info("Login user: {}", userSignInRequest.getUsername());
+        if(StringUtils.isBlank(userSignInRequest.getEmail()) && StringUtils.isBlank(userSignInRequest.getUsername())){
+            throw new BadRequest("Please provide complete login information!");
+        }
+
+        User user;
+
+        if(StringUtils.isNotBlank(userSignInRequest.getEmail())){
+            user = userRepositories.findByEmail(userSignInRequest.getEmail()).orElseThrow(
+                    () -> new ResourceNotFound("User not found!")
+            );
+        } else {
+            user = userRepositories.findByUsername(userSignInRequest.getUsername()).orElseThrow(
+                    () -> new ResourceNotFound("User not found!")
+            );
+        }
 
         if(! passwordEncoder.matches(userSignInRequest.getPassword(), user.getPassword())){
             throw new BadRequest("Invalid password!");
@@ -48,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
         UserGeneralResponse userGeneralResponse = modelMapper.map(user, UserGeneralResponse.class);
         return AuthResponse.builder()
                 .user(userGeneralResponse)
-                .accessToken(jwtUtil.generateToken(user, 600))
+                .accessToken(jwtUtil.generateToken(user.getName(), user.getEmail(), user.getUsername(), user.getRole(), 600))
                 .refreshToken("refresh")
                 .build();
     }

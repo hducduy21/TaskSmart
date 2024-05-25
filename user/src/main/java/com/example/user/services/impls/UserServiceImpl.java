@@ -4,12 +4,13 @@ import com.example.user.dtos.request.UserInformationUpdateRequest;
 import com.example.user.dtos.request.UserRegistrationRequest;
 import com.example.user.dtos.response.UserResponse;
 import com.example.user.models.User;
-import com.example.user.models.enums.ERole;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.UserService;
+import com.tasksmart.sharedLibrary.configs.AppConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,7 @@ import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Implementation of the UserService interface.
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
 
     /** {@inheritDoc} */
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UserResponse> getAllUser() {
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
@@ -51,23 +54,35 @@ public class UserServiceImpl implements UserService {
 
     /** {@inheritDoc} */
     @Override
-    public UserResponse getUserById(String id) {
-        User user = userRepositories.findById(id).orElseThrow(
-                ()->new ResourceNotFound("User not found!")
-        );
-        return this.getUserResponse(user);
+    public UserResponse getUserByIdOrUsername(String idOrUsername) {
+        log.info("Get user by id or username: {}", idOrUsername);
+        Optional<User> user = userRepositories.findById(idOrUsername);
+
+        if(user.isEmpty()){
+            user = userRepositories.findByUsername(idOrUsername);
+        }
+
+        if(user.isEmpty()){
+            throw new ResourceNotFound("User not found!");
+        }
+        return this.getUserResponse(user.get());
     }
 
     /** {@inheritDoc} */
     @Override
     public UserResponse createUserById(UserRegistrationRequest userRegistrationRequest) {
-        boolean uniqueEmail = userRepositories.existsByEmail(userRegistrationRequest.getEmail());
-        if(uniqueEmail){
+        boolean uniqueEmail = !userRepositories.existsByEmail(userRegistrationRequest.getEmail());
+        if( !uniqueEmail ){
             throw new ResourceConflict("Email already exits!");
         }
 
-        HashSet<ERole> roles = new HashSet<>();
-        roles.add(ERole.USER);
+        boolean uniqueUsername = !userRepositories.existsByUsername(userRegistrationRequest.getUsername());
+        if( !uniqueUsername ){
+            throw new ResourceConflict("Username already exits!");
+        }
+
+        HashSet<String> roles = new HashSet<>();
+        roles.add(AppConstant.Role_User);
 
         User user = modelMapper.map(userRegistrationRequest, User.class);
         user.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
@@ -91,6 +106,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /** {@inheritDoc} */
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteById(String id) {
         boolean exists = userRepositories.existsById(id);

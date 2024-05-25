@@ -26,7 +26,7 @@ public interface UserService {
      * @param id The ID of the user to retrieve.
      * @return The user object corresponding to the provided ID, or null if not found.
      */
-    UserResponse getUserById(String id);
+    UserResponse getUserByIdOrUsername(String id);
 
     /**
      * Creates a new user based on the provided registration request.

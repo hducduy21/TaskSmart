@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AppConstant {
-    public static final String CHECK = "check";
+    public static final String Role_Admin = "ADMIN";
+    public static final String Role_User = "USER";
 }
 

@@ -23,7 +23,6 @@ public class WorkSpaceController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<WorkSpaceGeneralResponse> getAllWorkSpace(){
-        System.out.println(AppConstant.CHECK);
         return workSpaceService.getAllWorkSpace();
     }
 

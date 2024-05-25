@@ -1,6 +1,5 @@
 package com.example.user.dtos.response;
 
-import com.example.user.models.enums.ERole;
 import lombok.*;
 
 import java.util.Set;
@@ -28,7 +27,7 @@ public class UserResponse {
     private String email;
 
     /** This is the storage field for the user's role. */
-    private Set<ERole> role;
+    private Set<String> role;
 
     /** This is the storage field for the user's avatar image. */
     private String profileImageId;

@@ -1,11 +1,11 @@
 package com.example.user.models;
 
-import com.example.user.models.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
@@ -29,16 +29,18 @@ public class User {
     private String name;
 
     /** This is the storage field for the username. */
+    @Indexed(unique = true)
     private String username;
 
     /** This is the storage field for the password encoded. */
     private String password;
 
     /** This is the storage field for the user's email. */
+    @Indexed(unique = true)
     private String email;
 
     /** This is the storage field for the user's role. */
-    private Set<ERole> role;
+    private Set<String> role;
 
     /** This is the storage field for the user's avatar image. */
     private String profileImageId;
