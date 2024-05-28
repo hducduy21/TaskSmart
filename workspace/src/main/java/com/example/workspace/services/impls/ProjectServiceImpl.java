@@ -11,7 +11,9 @@ import com.example.workspace.models.Project;
 import com.example.workspace.repositories.ProjectRepository;
 import com.example.workspace.services.ListCardService;
 import com.example.workspace.services.ProjectService;
+import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
+import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     /** The ListCardService instance.*/
     private final ListCardService listCardService;
+
+    private final UserClient userClient;
 
     /** {@inheritDoc} */
     @Override
@@ -65,6 +69,7 @@ public class ProjectServiceImpl implements ProjectService {
     /** {@inheritDoc} */
     @Override
     public ProjectGeneralResponse saveProject(Project project){
+
         projectRepository.save(project);
         return getProjectGeneralResponse(project);
     }
@@ -130,7 +135,14 @@ public class ProjectServiceImpl implements ProjectService {
      * @return the ProjectResponse.
      */
     public ProjectResponse getProjectResponse(Project project){
+        List<UserGeneralResponse> users = project.getUsers().stream().map(userRelation->{
+            UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userRelation.getUserId());
+            userGeneralResponse.setRelation(userRelation.getRole().toString());
+            return userGeneralResponse;
+        }).toList();
+
         ProjectResponse projectResponse = modelMapper.map(project, ProjectResponse.class);
+        projectResponse.setUsers(users);
         projectResponse.setListCards(listCardService.getAllListCardByProject(project.getId()));
         return projectResponse;
     }

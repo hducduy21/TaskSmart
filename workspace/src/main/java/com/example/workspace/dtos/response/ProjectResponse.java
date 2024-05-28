@@ -1,5 +1,6 @@
 package com.example.workspace.dtos.response;
 
+import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,4 +33,7 @@ public class ProjectResponse {
 
     /** This is the storage field for the project's list of cards. */
     private List<ListCardResponse> listCards;
+
+    /** This is the storage field for the project's list of users. */
+    private List<UserGeneralResponse> users;
 }

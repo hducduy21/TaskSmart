@@ -1,6 +1,5 @@
 package com.example.workspace.controllers;
 
-import com.example.workspace.dtos.request.CardCreationRequest;
 import com.example.workspace.dtos.response.CardResponse;
 import com.example.workspace.services.CardService;
 import lombok.RequiredArgsConstructor;

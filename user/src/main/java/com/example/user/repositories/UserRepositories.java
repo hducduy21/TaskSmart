@@ -3,6 +3,7 @@ package com.example.user.repositories;
 import com.example.user.models.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,4 +26,6 @@ public interface UserRepositories extends MongoRepository<User, String> {
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    List<User> findAllByIdIn(List<String> userIds);
 }

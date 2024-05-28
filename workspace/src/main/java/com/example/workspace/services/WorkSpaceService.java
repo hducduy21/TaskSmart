@@ -1,5 +1,6 @@
 package com.example.workspace.services;
 
+import com.example.workspace.dtos.request.MembersAdditionalRequest;
 import com.example.workspace.dtos.request.ProjectRequest;
 import com.example.workspace.dtos.request.WorkSpaceRequest;
 import com.example.workspace.dtos.response.ProjectGeneralResponse;
@@ -59,4 +60,11 @@ public interface WorkSpaceService {
      * @return true if the Work Space exists, false otherwise.
      */
     boolean isWorkSpaceExist(String workSpaceId);
+
+    /**
+     * Adds members to a Work Space.
+     *
+     * @return the updated Project.
+     */
+//    ProjectGeneralResponse inviteMembers(String workSpaceId, MembersAdditionalRequest membersAdditionalRequest);
 }

@@ -2,6 +2,7 @@ package com.example.user.services.impls;
 
 import com.example.user.dtos.request.UserInformationUpdateRequest;
 import com.example.user.dtos.request.UserRegistrationRequest;
+import com.example.user.dtos.response.UserGeneralResponse;
 import com.example.user.dtos.response.UserResponse;
 import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
@@ -153,6 +154,20 @@ public class UserServiceImpl implements UserService {
      */
     public UserResponse getUserResponse(User user){
         return modelMapper.map(user,UserResponse.class);
+    }
+
+    //internal
+    @Override
+    public UserGeneralResponse getUserGeneralById(String id) {
+        return userRepositories.findById(id)
+                .map(user -> modelMapper.map(user, UserGeneralResponse.class))
+                .orElseThrow(() -> new ResourceNotFound("User not found!"));
+    }
+
+    @Override
+    public List<UserGeneralResponse> getUsersGeneralByListId(List<String> userIds) {
+        List<User> users = userRepositories.findAllByIdIn(userIds);
+        return users.stream().map(user -> modelMapper.map(user, UserGeneralResponse.class)).toList();
     }
 
     private String getUserIdAuthenticated() {

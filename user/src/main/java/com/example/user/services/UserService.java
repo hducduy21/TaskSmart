@@ -2,6 +2,7 @@ package com.example.user.services;
 
 import com.example.user.dtos.request.UserInformationUpdateRequest;
 import com.example.user.dtos.request.UserRegistrationRequest;
+import com.example.user.dtos.response.UserGeneralResponse;
 import com.example.user.dtos.response.UserResponse;
 import com.example.user.models.User;
 
@@ -59,4 +60,8 @@ public interface UserService {
      * @param id The ID of the user to delete.
      */
     void deleteById(String id);
+
+    //internal
+    UserGeneralResponse getUserGeneralById(String id);
+    List<UserGeneralResponse> getUsersGeneralByListId(List<String> userIds);
 }

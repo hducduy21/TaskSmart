@@ -1,5 +1,6 @@
 package com.example.workspace.controllers;
 
+import com.example.workspace.dtos.request.MembersAdditionalRequest;
 import com.example.workspace.dtos.request.ProjectRequest;
 import com.example.workspace.dtos.request.WorkSpaceRequest;
 import com.example.workspace.dtos.response.ProjectGeneralResponse;
@@ -7,6 +8,7 @@ import com.example.workspace.dtos.response.WorkSpaceGeneralResponse;
 import com.example.workspace.dtos.response.WorkSpaceResponse;
 import com.example.workspace.services.WorkSpaceService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
+import com.tasksmart.sharedLibrary.dtos.responses.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,12 @@ public class WorkSpaceController {
     public WorkSpaceGeneralResponse createWorkSpace(@Valid @RequestBody WorkSpaceRequest workSpaceRequest){
         return  workSpaceService.createWorkSpace(workSpaceRequest);
     }
+
+//    @PostMapping("{workSpaceId}/members")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public SuccessResponse addMembers(@PathVariable String workSpaceId, @Valid @RequestBody MembersAdditionalRequest membersAdditionalRequest){
+//        return workSpaceService.inviteMembers(workSpaceId, membersAdditionalRequest);
+//    }
 
     @PostMapping("{workSpaceId}")
     @ResponseStatus(HttpStatus.CREATED)

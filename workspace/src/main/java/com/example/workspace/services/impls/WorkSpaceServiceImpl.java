@@ -6,14 +6,20 @@ import com.example.workspace.dtos.response.ProjectGeneralResponse;
 import com.example.workspace.dtos.response.WorkSpaceGeneralResponse;
 import com.example.workspace.dtos.response.WorkSpaceResponse;
 import com.example.workspace.models.Project;
+import com.example.workspace.models.UserRelation;
 import com.example.workspace.models.WorkSpace;
 import com.example.workspace.models.enums.EWorkSpaceType;
 import com.example.workspace.repositories.WorkSpaceRepository;
 import com.example.workspace.services.ProjectService;
 import com.example.workspace.services.WorkSpaceService;
+import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
+import com.tasksmart.sharedLibrary.exceptions.UnauthenticateException;
+import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +30,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final WorkSpaceRepository workSpaceRepository;
     private final ModelMapper modelMapper;
     private final ProjectService projectService;
+    private final UserClient userClient;
 
     @Override
     public List<WorkSpaceGeneralResponse> getAllWorkSpace() {
@@ -40,8 +47,11 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     public WorkSpaceGeneralResponse createWorkSpace(WorkSpaceRequest workSpaceRequest) {
+        String userId = getUserIdAuthenticated();
+
         WorkSpace workSpace = modelMapper.map(workSpaceRequest, WorkSpace.class);
         workSpace.setType(EWorkSpaceType.Private);
+        workSpace.setOwner(userId);
         workSpaceRepository.save(workSpace);
         return getWorkSpaceGeneralResponse(workSpace);
     }
@@ -51,7 +61,11 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         if (!workSpaceRepository.existsById(workSpaceId)){
             throw new ResourceNotFound("WorkSpace not found!");
         }
+
+        String userId = getUserIdAuthenticated();
+
         Project project = modelMapper.map(projectRequest, Project.class);
+        project.setOwner(userId);
         project.setWorkSpaceId(workSpaceId);
         return projectService.saveProject(project);
     }
@@ -85,8 +99,26 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     public WorkSpaceResponse getWorkSpaceResponse(WorkSpace workSpace){
+        List<UserGeneralResponse> userIds = workSpace.getUsers().stream().map(userRelation->{
+            UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userRelation.getUserId());
+            userGeneralResponse.setRelation(userRelation.getRole().toString());
+            return userGeneralResponse;
+        }).toList();
+
         WorkSpaceResponse workSpaceResponse = modelMapper.map(workSpace, WorkSpaceResponse.class);
+
+        workSpaceResponse.setUsers(userIds);
         workSpaceResponse.setProjects(projectService.getAllProjectByWorkSpace(workSpace.getId()));
         return workSpaceResponse;
+    }
+
+    private String getUserIdAuthenticated() {
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(StringUtils.isBlank(userId)){
+            throw new UnauthenticateException("Login required!");
+        }
+
+        return userId;
     }
 }
