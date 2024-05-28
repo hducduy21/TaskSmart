@@ -7,9 +7,12 @@ import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.UserService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
+import com.tasksmart.sharedLibrary.exceptions.UnauthenticateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,6 +71,17 @@ public class UserServiceImpl implements UserService {
         return this.getUserResponse(user.get());
     }
 
+    @Override
+    public UserResponse getProfile() {
+        String userId = getUserIdAuthenticated();
+
+        Optional<User> userOptional = userRepositories.findById(userId);
+        if(userOptional.isEmpty()){
+            throw new ResourceNotFound("User not found!");
+        }
+        return this.getUserResponse(userOptional.get());
+    }
+
     /** {@inheritDoc} */
     @Override
     public UserResponse createUserById(UserRegistrationRequest userRegistrationRequest) {
@@ -96,7 +110,22 @@ public class UserServiceImpl implements UserService {
     /** {@inheritDoc} */
     @Override
     public UserResponse updateUser(UserInformationUpdateRequest userInformationUpdateRequest) {
-        return null;
+        String userId = getUserIdAuthenticated();
+
+        Optional<User> userOptional = userRepositories.findById(userId);
+        if(userOptional.isEmpty()){
+            throw new ResourceNotFound("User not found!");
+        }
+
+        User user = userOptional.get();
+        user.setName(userInformationUpdateRequest.getName());
+        user.setEmail(userInformationUpdateRequest.getEmail());
+        user.setUsername(userInformationUpdateRequest.getUsername());
+        user.setProfileBackground(userInformationUpdateRequest.getProfileBackground());
+
+        userRepositories.save(user);
+
+        return this.getUserResponse(user);
     }
 
     /** {@inheritDoc} */
@@ -124,5 +153,15 @@ public class UserServiceImpl implements UserService {
      */
     public UserResponse getUserResponse(User user){
         return modelMapper.map(user,UserResponse.class);
+    }
+
+    private String getUserIdAuthenticated() {
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(StringUtils.isBlank(userId)){
+            throw new UnauthenticateException("Login required!");
+        }
+
+        return userId;
     }
 }

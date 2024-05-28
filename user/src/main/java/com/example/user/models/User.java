@@ -51,7 +51,7 @@ public class User {
     /** This is the storage field for the timezone of user area. */
     private int timeZone;
 
-    /** This is the storage field for the authentication status. */
+    /** This is the storage field for the email authentication status. */
     private boolean enabled;
 
     /** This is the storage field for the user's operability. */

@@ -5,7 +5,9 @@ import com.tasksmart.sharedLibrary.dtos.responses.ErrorResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.ResourceConflict;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
+import com.tasksmart.sharedLibrary.exceptions.UnauthenticateException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +19,15 @@ import java.util.List;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+    @ExceptionHandler(UnauthenticateException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse resourceNotFound(UnauthenticateException unauthenticateException) {
+        return ErrorResponse.builder()
+                .message(unauthenticateException.getMessage())
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .build();
+    }
+
     @ExceptionHandler(ResourceNotFound.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse resourceNotFound(ResourceNotFound resourceNotFound) {

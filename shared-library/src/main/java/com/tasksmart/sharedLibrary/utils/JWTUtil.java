@@ -38,11 +38,12 @@ public class JWTUtil {
         return jwtAuthenticationConverter;
     }
 
-    public String generateToken(String name, String username, String email, Set<String> roles, long millis){
+    public String generateToken(String userId, String name, String username, String email, Set<String> roles, long millis){
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(name)
+                .claim("userId", userId)
                 .claim("email", email)
                 .claim("username", username)
                 .claim("scope", buildScope(roles))

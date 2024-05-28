@@ -4,12 +4,12 @@ import com.example.user.dtos.request.UserInformationUpdateRequest;
 import com.example.user.dtos.request.UserRegistrationRequest;
 import com.example.user.dtos.response.UserResponse;
 import com.example.user.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,13 +39,24 @@ public class UserController {
     }
 
     /**
+     * Retrieves the profile of the currently authenticated user.
+     *
+     * @return The profile of the currently authenticated user.
+     */
+    @GetMapping("profile")
+    public UserResponse getAccountProfile(){
+        return userService.getProfile();
+    }
+
+    /**
      * Retrieves a user by their ID.
      *
      * @param userIdOrUsername The ID of the user to retrieve.
      * @return The user object corresponding to the provided ID, or null if not found.
      */
     @GetMapping("{userIdOrUsername}")
-    public UserResponse getUserById(@PathVariable String userIdOrUsername){
+    public UserResponse getUserByIdOrUsername(@PathVariable String userIdOrUsername){
+        System.out.println("Get user by id or username: " + userIdOrUsername);
         return userService.getUserByIdOrUsername(userIdOrUsername);
     }
 
@@ -69,7 +80,7 @@ public class UserController {
      */
     @PutMapping()
     public UserResponse updateUserInformation(@Valid @RequestBody UserInformationUpdateRequest userInformationUpdateRequest){
-        return userService.updateUser(userInformationUpdateRequest); //wait to authentication function.
+        return userService.updateUser(userInformationUpdateRequest);
     }
 
     /**

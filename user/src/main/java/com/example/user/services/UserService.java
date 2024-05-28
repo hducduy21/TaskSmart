@@ -28,6 +28,8 @@ public interface UserService {
      */
     UserResponse getUserByIdOrUsername(String id);
 
+    UserResponse getProfile();
+
     /**
      * Creates a new user based on the provided registration request.
      *

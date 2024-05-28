@@ -42,7 +42,6 @@ public class AuthServiceImpl implements AuthService {
     /** {@inheritDoc} */
     @Override
     public AuthResponse login(UserSignInRequest userSignInRequest) {
-        log.info("Login user: {}", userSignInRequest.getUsername());
         if(StringUtils.isBlank(userSignInRequest.getEmail()) && StringUtils.isBlank(userSignInRequest.getUsername())){
             throw new BadRequest("Please provide complete login information!");
         }
@@ -66,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         UserGeneralResponse userGeneralResponse = modelMapper.map(user, UserGeneralResponse.class);
         return AuthResponse.builder()
                 .user(userGeneralResponse)
-                .accessToken(jwtUtil.generateToken(user.getName(), user.getEmail(), user.getUsername(), user.getRole(), 600))
+                .accessToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getEmail(), user.getUsername(), user.getRole(), 600))
                 .refreshToken("refresh")
                 .build();
     }

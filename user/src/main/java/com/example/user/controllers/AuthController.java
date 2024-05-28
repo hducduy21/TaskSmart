@@ -2,7 +2,6 @@ package com.example.user.controllers;
 
 import com.example.user.dtos.request.UserSignInRequest;
 import com.example.user.dtos.response.AuthResponse;
-import com.example.user.dtos.response.UserResponse;
 import com.example.user.services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
