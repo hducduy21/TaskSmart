@@ -1,5 +1,6 @@
 package com.example.workspace.dtos.response;
 
+import com.example.workspace.models.UserRelation;
 import com.example.workspace.models.enums.EWorkSpaceType;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import lombok.AllArgsConstructor;
@@ -34,5 +35,6 @@ public class WorkSpaceResponse {
     /** This is the storage field for the workspace's projects. */
     private List<ProjectGeneralResponse> projects;
 
-    private List<UserGeneralResponse> users;
+    /** The list of users associated with the WorkSpace. */
+    private List<UserRelation> users;
 }

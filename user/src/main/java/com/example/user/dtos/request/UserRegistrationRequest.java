@@ -21,8 +21,7 @@ public class UserRegistrationRequest {
 
     /** This is the storage field for the username. */
     @NotBlank(message = "Username cannot be blank")
-    @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters")
-    @Pattern(regexp = "^[a-zA-Z0-9_-]*$", message = "Username must contain only letters, numbers, underscores, and hyphens")
+    @Pattern(regexp = "^[a-zA-Z0-9]{6,20}$", message = "Username must be between 6 and 20 characters and contain only letters and digits")
     private String username;
 
     /** This is the storage field for the user password. */

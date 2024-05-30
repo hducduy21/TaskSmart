@@ -1,13 +1,12 @@
 package com.example.user.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.util.CollectionUtils;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -56,4 +55,46 @@ public class User {
 
     /** This is the storage field for the user's operability. */
     private boolean locked;
+
+    private WorkSpace personalWorkSpace;
+    private Set<WorkSpace> workspaces;
+    private Set<Project> projects;
+
+    public void addWorkSpace(WorkSpace workSpace) {
+        if(CollectionUtils.isEmpty(this.workspaces))
+            this.workspaces = new HashSet<>();
+        this.workspaces.add(workSpace);
+    }
+
+    public void addProject(Project project) {
+        if(CollectionUtils.isEmpty(this.projects))
+            this.projects = new HashSet<>();
+        this.projects.add(project);
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    @Builder
+    public static class WorkSpace {
+        /** The unique identifier for the WorkSpace. */
+        private String id;
+
+        /** The name of the WorkSpace. */
+        private String name;
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    @Builder
+    public static class Project {
+        /** The unique identifier for the Project. */
+        private String id;
+
+        /** The name of the Project. */
+        private String name;
+    }
 }

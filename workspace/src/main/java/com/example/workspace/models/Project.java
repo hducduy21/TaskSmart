@@ -1,10 +1,9 @@
 package com.example.workspace.models;
 
 import com.example.workspace.models.enums.EUserRole;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.workspace.models.enums.EWorkSpaceType;
+import jakarta.ws.rs.BadRequestException;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Project {
     /** The unique identifier for the Project. */
     @Id
@@ -41,14 +41,14 @@ public class Project {
     /** The list of ListCards associated with the Project. */
     private String workSpaceId;
 
-    /** The list of users associated with the Project. */
+    /** The list of users associated with the WorkSpace. */
     private List<UserRelation> users;
 
-    public void setOwner(String ownerId) {
+    public void setOwner(UserRelation owner) {
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
-        this.users.add(UserRelation.builder().userId(ownerId).role(EUserRole.Owner).build());
+        this.users.add(owner);
     }
 
     public void addMembers(String memberId) {

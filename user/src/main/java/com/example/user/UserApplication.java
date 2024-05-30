@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
-@ComponentScan(basePackages = "com.tasksmart.sharedLibrary.*")
+@EnableFeignClients("com.tasksmart.sharedLibrary.*")
+@ComponentScan("com.tasksmart.sharedLibrary.*")
 public class UserApplication {
 
 	public static void main(String[] args) {

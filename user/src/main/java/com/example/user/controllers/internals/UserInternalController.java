@@ -2,6 +2,7 @@ package com.example.user.controllers.internals;
 
 import com.example.user.dtos.response.UserGeneralResponse;
 import com.example.user.dtos.response.UserResponse;
+import com.example.user.services.UserInternalService;
 import com.example.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import java.util.List;
 @RequestMapping("/${url_base}/internal/${url_user}")
 @Slf4j
 public class UserInternalController {
-    private final UserService userService;
+    private final UserInternalService userService;
 
     @GetMapping("list")
     public List<UserGeneralResponse> getUsersGeneralByListId(@RequestBody List<String> userIds){

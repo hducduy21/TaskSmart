@@ -61,7 +61,4 @@ public interface UserService {
      */
     void deleteById(String id);
 
-    //internal
-    UserGeneralResponse getUserGeneralById(String id);
-    List<UserGeneralResponse> getUsersGeneralByListId(List<String> userIds);
 }

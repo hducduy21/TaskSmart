@@ -19,7 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
-//    private static final String[] PERMIT_ALL_ENDPOINTS = {};
+    private static final String[] PERMIT_ALL_ENDPOINTS = {"/api/internal/workspaces/personal"};
 //    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PUT_ENDPOINTS = {};
@@ -32,7 +32,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+                .authorizeHttpRequests(authorizeRequests ->
+                    authorizeRequests.requestMatchers(PERMIT_ALL_ENDPOINTS).permitAll()
+                            .anyRequest().authenticated())
         ;
 
         httpSecurity.oauth2ResourceServer(oauth2ResourceServer ->

@@ -2,18 +2,20 @@ package com.example.user.services.impls;
 
 import com.example.user.dtos.request.UserInformationUpdateRequest;
 import com.example.user.dtos.request.UserRegistrationRequest;
-import com.example.user.dtos.response.UserGeneralResponse;
 import com.example.user.dtos.response.UserResponse;
 import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.UserService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
-import com.tasksmart.sharedLibrary.exceptions.UnauthenticateException;
+import com.tasksmart.sharedLibrary.configs.KafkaMessageConverter;
+import com.tasksmart.sharedLibrary.dtos.messages.UserMessage;
+import com.tasksmart.sharedLibrary.dtos.responses.WorkSpaceGeneralResponse;
+import com.tasksmart.sharedLibrary.repositories.httpClients.WorkSpaceClient;
+import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +41,9 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepositories userRepositories;
     private final ModelMapper modelMapper;
+    private final WorkSpaceClient workSpaceClient;
+    private final KafkaTemplate<String,Object> kafkaTemplate;
+    private final AuthenticationUtils authenticationUtils;
 
     /** {@inheritDoc} */
     @PreAuthorize("hasRole('ADMIN')")
@@ -52,8 +57,7 @@ public class UserServiceImpl implements UserService {
         });
 
         List<User> users = userRepositories.findAll();
-        List<UserResponse> userResponses = users.stream().map(this::getUserResponse).toList();
-        return userResponses;
+        return users.stream().map(this::getUserResponse).toList();
     }
 
     /** {@inheritDoc} */
@@ -74,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getProfile() {
-        String userId = getUserIdAuthenticated();
+        String userId = authenticationUtils.getUserIdAuthenticated();
 
         Optional<User> userOptional = userRepositories.findById(userId);
         if(userOptional.isEmpty()){
@@ -88,30 +92,46 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUserById(UserRegistrationRequest userRegistrationRequest) {
         boolean uniqueEmail = !userRepositories.existsByEmail(userRegistrationRequest.getEmail());
         if( !uniqueEmail ){
-            throw new ResourceConflict("Email already exits!");
+            throw new ResourceConflict("Email already exists!");
         }
 
         boolean uniqueUsername = !userRepositories.existsByUsername(userRegistrationRequest.getUsername());
         if( !uniqueUsername ){
-            throw new ResourceConflict("Username already exits!");
+            throw new ResourceConflict("Username already exists!");
         }
 
         HashSet<String> roles = new HashSet<>();
         roles.add(AppConstant.Role_User);
-
         User user = modelMapper.map(userRegistrationRequest, User.class);
-        user.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
-        user.setRole(roles);
-        user.setEnabled(true);
-        user.setLocked(false);
-        userRepositories.save(user);
+        try {
+            user.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
+            user.setRole(roles);
+            user.setEnabled(true);
+            user.setLocked(false);
+
+            WorkSpaceGeneralResponse workSpaceGeneralResponse = workSpaceClient.createPersonalWorkSpace(user.getId(), user.getName(), user.getUsername());
+            User.WorkSpace personalWorkSpace = User.WorkSpace.builder()
+                    .id(workSpaceGeneralResponse.getId())
+                    .name(workSpaceGeneralResponse.getName())
+                    .build();
+            user.setPersonalWorkSpace(personalWorkSpace);
+
+            userRepositories.save(user);
+        }catch (Exception e){
+            log.error("Error: create user {}", e.getMessage());
+            throw new ResourceConflict("Error creating user! Please try later.");
+        }
+
+        kafkaTemplate.setMessageConverter(new KafkaMessageConverter());
+        kafkaTemplate.send("user-registration", modelMapper.map(user, UserMessage.class));
+
         return this.getUserResponse(user);
     }
 
     /** {@inheritDoc} */
     @Override
     public UserResponse updateUser(UserInformationUpdateRequest userInformationUpdateRequest) {
-        String userId = getUserIdAuthenticated();
+        String userId = authenticationUtils.getUserIdAuthenticated();
 
         Optional<User> userOptional = userRepositories.findById(userId);
         if(userOptional.isEmpty()){
@@ -125,6 +145,9 @@ public class UserServiceImpl implements UserService {
         user.setProfileBackground(userInformationUpdateRequest.getProfileBackground());
 
         userRepositories.save(user);
+
+        kafkaTemplate.setMessageConverter(new KafkaMessageConverter());
+        kafkaTemplate.send("user-updation", modelMapper.map(user, UserMessage.class));
 
         return this.getUserResponse(user);
     }
@@ -156,27 +179,4 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(user,UserResponse.class);
     }
 
-    //internal
-    @Override
-    public UserGeneralResponse getUserGeneralById(String id) {
-        return userRepositories.findById(id)
-                .map(user -> modelMapper.map(user, UserGeneralResponse.class))
-                .orElseThrow(() -> new ResourceNotFound("User not found!"));
-    }
-
-    @Override
-    public List<UserGeneralResponse> getUsersGeneralByListId(List<String> userIds) {
-        List<User> users = userRepositories.findAllByIdIn(userIds);
-        return users.stream().map(user -> modelMapper.map(user, UserGeneralResponse.class)).toList();
-    }
-
-    private String getUserIdAuthenticated() {
-        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if(StringUtils.isBlank(userId)){
-            throw new UnauthenticateException("Login required!");
-        }
-
-        return userId;
-    }
 }

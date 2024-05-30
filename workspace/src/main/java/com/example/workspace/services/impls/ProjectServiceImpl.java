@@ -11,11 +11,13 @@ import com.example.workspace.models.Project;
 import com.example.workspace.repositories.ProjectRepository;
 import com.example.workspace.services.ListCardService;
 import com.example.workspace.services.ProjectService;
+import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,6 +40,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final ListCardService listCardService;
 
     private final UserClient userClient;
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     /** {@inheritDoc} */
     @Override
@@ -84,6 +88,8 @@ public class ProjectServiceImpl implements ProjectService {
         project.setDescription(projectRequest.getDescription());
         project.setBackground(projectRequest.getBackground());
         projectRepository.save(project);
+
+        kafkaTemplate.send("project-updation", modelMapper.map(project, ProjectMessage.class));
         return getProjectGeneralResponse(project);
     }
 

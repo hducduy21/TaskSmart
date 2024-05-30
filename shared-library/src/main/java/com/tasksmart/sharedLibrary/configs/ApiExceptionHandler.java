@@ -2,10 +2,7 @@ package com.tasksmart.sharedLibrary.configs;
 
 import com.tasksmart.sharedLibrary.dtos.responses.ErrorFieldValidationResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.ErrorResponse;
-import com.tasksmart.sharedLibrary.exceptions.BadRequest;
-import com.tasksmart.sharedLibrary.exceptions.ResourceConflict;
-import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
-import com.tasksmart.sharedLibrary.exceptions.UnauthenticateException;
+import com.tasksmart.sharedLibrary.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
@@ -52,6 +49,15 @@ public class ApiExceptionHandler {
         return ErrorResponse.builder()
                 .message(badRequest.getMessage())
                 .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
+    }
+
+    @ExceptionHandler(InternalServerError.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse internalServerError(InternalServerError internalServerError) {
+        return ErrorResponse.builder()
+                .message(internalServerError.getMessage())
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .build();
     }
 

@@ -2,11 +2,9 @@ package com.example.workspace.models;
 
 import com.example.workspace.models.enums.EUserRole;
 import com.example.workspace.models.enums.EWorkSpaceType;
+import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import jakarta.ws.rs.BadRequestException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.CollectionUtils;
@@ -24,6 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class WorkSpace {
     /** The unique identifier for the WorkSpace. */
     @Id
@@ -41,14 +40,24 @@ public class WorkSpace {
     /** The list of users associated with the WorkSpace. */
     private List<UserRelation> users;
 
-    public void setOwner(String ownerId) {
+    public UserRelation getOwner() {
+        return this.users.stream()
+                .filter(user -> user.getRole().equals(EUserRole.Owner))
+                .findFirst()
+                .orElseThrow(() -> new InternalServerError("Owner not found in workspace-" + this.id));
+    }
+
+    public void setOwner(UserRelation owner) {
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
-        this.users.add(UserRelation.builder().userId(ownerId).role(EUserRole.Owner).build());
+        this.users.add(owner);
     }
 
     public void addMembers(String memberId) {
+        if(this.type.equals(EWorkSpaceType.Personal)) {
+            throw new BadRequestException("Personal workspace cannot invite members");
+        }
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
@@ -56,6 +65,9 @@ public class WorkSpace {
     }
 
     public void addCustomer(String customerId) {
+        if(this.type.equals(EWorkSpaceType.Personal)) {
+            throw new BadRequestException("Personal workspace cannot invite customers");
+        }
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }

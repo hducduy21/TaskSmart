@@ -1,9 +1,6 @@
-package com.example.workspace.models;
+package com.tasksmart.sharedLibrary.dtos.messages;
 
-import com.example.workspace.models.enums.EUserRole;
 import lombok.*;
-
-import java.util.List;
 
 /**
  * Class representing a user relation model.
@@ -29,5 +26,5 @@ public class UserRelation {
     private String profileImageId;
 
     /** The role of the User. */
-    private EUserRole role;
+    private String role;
 }

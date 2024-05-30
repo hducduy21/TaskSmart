@@ -1,6 +1,5 @@
 package com.example.workspace.services;
 
-import com.example.workspace.dtos.request.MembersAdditionalRequest;
 import com.example.workspace.dtos.request.ProjectRequest;
 import com.example.workspace.dtos.request.WorkSpaceRequest;
 import com.example.workspace.dtos.response.ProjectGeneralResponse;
