@@ -18,11 +18,24 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
+/**
+ * This class is used to filter the request to check the authentication.
+ * If the request has the Authorization header, it will check the token and set the authentication to the SecurityContext.
+ * If the request has no Authorization header, it will pass the request
+ *
+ * @author Duy Hoang
+ */
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter extends GenericFilterBean {
+    /** The JWTUtil instance for decoding the token.*/
     private final JWTUtil jwtUtil;
 
+    /**
+     * This method is used to filter the request to check the authentication.
+     * If the request has the Authorization header, it will check the token and set the authentication to the SecurityContext.
+     * If the request has no Authorization header, it will pass the request
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;

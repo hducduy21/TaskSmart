@@ -3,10 +3,7 @@ package com.example.workspace.services;
 import com.example.workspace.dtos.request.CardCreationRequest;
 import com.example.workspace.dtos.request.ListCardCreationRequest;
 import com.example.workspace.dtos.request.ProjectRequest;
-import com.example.workspace.dtos.response.CardResponse;
-import com.example.workspace.dtos.response.ListCardResponse;
-import com.example.workspace.dtos.response.ProjectGeneralResponse;
-import com.example.workspace.dtos.response.ProjectResponse;
+import com.example.workspace.dtos.response.*;
 import com.example.workspace.models.Project;
 
 import java.util.List;
@@ -79,4 +76,21 @@ public interface ProjectService {
      * Deletes a Project.
      */
     void deleteProject(String projectId);
+
+    /**
+     * Joins a Project by invite code.
+     *
+     * @param projectId project id
+     * @param inviteCode invite code
+     * @return ProjectResponse
+     */
+    ProjectResponse joinProjectByInviteCode(String projectId, String inviteCode);
+
+    /**
+     * Refreshes the invite code of a Project.
+     *
+     * @param projectId project id
+     * @return ProjectResponse
+     */
+    InviteCodeResponse updateInviteCode(String projectId, Boolean isPublic, Boolean refresh);
 }

@@ -19,6 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class User {
     @Id
     /** This is the storage field for the user's identification. */
@@ -57,8 +58,12 @@ public class User {
     private boolean locked;
 
     private WorkSpace personalWorkSpace;
-    private Set<WorkSpace> workspaces;
-    private Set<Project> projects;
+
+    @Builder.Default
+    private Set<WorkSpace> workspaces = new HashSet<>();
+
+    @Builder.Default
+    private Set<Project> projects = new HashSet<>();
 
     public void addWorkSpace(WorkSpace workSpace) {
         if(CollectionUtils.isEmpty(this.workspaces))

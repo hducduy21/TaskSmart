@@ -3,9 +3,7 @@ package com.example.workspace.controllers;
 import com.example.workspace.dtos.request.MembersAdditionalRequest;
 import com.example.workspace.dtos.request.ProjectRequest;
 import com.example.workspace.dtos.request.WorkSpaceRequest;
-import com.example.workspace.dtos.response.ProjectGeneralResponse;
-import com.example.workspace.dtos.response.WorkSpaceGeneralResponse;
-import com.example.workspace.dtos.response.WorkSpaceResponse;
+import com.example.workspace.dtos.response.*;
 import com.example.workspace.services.WorkSpaceService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
 import com.tasksmart.sharedLibrary.dtos.responses.SuccessResponse;
@@ -26,6 +24,20 @@ public class WorkSpaceController {
     @ResponseStatus(HttpStatus.OK)
     public List<WorkSpaceGeneralResponse> getAllWorkSpace(){
         return workSpaceService.getAllWorkSpace();
+    }
+
+    @GetMapping("/invite/{projectId}/{inviteCode}")
+    @ResponseStatus(HttpStatus.OK)
+    public WorkSpaceResponse joinWorkSpace(@PathVariable String workspaceId, @PathVariable String inviteCode){
+        return workSpaceService.joinWorkSpaceByInviteCode(workspaceId, inviteCode);
+    }
+
+    @PatchMapping("/invite/{projectId}")
+    @ResponseStatus(HttpStatus.OK)
+    public InviteCodeResponse updateInviteCode(@PathVariable String workspaceId,
+                                               @RequestParam(required = false) Boolean isPublic,
+                                               @RequestParam(required = false) Boolean refresh){
+        return workSpaceService.updateInviteCode(workspaceId, isPublic, refresh);
     }
 
     @GetMapping("{workSpaceId}")

@@ -3,10 +3,7 @@ package com.example.workspace.controllers;
 import com.example.workspace.dtos.request.CardCreationRequest;
 import com.example.workspace.dtos.request.ListCardCreationRequest;
 import com.example.workspace.dtos.request.ProjectRequest;
-import com.example.workspace.dtos.response.CardResponse;
-import com.example.workspace.dtos.response.ListCardResponse;
-import com.example.workspace.dtos.response.ProjectGeneralResponse;
-import com.example.workspace.dtos.response.ProjectResponse;
+import com.example.workspace.dtos.response.*;
 import com.example.workspace.services.ProjectService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
 import jakarta.validation.Valid;
@@ -34,6 +31,21 @@ public class ProjectController {
         return projectService.getAllProject();
     }
 
+    @GetMapping("/invite/{projectId}/{inviteCode}")
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectResponse joinProject(@PathVariable String projectId, @PathVariable String inviteCode){
+        return projectService.joinProjectByInviteCode(projectId, inviteCode);
+    }
+
+    @PatchMapping("/invite/{projectId}")
+    @ResponseStatus(HttpStatus.OK)
+    public InviteCodeResponse updateInviteCode(@PathVariable String projectId,
+                                                @RequestParam(required = false) Boolean isPublic,
+                                                @RequestParam(required = false) Boolean refresh){
+        return projectService.updateInviteCode(projectId, isPublic, refresh);
+    }
+
+
     @GetMapping("{projectId}")
     @ResponseStatus(HttpStatus.OK)
     public ProjectResponse getProjectById(@PathVariable String projectId){
@@ -42,9 +54,8 @@ public class ProjectController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectGeneralResponse createPersonalProject(){
-        //wait to authenticate
-        return null;
+    public ProjectGeneralResponse createPersonalProject(@Valid @RequestBody ProjectRequest projectRequest){
+        return projectService.createPersonalProject(projectRequest);
     }
 
     @PutMapping("{projectId}")

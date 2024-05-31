@@ -28,4 +28,6 @@ public class UserGeneralResponse {
     private String profileImageId;
 
     private String relation;
+
+    private String personalWorkSpace;
 }

@@ -8,6 +8,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+/**
+ * This class is used to intercept the request to add the Authorization header to the request.
+ * This class implements the RequestInterceptor interface from the Feign library.
+ * This class is used to add the Authorization header to the request when the request is sent to the other services.
+ *
+ * @author Duy Hoang
+ */
 @Slf4j
 public class FeignRequestInterceptor implements RequestInterceptor {
     @Override

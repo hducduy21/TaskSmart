@@ -3,24 +3,31 @@ package com.example.workspace.services.impls;
 import com.example.workspace.dtos.request.CardCreationRequest;
 import com.example.workspace.dtos.request.ListCardCreationRequest;
 import com.example.workspace.dtos.request.ProjectRequest;
-import com.example.workspace.dtos.response.CardResponse;
-import com.example.workspace.dtos.response.ListCardResponse;
-import com.example.workspace.dtos.response.ProjectGeneralResponse;
-import com.example.workspace.dtos.response.ProjectResponse;
+import com.example.workspace.dtos.response.*;
+import com.example.workspace.models.Invitation;
 import com.example.workspace.models.Project;
+import com.example.workspace.models.UserRelation;
+import com.example.workspace.models.enums.EUserRole;
 import com.example.workspace.repositories.ProjectRepository;
 import com.example.workspace.services.ListCardService;
 import com.example.workspace.services.ProjectService;
 import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
+import com.tasksmart.sharedLibrary.dtos.messages.UserJoinProjectMessage;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
+import com.tasksmart.sharedLibrary.exceptions.BadRequest;
+import com.tasksmart.sharedLibrary.exceptions.Forbidden;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
+import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * This class implements the ProjectService interface.
@@ -42,6 +49,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserClient userClient;
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final AuthenticationUtils authenticationUtils;
 
     /** {@inheritDoc} */
     @Override
@@ -67,13 +75,33 @@ public class ProjectServiceImpl implements ProjectService {
     /** {@inheritDoc} */
     @Override
     public ProjectGeneralResponse createPersonalProject(ProjectRequest projectRequest){
-        return null;
+        //Get user id from token
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        //Convert dto to entity
+        Project project = modelMapper.map(projectRequest, Project.class);
+
+        //Fetch to get user info
+        UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userId);
+        UserRelation userRelation = modelMapper.map(userGeneralResponse, UserRelation.class);
+        userRelation.setRole(EUserRole.Owner);
+
+        //Fill user information to project
+        project.setWorkSpaceId(userGeneralResponse.getPersonalWorkSpace());
+        project.setOwner(userRelation);
+
+        //Save to database
+        projectRepository.save(project);
+
+        //Notifications to other applications to said that a new project has been created
+        kafkaTemplate.send("project-creation",modelMapper.map(project, ProjectMessage.class));
+
+        return getProjectGeneralResponse(project);
     }
 
     /** {@inheritDoc} */
     @Override
     public ProjectGeneralResponse saveProject(Project project){
-
         projectRepository.save(project);
         return getProjectGeneralResponse(project);
     }
@@ -81,14 +109,25 @@ public class ProjectServiceImpl implements ProjectService {
     /** {@inheritDoc} */
     @Override
     public ProjectGeneralResponse editProject(String projectId, ProjectRequest projectRequest) {
+        //Get project by id
         Project project = projectRepository.findById(projectId).orElseThrow(
                 ()->new ResourceNotFound("Project not found!")
         );
+
+        //Get user id from token
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        //Check user is owner of project
+        if(!StringUtils.equals(project.getOwner().getUserId(), userId)){
+            throw new Forbidden("You do not have permission to edit this project!");
+        }
+
+        //Update project
         project.setName(projectRequest.getName());
         project.setDescription(projectRequest.getDescription());
         project.setBackground(projectRequest.getBackground());
         projectRepository.save(project);
 
+        //Notifications to other applications to said that a project has been updated
         kafkaTemplate.send("project-updation", modelMapper.map(project, ProjectMessage.class));
         return getProjectGeneralResponse(project);
     }
@@ -124,6 +163,83 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.deleteById(projectId);
     }
 
+    @Override
+    public ProjectResponse joinProjectByInviteCode(String projectId, String inviteCode) {
+        //Get user id from token
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        //Get project by id
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
+
+        //Check is project public
+        if (!project.getInvitation().isPublic()) {
+            throw new Forbidden("Project is not public!");
+        }
+
+        //Check invite code
+        if(!StringUtils.equals(project.getInvitation().getCode(), inviteCode)){
+            throw new Forbidden("Invite code is not correct!");
+        }
+
+        //Check user is already joined
+        for(UserRelation userRelation: project.getUsers()){
+            if(StringUtils.equals(userRelation.getUserId(), userId)){
+                return getProjectResponse(project);
+            }
+        }
+
+        //Add user to project
+        project.addMembers(getUserRelation(userId));
+        projectRepository.save(project);
+
+        //Notifications to other applications to said that a user has been joined to project
+        UserJoinProjectMessage userJoinProjectMessage = UserJoinProjectMessage.builder()
+                .id(project.getId())
+                .name(project.getName())
+                .userId(userId)
+                .build();
+        kafkaTemplate.send("project-add-member", userJoinProjectMessage);
+
+        return getProjectResponse(project);
+    }
+
+    @Override
+    public InviteCodeResponse updateInviteCode(String projectId, Boolean isPublic, Boolean refresh) {
+        if(ObjectUtils.allNull(isPublic, refresh)){
+            throw new BadRequest("Nothing to update!");
+        }
+
+        //Get user id from token
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        //Get project by id
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
+
+        //Check user is owner of project
+        if(!StringUtils.equals(project.getOwner().getUserId(), userId)){
+            throw new Forbidden("You do not have permission to refresh invite code!");
+        }
+
+        Invitation invitation = project.getInvitation();
+        if (ObjectUtils.isNotEmpty(refresh) && refresh) {
+            //Refresh invite code
+            invitation.setCode(UUID.randomUUID().toString());
+        }
+
+        if (ObjectUtils.isNotEmpty(isPublic)) {
+            invitation.setPublic(isPublic);
+        }
+
+        project.setInvitation(invitation);
+        projectRepository.save(project);
+
+        return InviteCodeResponse.builder().inviteCode(invitation.getCode()).build();
+    }
+
     /**
      * Get ProjectGeneralResponse from Project.
      *
@@ -141,15 +257,33 @@ public class ProjectServiceImpl implements ProjectService {
      * @return the ProjectResponse.
      */
     public ProjectResponse getProjectResponse(Project project){
-        List<UserGeneralResponse> users = project.getUsers().stream().map(userRelation->{
-            UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userRelation.getUserId());
-            userGeneralResponse.setRelation(userRelation.getRole().toString());
-            return userGeneralResponse;
-        }).toList();
-
         ProjectResponse projectResponse = modelMapper.map(project, ProjectResponse.class);
-        projectResponse.setUsers(users);
         projectResponse.setListCards(listCardService.getAllListCardByProject(project.getId()));
+        projectResponse.setInviteCode(getInviteCode(project.getInvitation()));
         return projectResponse;
+    }
+
+    /**
+     * Get invite code from Invitation.
+     *
+     * @param invitation the Invitation.
+     * @return the invite code.
+     */
+    public String getInviteCode(Invitation invitation){
+        if(invitation.isPublic()){
+            return invitation.getCode();
+        }
+        return "";
+    }
+
+    /**
+     * Get UserRelation from UserGeneralResponse.
+     *
+     * @param userId the user id.
+     * @return the UserRelation.
+     */
+    private UserRelation getUserRelation(String userId){
+        UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userId);
+        return modelMapper.map(userGeneralResponse, UserRelation.class);
     }
 }

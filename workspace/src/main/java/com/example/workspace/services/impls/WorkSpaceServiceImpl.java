@@ -2,9 +2,8 @@ package com.example.workspace.services.impls;
 
 import com.example.workspace.dtos.request.ProjectRequest;
 import com.example.workspace.dtos.request.WorkSpaceRequest;
-import com.example.workspace.dtos.response.ProjectGeneralResponse;
-import com.example.workspace.dtos.response.WorkSpaceGeneralResponse;
-import com.example.workspace.dtos.response.WorkSpaceResponse;
+import com.example.workspace.dtos.response.*;
+import com.example.workspace.models.Invitation;
 import com.example.workspace.models.Project;
 import com.example.workspace.models.UserRelation;
 import com.example.workspace.models.WorkSpace;
@@ -14,19 +13,24 @@ import com.example.workspace.repositories.WorkSpaceRepository;
 import com.example.workspace.services.ProjectService;
 import com.example.workspace.services.WorkSpaceService;
 import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
+import com.tasksmart.sharedLibrary.dtos.messages.UserJoinProjectMessage;
 import com.tasksmart.sharedLibrary.dtos.messages.WorkSpaceMessage;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
+import com.tasksmart.sharedLibrary.exceptions.BadRequest;
+import com.tasksmart.sharedLibrary.exceptions.Forbidden;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.exceptions.UnauthenticateException;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -132,6 +136,84 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     public WorkSpaceGeneralResponse getWorkSpaceGeneralResponse(WorkSpace workSpace){
         return modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
     }
+
+    @Override
+    public WorkSpaceResponse joinWorkSpaceByInviteCode(String workspaceId, String inviteCode) {
+        //Get user id from token
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        //Get workspace by id
+        WorkSpace workSpace = workSpaceRepository.findById(workspaceId).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
+
+        //Check is workspace public
+        if (!workSpace.getInvitation().isPublic()) {
+            throw new Forbidden("WorkSpace is not public!");
+        }
+
+        //Check invite code
+        if(!StringUtils.equals(workSpace.getInvitation().getCode(), inviteCode)){
+            throw new Forbidden("Invite code is not correct!");
+        }
+
+        //Check user is already joined
+        for(UserRelation userRelation: workSpace.getUsers()){
+            if(StringUtils.equals(userRelation.getUserId(), userId)){
+                return getWorkSpaceResponse(workSpace);
+            }
+        }
+
+        //Add user to workspace
+        workSpace.addMembers(getUserRelation(userId));
+        workSpaceRepository.save(workSpace);
+
+        //Notifications to other applications to said that a user has been joined to project
+        UserJoinProjectMessage userJoinProjectMessage = UserJoinProjectMessage.builder()
+                .id(workSpace.getId())
+                .name(workSpace.getName())
+                .userId(userId)
+                .build();
+        kafkaTemplate.send("workspace-add-member", userJoinProjectMessage);
+
+        return getWorkSpaceResponse(workSpace);
+    }
+
+    @Override
+    public InviteCodeResponse updateInviteCode(String projectId, Boolean isPublic, Boolean refresh) {
+        if(ObjectUtils.allNull(isPublic, refresh)){
+            throw new BadRequest("Nothing to update!");
+        }
+
+        //Get user id from token
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        //Get workspace by id
+        WorkSpace workSpace = workSpaceRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
+
+        //Check user is owner of workspace
+        if(!StringUtils.equals(workSpace.getOwner().getUserId(), userId)){
+            throw new Forbidden("You do not have permission to refresh invite code!");
+        }
+
+        Invitation invitation = workSpace.getInvitation();
+        if (ObjectUtils.isNotEmpty(refresh) && refresh) {
+            //Refresh invite code
+            invitation.setCode(UUID.randomUUID().toString());
+        }
+
+        if (ObjectUtils.isNotEmpty(isPublic)) {
+            invitation.setPublic(isPublic);
+        }
+
+        workSpace.setInvitation(invitation);
+        workSpaceRepository.save(workSpace);
+
+        return InviteCodeResponse.builder().inviteCode(invitation.getCode()).build();
+    }
+
 
     public WorkSpaceResponse getWorkSpaceResponse(WorkSpace workSpace){
         WorkSpaceResponse workSpaceResponse = modelMapper.map(workSpace, WorkSpaceResponse.class);

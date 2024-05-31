@@ -11,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Class representing a workspace model.
@@ -37,8 +38,15 @@ public class WorkSpace {
     /** The description of the WorkSpace. */
     private String description;
 
+    @Builder.Default
+    private Invitation invitation = Invitation.builder()
+            .isPublic(false)
+            .code(UUID.randomUUID().toString())
+            .build();
+
     /** The list of users associated with the WorkSpace. */
-    private List<UserRelation> users;
+    @Builder.Default
+    private List<UserRelation> users = new ArrayList<>();
 
     public UserRelation getOwner() {
         return this.users.stream()
@@ -51,26 +59,23 @@ public class WorkSpace {
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
+        owner.setRole(EUserRole.Owner);
         this.users.add(owner);
     }
 
-    public void addMembers(String memberId) {
-        if(this.type.equals(EWorkSpaceType.Personal)) {
-            throw new BadRequestException("Personal workspace cannot invite members");
-        }
+    public void addMembers(UserRelation member) {
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
-        this.users.add(UserRelation.builder().userId(memberId).role(EUserRole.Member).build());
+        member.setRole(EUserRole.Member);
+        this.users.add(member);
     }
 
-    public void addCustomer(String customerId) {
-        if(this.type.equals(EWorkSpaceType.Personal)) {
-            throw new BadRequestException("Personal workspace cannot invite customers");
-        }
+    public void addCustomer(UserRelation customer) {
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
-        this.users.add(UserRelation.builder().userId(customerId).role(EUserRole.Customer).build());
+        customer.setRole(EUserRole.Customer);
+        this.users.add(customer);
     }
 }

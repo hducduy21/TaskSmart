@@ -2,6 +2,7 @@ package com.example.workspace.models;
 
 import com.example.workspace.models.enums.EUserRole;
 import com.example.workspace.models.enums.EWorkSpaceType;
+import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import jakarta.ws.rs.BadRequestException;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -12,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Class representing a project model.
@@ -41,27 +43,44 @@ public class Project {
     /** The list of ListCards associated with the Project. */
     private String workSpaceId;
 
+    @Builder.Default
+    private Invitation invitation = Invitation.builder()
+                                                .isPublic(false)
+                                                .code(UUID.randomUUID().toString())
+                                                .build();
+
     /** The list of users associated with the WorkSpace. */
-    private List<UserRelation> users;
+    @Builder.Default
+    private List<UserRelation> users = new ArrayList<>();
+
+    public UserRelation getOwner() {
+        return this.users.stream()
+                .filter(user -> user.getRole().equals(EUserRole.Owner))
+                .findFirst()
+                .orElseThrow(() -> new InternalServerError("Owner not found in workspace-" + this.id));
+    }
 
     public void setOwner(UserRelation owner) {
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
+        owner.setRole(EUserRole.Owner);
         this.users.add(owner);
     }
 
-    public void addMembers(String memberId) {
+    public void addMembers(UserRelation member) {
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
-        this.users.add(UserRelation.builder().userId(memberId).role(EUserRole.Member).build());
+        member.setRole(EUserRole.Member);
+        this.users.add(member);
     }
 
-    public void addCustomer(String customerId) {
+    public void addCustomer(UserRelation customer) {
         if(CollectionUtils.isEmpty(this.users)) {
             this.users = new ArrayList<>();
         }
-        this.users.add(UserRelation.builder().userId(customerId).role(EUserRole.Customer).build());
+        customer.setRole(EUserRole.Customer);
+        this.users.add(customer);
     }
 }

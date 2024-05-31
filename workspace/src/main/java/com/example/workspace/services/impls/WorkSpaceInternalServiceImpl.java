@@ -75,8 +75,13 @@ public class WorkSpaceInternalServiceImpl implements WorkSpaceInternalService {
                             userRelation.setUsername(userMessage.getProfileImageId());
                             userRelation.setUsername(userMessage.getUsername());
                         }
-                    }
-                    );
+                    });
+
+            if(workSpace.getType().equals(EWorkSpaceType.Personal)){
+                workSpace.setName(userMessage.getName() + "'s workspace");
+                workSpace.setDescription("Personal workspace of " + userMessage.getName());
+            }
+
             workSpaceRepository.save(workSpace);
             log.info("User-{} in workspace-{} updated information", userMessage.getId(), workSpaceId);
         }else{

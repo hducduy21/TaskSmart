@@ -1,10 +1,10 @@
 package com.example.user.services.impls;
 
-import com.example.user.dtos.response.UserGeneralResponse;
 import com.example.user.models.User;
 import com.example.user.repositories.UserRepositories;
 import com.example.user.services.UserInternalService;
 import com.tasksmart.sharedLibrary.dtos.messages.*;
+import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +28,14 @@ public class UserInternalServiceImpl implements UserInternalService {
     @Override
     public UserGeneralResponse getUserGeneralById(String id) {
         return userRepositories.findById(id)
-                .map(user -> modelMapper.map(user, UserGeneralResponse.class))
+                .map(this::getUserGeneralResponse)
                 .orElseThrow(() -> new ResourceNotFound("User not found!"));
     }
 
     @Override
     public List<UserGeneralResponse> getUsersGeneralByListId(List<String> userIds) {
         List<User> users = userRepositories.findAllByIdIn(userIds);
-        return users.stream().map(user -> modelMapper.map(user, UserGeneralResponse.class)).toList();
+        return users.stream().map(this::getUserGeneralResponse).toList();
     }
 
     @Override
@@ -155,27 +155,12 @@ public class UserInternalServiceImpl implements UserInternalService {
         if(userOptional.isPresent()){
             User user = userOptional.get();
 
-            //check user is joined?
-            boolean isJoined = false;
-            for(User.Project project: user.getProjects()){
-                if(StringUtils.equals(project.getId(), userJoinProjectMessage.getId())){
-                    isJoined = true;
-                    break;
-                }
-            }
-            if( isJoined ){
-                log.error("User-{} already joined workspace-{}",userJoinProjectMessage.getUserId(), userJoinProjectMessage.getId());
-                return;
-            }
-
             User.Project project = User.Project.builder()
                     .id(userJoinProjectMessage.getId())
                     .name(userJoinProjectMessage.getName())
                     .build();
 
-            Set<User.Project> projects = user.getProjects();
-            projects.add(project);
-            user.setProjects(projects);
+            user.addProject(project);
             userRepositories.save(user);
 
             log.info("User-{} joined project-{}",userJoinProjectMessage.getUserId(), userJoinProjectMessage.getId());
@@ -212,5 +197,11 @@ public class UserInternalServiceImpl implements UserInternalService {
             userRepositories.save(user);
         }
         log.error("User-{} not found to update project-{}",userId, projectMessage.getId());
+    }
+
+    private UserGeneralResponse getUserGeneralResponse(User user){
+        UserGeneralResponse userGeneralResponse = modelMapper.map(user, UserGeneralResponse.class);
+        userGeneralResponse.setPersonalWorkSpace(user.getPersonalWorkSpace().getId());
+        return userGeneralResponse;
     }
 }

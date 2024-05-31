@@ -1,5 +1,6 @@
 package com.example.workspace.dtos.response;
 
+import com.example.workspace.models.UserRelation;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,9 +32,13 @@ public class ProjectResponse {
     /** This is the storage field for the project's description. */
     private String description;
 
+    /** This is the storage field for the project's invite code. */
+    @Builder.Default
+    private String inviteCode = "";
+
     /** This is the storage field for the project's list of cards. */
     private List<ListCardResponse> listCards;
 
     /** This is the storage field for the project's list of users. */
-    private List<UserGeneralResponse> users;
+    private List<UserRelation> users;
 }

@@ -2,9 +2,7 @@ package com.example.workspace.services;
 
 import com.example.workspace.dtos.request.ProjectRequest;
 import com.example.workspace.dtos.request.WorkSpaceRequest;
-import com.example.workspace.dtos.response.ProjectGeneralResponse;
-import com.example.workspace.dtos.response.WorkSpaceGeneralResponse;
-import com.example.workspace.dtos.response.WorkSpaceResponse;
+import com.example.workspace.dtos.response.*;
 
 import java.util.List;
 
@@ -61,9 +59,19 @@ public interface WorkSpaceService {
     boolean isWorkSpaceExist(String workSpaceId);
 
     /**
-     * Adds members to a Work Space.
+     * Joins a Project by invite code.
      *
-     * @return the updated Project.
+     * @param workspaceId project id
+     * @param inviteCode invite code
+     * @return ProjectResponse
      */
-//    ProjectGeneralResponse inviteMembers(String workSpaceId, MembersAdditionalRequest membersAdditionalRequest);
+    WorkSpaceResponse joinWorkSpaceByInviteCode(String workspaceId, String inviteCode);
+
+    /**
+     * Refreshes the invite code of a Project.
+     *
+     * @param workspaceId project id
+     * @return ProjectResponse
+     */
+    InviteCodeResponse updateInviteCode(String workspaceId, Boolean isPublic, Boolean refresh);
 }

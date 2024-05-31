@@ -1,5 +1,6 @@
 package com.example.user.dtos.response;
 
+import com.example.user.models.User;
 import lombok.*;
 
 import java.util.Set;
@@ -37,4 +38,8 @@ public class UserResponse {
 
     /** This is the storage field for the timezone of user area. */
     private int timeZone;
+
+    private User.WorkSpace personalWorkSpace;
+    private Set<User.WorkSpace> workspaces;
+    private Set<User.Project> projects;
 }

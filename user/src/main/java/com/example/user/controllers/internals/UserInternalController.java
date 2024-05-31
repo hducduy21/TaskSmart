@@ -1,12 +1,9 @@
 package com.example.user.controllers.internals;
 
-import com.example.user.dtos.response.UserGeneralResponse;
-import com.example.user.dtos.response.UserResponse;
 import com.example.user.services.UserInternalService;
-import com.example.user.services.UserService;
+import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

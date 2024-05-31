@@ -1,6 +1,7 @@
 package com.example.user.listeners;
 
 import com.example.user.services.UserInternalService;
+import com.tasksmart.sharedLibrary.dtos.messages.UserJoinProjectMessage;
 import com.tasksmart.sharedLibrary.dtos.messages.WorkSpaceMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaHandler;
@@ -9,14 +10,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@KafkaListener(id = "workspace-creation-group",topics = {"workspace-creation"})
-public class WorkSpaceCreationListener {
+@KafkaListener(id = "project-join-group",topics = {"project-add-member"})
+public class UserJoinProjectListener {
 
     private final UserInternalService userInternalService;
 
     @KafkaHandler
-    public void handleWorkSpaceCreation(WorkSpaceMessage workSpaceMessage) {
-        System.out.println("WorkSpace creation message: " + workSpaceMessage.getId());
-        userInternalService.createWorkSpace(workSpaceMessage);
+    public void handleJoinProject(UserJoinProjectMessage userJoinProjectMessage) {
+        userInternalService.joinProject(userJoinProjectMessage);
     }
 }
