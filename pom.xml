@@ -21,6 +21,8 @@
     <module>workspace</module>
     <module>gateway</module>
     <module>shared-library</module>
+    <module>notification</module>
+    <module>cloud-config</module>
   </modules>
 
   <properties>
