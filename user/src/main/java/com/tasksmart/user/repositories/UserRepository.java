@@ -12,7 +12,7 @@ import java.util.Optional;
  *
  * @author Duy Hoang
  */
-public interface UserRepositories extends MongoRepository<User, String> {
+public interface UserRepository extends MongoRepository<User, String> {
     /**
      * Finds a user by their email address.
      *

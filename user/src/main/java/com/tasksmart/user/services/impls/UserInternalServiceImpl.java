@@ -1,7 +1,7 @@
 package com.tasksmart.user.services.impls;
 
 import com.tasksmart.user.models.User;
-import com.tasksmart.user.repositories.UserRepositories;
+import com.tasksmart.user.repositories.UserRepository;
 import com.tasksmart.user.services.UserInternalService;
 import com.tasksmart.sharedLibrary.dtos.messages.*;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
@@ -21,20 +21,20 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class UserInternalServiceImpl implements UserInternalService {
-    private final UserRepositories userRepositories;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final AuthenticationUtils authenticationUtils;
 
     @Override
     public UserGeneralResponse getUserGeneralById(String id) {
-        return userRepositories.findById(id)
+        return userRepository.findById(id)
                 .map(this::getUserGeneralResponse)
                 .orElseThrow(() -> new ResourceNotFound("User not found!"));
     }
 
     @Override
     public List<UserGeneralResponse> getUsersGeneralByListId(List<String> userIds) {
-        List<User> users = userRepositories.findAllByIdIn(userIds);
+        List<User> users = userRepository.findAllByIdIn(userIds);
         return users.stream().map(this::getUserGeneralResponse).toList();
     }
 
@@ -51,7 +51,7 @@ public class UserInternalServiceImpl implements UserInternalService {
 
         String userId = userRelation.get().getUserId();
 
-        Optional<User> userOptional = userRepositories.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isPresent()){
             User user = userOptional.get();
             User.WorkSpace workSpace = User.WorkSpace.builder()
@@ -60,7 +60,7 @@ public class UserInternalServiceImpl implements UserInternalService {
                     .build();
 
             user.addWorkSpace(workSpace);
-            userRepositories.save(user);
+            userRepository.save(user);
 
             log.info("User-{} created workspace-{}",userId, workSpaceMessage.getId());
             return;
@@ -80,7 +80,7 @@ public class UserInternalServiceImpl implements UserInternalService {
         }
         String userId = userRelation.get().getUserId();
 
-        Optional<User> userOptional = userRepositories.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isPresent()){
             User user = userOptional.get();
             User.Project project = User.Project.builder()
@@ -89,7 +89,7 @@ public class UserInternalServiceImpl implements UserInternalService {
                     .build();
 
             user.addProject(project);
-            userRepositories.save(user);
+            userRepository.save(user);
 
             log.info("User-{} created project-{}",userId, projectMessage.getId());
             return;
@@ -115,7 +115,7 @@ public class UserInternalServiceImpl implements UserInternalService {
 
     @Override
     public void joinWorkSpace(UserJoinWorkSpaceMessage userJoinWorkSpaceMessage) {
-        Optional<User> userOptional = userRepositories.findById(userJoinWorkSpaceMessage.getUserId());
+        Optional<User> userOptional = userRepository.findById(userJoinWorkSpaceMessage.getUserId());
         if(userOptional.isPresent()){
             User user = userOptional.get();
 
@@ -140,7 +140,7 @@ public class UserInternalServiceImpl implements UserInternalService {
             Set<User.WorkSpace> workSpaces = user.getWorkspaces();
             workSpaces.add(workSpace);
             user.setWorkspaces(workSpaces);
-            userRepositories.save(user);
+            userRepository.save(user);
 
             log.info("User-{} joined workspace-{}",userJoinWorkSpaceMessage.getUserId(), userJoinWorkSpaceMessage.getId());
         } else {
@@ -151,7 +151,7 @@ public class UserInternalServiceImpl implements UserInternalService {
 
     @Override
     public void joinProject(UserJoinProjectMessage userJoinProjectMessage) {
-        Optional<User> userOptional = userRepositories.findById(userJoinProjectMessage.getUserId());
+        Optional<User> userOptional = userRepository.findById(userJoinProjectMessage.getUserId());
         if(userOptional.isPresent()){
             User user = userOptional.get();
 
@@ -161,7 +161,7 @@ public class UserInternalServiceImpl implements UserInternalService {
                     .build();
 
             user.addProject(project);
-            userRepositories.save(user);
+            userRepository.save(user);
 
             log.info("User-{} joined project-{}",userJoinProjectMessage.getUserId(), userJoinProjectMessage.getId());
         } else {
@@ -170,7 +170,7 @@ public class UserInternalServiceImpl implements UserInternalService {
     }
 
     private void updateWorkSpaceUser(String userId, WorkSpaceMessage workSpaceMessage){
-        Optional<User> userOptional = userRepositories.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isPresent()){
             User user = userOptional.get();
             user.getWorkspaces().forEach(workSpace -> {
@@ -179,13 +179,13 @@ public class UserInternalServiceImpl implements UserInternalService {
                     log.info("User-{} updated workspace-{}",userId, workSpaceMessage.getId());
                 }
             });
-            userRepositories.save(user);
+            userRepository.save(user);
         }
         log.error("User-{} not found to update workspace-{}",userId, workSpaceMessage.getId());
     }
 
     private void updateProjectUser(String userId, ProjectMessage projectMessage){
-        Optional<User> userOptional = userRepositories.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isPresent()){
             User user = userOptional.get();
             user.getProjects().forEach(project -> {
@@ -194,7 +194,7 @@ public class UserInternalServiceImpl implements UserInternalService {
                     log.info("User-{} updated project-{}",userId, projectMessage.getId());
                 }
             });
-            userRepositories.save(user);
+            userRepository.save(user);
         }
         log.error("User-{} not found to update project-{}",userId, projectMessage.getId());
     }

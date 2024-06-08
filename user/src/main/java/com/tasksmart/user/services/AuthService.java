@@ -2,8 +2,11 @@ package com.tasksmart.user.services;
 
 import com.tasksmart.user.dtos.request.UserSignInRequest;
 import com.tasksmart.user.dtos.response.AuthResponse;
+import com.tasksmart.user.dtos.response.UserGeneralResponse;
 
 public interface AuthService {
+
+    UserGeneralResponse introspect();
     /**
      * Authenticates a user based on the provided sign-in request.
      *

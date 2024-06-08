@@ -1,10 +1,13 @@
 package com.tasksmart.user.services.impls;
 
+import com.tasksmart.sharedLibrary.exceptions.BadRequest;
+import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.user.dtos.request.UserInformationUpdateRequest;
 import com.tasksmart.user.dtos.request.UserRegistrationRequest;
 import com.tasksmart.user.dtos.response.UserResponse;
 import com.tasksmart.user.models.User;
-import com.tasksmart.user.repositories.UserRepositories;
+import com.tasksmart.user.repositories.UserRepository;
 import com.tasksmart.user.services.UserService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
 import com.tasksmart.sharedLibrary.configs.KafkaMessageConverter;
@@ -23,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.List;
@@ -39,11 +43,12 @@ import java.util.Optional;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
-    private final UserRepositories userRepositories;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final WorkSpaceClient workSpaceClient;
     private final KafkaTemplate<String,Object> kafkaTemplate;
     private final AuthenticationUtils authenticationUtils;
+    private final AwsS3Service awsS3Service;
 
     /** {@inheritDoc} */
     @PreAuthorize("hasRole('ADMIN')")
@@ -56,7 +61,7 @@ public class UserServiceImpl implements UserService {
             log.info("Authority: {}", authority.getAuthority());
         });
 
-        List<User> users = userRepositories.findAll();
+        List<User> users = userRepository.findAll();
         return users.stream().map(this::getUserResponse).toList();
     }
 
@@ -64,10 +69,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getUserByIdOrUsername(String idOrUsername) {
         log.info("Get user by id or username: {}", idOrUsername);
-        Optional<User> user = userRepositories.findById(idOrUsername);
+        Optional<User> user = userRepository.findById(idOrUsername);
 
         if(user.isEmpty()){
-            user = userRepositories.findByUsername(idOrUsername);
+            user = userRepository.findByUsername(idOrUsername);
         }
 
         if(user.isEmpty()){
@@ -80,7 +85,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getProfile() {
         String userId = authenticationUtils.getUserIdAuthenticated();
 
-        Optional<User> userOptional = userRepositories.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isEmpty()){
             throw new ResourceNotFound("User not found!");
         }
@@ -90,12 +95,16 @@ public class UserServiceImpl implements UserService {
     /** {@inheritDoc} */
     @Override
     public UserResponse createUserById(UserRegistrationRequest userRegistrationRequest) {
-        boolean uniqueEmail = !userRepositories.existsByEmail(userRegistrationRequest.getEmail());
+        if(!userRegistrationRequest.getPassword().equals(userRegistrationRequest.getConfirmPassword())){
+            throw new BadRequest("Password and confirm password do not match!");
+        }
+
+        boolean uniqueEmail = !userRepository.existsByEmail(userRegistrationRequest.getEmail());
         if( !uniqueEmail ){
             throw new ResourceConflict("Email already exists!");
         }
 
-        boolean uniqueUsername = !userRepositories.existsByUsername(userRegistrationRequest.getUsername());
+        boolean uniqueUsername = !userRepository.existsByUsername(userRegistrationRequest.getUsername());
         if( !uniqueUsername ){
             throw new ResourceConflict("Username already exists!");
         }
@@ -116,7 +125,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             user.setPersonalWorkSpace(personalWorkSpace);
 
-            userRepositories.save(user);
+            userRepository.save(user);
         }catch (Exception e){
             log.error("Error: create user {}", e.getMessage());
             throw new ResourceConflict("Error creating user! Please try later.");
@@ -133,7 +142,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(UserInformationUpdateRequest userInformationUpdateRequest) {
         String userId = authenticationUtils.getUserIdAuthenticated();
 
-        Optional<User> userOptional = userRepositories.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isEmpty()){
             throw new ResourceNotFound("User not found!");
         }
@@ -144,7 +153,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userInformationUpdateRequest.getUsername());
         user.setProfileBackground(userInformationUpdateRequest.getProfileBackground());
 
-        userRepositories.save(user);
+        userRepository.save(user);
 
         kafkaTemplate.setMessageConverter(new KafkaMessageConverter());
         kafkaTemplate.send("user-updation", modelMapper.map(user, UserMessage.class));
@@ -162,11 +171,34 @@ public class UserServiceImpl implements UserService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteById(String id) {
-        boolean exists = userRepositories.existsById(id);
+        boolean exists = userRepository.existsById(id);
         if(!exists){
             throw new ResourceNotFound("User not found!");
         }
-        userRepositories.deleteById(id);
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public byte[] getProfileImage() {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        try {
+            return awsS3Service.getByte(userId);
+        }catch (Exception e){
+            log.error("Error: get profile image {}", e.getMessage());
+            throw new InternalServerError("Error getting profile image! Please try later.");
+        }
+    }
+
+    @Override
+    public void uploadProfileImage(MultipartFile file) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        try {
+            awsS3Service.uploadFile(userId, file);
+        }catch (Exception e){
+            log.error("Error: upload profile image {}", e.getMessage());
+            throw new InternalServerError("Error uploading profile image! Please try later.");
+        }
+
     }
 
     /**

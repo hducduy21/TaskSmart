@@ -1,10 +1,11 @@
 package com.tasksmart.user.services.impls;
 
+import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import com.tasksmart.user.dtos.request.UserSignInRequest;
 import com.tasksmart.user.dtos.response.AuthResponse;
 import com.tasksmart.user.dtos.response.UserGeneralResponse;
 import com.tasksmart.user.models.User;
-import com.tasksmart.user.repositories.UserRepositories;
+import com.tasksmart.user.repositories.UserRepository;
 import com.tasksmart.user.services.AuthService;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
     /** Repository instance for accessing user data. */
-    private final UserRepositories userRepositories;
+    private final UserRepository userRepository;
 
     /** Mapper instance for converting data between different representations. */
     private final ModelMapper modelMapper;
@@ -36,6 +37,17 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     private final JWTUtil jwtUtil;
+
+    private final AuthenticationUtils authenticationUtils;
+
+    @Override
+    public UserGeneralResponse introspect() {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFound("User not found!")
+        );
+        return modelMapper.map(user, UserGeneralResponse.class);
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -47,11 +59,11 @@ public class AuthServiceImpl implements AuthService {
         User user;
 
         if(StringUtils.isNotBlank(userSignInRequest.getEmail())){
-            user = userRepositories.findByEmail(userSignInRequest.getEmail()).orElseThrow(
+            user = userRepository.findByEmail(userSignInRequest.getEmail()).orElseThrow(
                     () -> new ResourceNotFound("User not found!")
             );
         } else {
-            user = userRepositories.findByUsername(userSignInRequest.getUsername()).orElseThrow(
+            user = userRepository.findByUsername(userSignInRequest.getUsername()).orElseThrow(
                     () -> new ResourceNotFound("User not found!")
             );
         }
@@ -63,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
         UserGeneralResponse userGeneralResponse = modelMapper.map(user, UserGeneralResponse.class);
         return AuthResponse.builder()
                 .user(userGeneralResponse)
-                .accessToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getEmail(), user.getUsername(), user.getRole(), 600))
+                .accessToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 600))
                 .refreshToken("refresh")
                 .build();
     }

@@ -11,7 +11,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -21,7 +25,7 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
     private static final String[] PERMIT_ALL_ENDPOINTS = {
-            "/api/auth/**"
+            "/api/auth/login", "/api/auth/refresh"
     };
 
     private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {
@@ -36,9 +40,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
+                .cors(AbstractHttpConfigurer::disable)
+//                .csrf(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers(PERMIT_ALL_ENDPOINTS).permitAll()
 
@@ -58,5 +64,4 @@ public class SecurityConfig {
 
         return httpSecurity.build();
     }
-
 }

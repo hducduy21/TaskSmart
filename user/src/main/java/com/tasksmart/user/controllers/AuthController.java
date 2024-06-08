@@ -2,6 +2,7 @@ package com.tasksmart.user.controllers;
 
 import com.tasksmart.user.dtos.request.UserSignInRequest;
 import com.tasksmart.user.dtos.response.AuthResponse;
+import com.tasksmart.user.dtos.response.UserGeneralResponse;
 import com.tasksmart.user.services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,12 @@ public class AuthController {
     /** Service instance for handling authentication operations. */
     private final AuthService authService;
 
+    @GetMapping("introspect")
+    @ResponseStatus(HttpStatus.OK)
+    public UserGeneralResponse introspect(){
+        return authService.introspect();
+    }
+
     /**
      * Handles the login endpoint.
      *
@@ -30,7 +37,7 @@ public class AuthController {
      * @return The authenticated user object.
      */
     @PostMapping("login")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public AuthResponse login(@Valid @RequestBody UserSignInRequest userSignInRequest){
         return authService.login(userSignInRequest);
     }

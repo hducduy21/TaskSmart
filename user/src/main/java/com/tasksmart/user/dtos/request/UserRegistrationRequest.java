@@ -29,6 +29,9 @@ public class UserRegistrationRequest {
     @Size(min = 6, max = 30, message = "Password must be between 6 and 30 characters")
     private String password;
 
+    @NotBlank(message = "Confirm password cannot be blank")
+    private String confirmPassword;
+
     /** This is the storage field for the user's email. */
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Invalid email format")

@@ -1,5 +1,6 @@
 package com.tasksmart.sharedLibrary.configs.filters;
 
+import com.tasksmart.sharedLibrary.models.UserDetail;
 import com.tasksmart.sharedLibrary.utils.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,7 +46,11 @@ public class AuthenticationFilter extends GenericFilterBean {
         if (authHeader != null && authHeader.startsWith("Bearer") && authentication != null) {
             JwtDecoder jwtDecoder = jwtUtil.jwtDecoder();
             Jwt jwt = jwtDecoder.decode(authHeader.substring(7));
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(jwt.getClaim("userId"), null, authentication.getAuthorities());
+            UserDetail userDetails = UserDetail.builder()
+                    .userId(jwt.getClaim("userId"))
+                    .email(jwt.getClaim("email"))
+                    .build();
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, authentication.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
         chain.doFilter(request, response);

@@ -3,6 +3,7 @@ package com.tasksmart.user.services;
 import com.tasksmart.user.dtos.request.UserInformationUpdateRequest;
 import com.tasksmart.user.dtos.request.UserRegistrationRequest;
 import com.tasksmart.user.dtos.response.UserResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -59,4 +60,6 @@ public interface UserService {
      */
     void deleteById(String id);
 
+    void uploadProfileImage(MultipartFile file);
+    byte[] getProfileImage();
 }

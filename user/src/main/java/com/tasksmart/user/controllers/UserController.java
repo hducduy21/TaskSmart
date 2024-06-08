@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -99,5 +100,15 @@ public class UserController {
     @DeleteMapping("{userId}")
     public void deleteUser(@PathVariable String userId){
         userService.deleteById(userId);
+    }
+
+    @GetMapping("/profileImage")
+    public byte[] getProfileImage(){
+        return userService.getProfileImage();
+    }
+
+    @PostMapping("/profileImage")
+    public void uploadProfileImage(@RequestParam MultipartFile file){
+        userService.uploadProfileImage(file);
     }
 }
