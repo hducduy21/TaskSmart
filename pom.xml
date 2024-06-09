@@ -23,6 +23,7 @@
     <module>shared-library</module>
     <module>notification</module>
     <module>cloud-config</module>
+    <module>resource</module>
   </modules>
 
   <properties>
