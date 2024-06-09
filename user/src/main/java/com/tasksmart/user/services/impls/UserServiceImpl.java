@@ -2,6 +2,7 @@ package com.tasksmart.user.services.impls;
 
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.repositories.httpClients.NotificationClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.user.dtos.request.UserInformationUpdateRequest;
 import com.tasksmart.user.dtos.request.UserRegistrationRequest;
@@ -46,6 +47,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final WorkSpaceClient workSpaceClient;
+    private final NotificationClient notificationClient;
     private final KafkaTemplate<String,Object> kafkaTemplate;
     private final AuthenticationUtils authenticationUtils;
     private final AwsS3Service awsS3Service;
@@ -109,24 +111,30 @@ public class UserServiceImpl implements UserService {
             throw new ResourceConflict("Username already exists!");
         }
 
+        boolean validEmailCode = notificationClient.verifyEmail(userRegistrationRequest.getEmail(), userRegistrationRequest.getVerifyCode());
+        System.out.println("validEmailCode: " + validEmailCode);
+        if(!validEmailCode){
+            throw new BadRequest(1031,"The email verification code is incorrect or has expired!");
+        }
+
         HashSet<String> roles = new HashSet<>();
         roles.add(AppConstant.Role_User);
         User user = modelMapper.map(userRegistrationRequest, User.class);
+        user.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
+        user.setRole(roles);
+        user.setEnabled(true);
+        user.setLocked(false);
+        userRepository.save(user);
         try {
-            user.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
-            user.setRole(roles);
-            user.setEnabled(true);
-            user.setLocked(false);
-
+            System.out.println("User: " + user.getId());
             WorkSpaceGeneralResponse workSpaceGeneralResponse = workSpaceClient.createPersonalWorkSpace(user.getId(), user.getName(), user.getUsername());
             User.WorkSpace personalWorkSpace = User.WorkSpace.builder()
                     .id(workSpaceGeneralResponse.getId())
                     .name(workSpaceGeneralResponse.getName())
                     .build();
             user.setPersonalWorkSpace(personalWorkSpace);
-
-            userRepository.save(user);
         }catch (Exception e){
+            userRepository.delete(user);
             log.error("Error: create user {}", e.getMessage());
             throw new ResourceConflict("Error creating user! Please try later.");
         }

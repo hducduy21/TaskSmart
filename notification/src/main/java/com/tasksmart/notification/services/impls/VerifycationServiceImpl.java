@@ -2,6 +2,7 @@ package com.tasksmart.notification.services.impls;
 
 import com.tasksmart.notification.models.TokenVerifycation;
 import com.tasksmart.notification.repositories.VerifycationRepository;
+import com.tasksmart.notification.services.EmailSenderService;
 import com.tasksmart.notification.services.VerifycationService;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.models.UserDetail;
@@ -12,19 +13,22 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class VerifycationServiceImpl implements VerifycationService {
-    private final AuthenticationUtils authenticationUtils;
     private final VerifycationRepository verificationRepository;
+    private final EmailSenderService emailSenderService;
 
     @Override
-    public boolean verify(String code) {
-        String userId = authenticationUtils.getUserAuthenticated().getUserId();
-        Optional<TokenVerifycation> tokenVerifycation = verificationRepository.findByUserIdAndCode(userId, code);
+    public boolean verify(String email, String code) {
+        Optional<TokenVerifycation> tokenVerifycation = verificationRepository.findByEmailAndCode(email, code);
         if(tokenVerifycation.isPresent()){
-            verificationRepository.delete(tokenVerifycation.get());
+            TokenVerifycation token = tokenVerifycation.get();
+            if(token.getCreateAt().getTime() + 60000*10 < new Date().getTime()){
+                throw new BadRequest("Token expired");
+            }
             return true;
         }else {
             throw new BadRequest("Invalid token");
@@ -32,19 +36,41 @@ public class VerifycationServiceImpl implements VerifycationService {
     }
 
     @Override
-    public TokenVerifycation verifycationRequest() {
-        UserDetail user = authenticationUtils.getUserAuthenticated();
-        System.out.println("Verification request for user: " + user.getEmail());
+    public boolean verifyInternal(String email, String code) {
+        Optional<TokenVerifycation> tokenVerifycation = verificationRepository.findByEmailAndCode(email, code);
+        if(tokenVerifycation.isPresent()){
+            TokenVerifycation token = tokenVerifycation.get();
+            if(token.getCreateAt().getTime() + 60000*10 < new Date().getTime()){
+                return false;
+            }
+            return true;
+        }else {
+            return false;
+        }
+    }
 
-        TokenVerifycation token = TokenVerifycation.builder()
-                .userId(user.getUserId())
-                .email(user.getEmail())
-                .build();
+    @Override
+    public TokenVerifycation verifycationRequest(String email) {
+        Optional<TokenVerifycation> tokenVerifycationOptional = verificationRepository.findByEmail(email);
+        if(tokenVerifycationOptional.isPresent()){
+            TokenVerifycation tokenVerifycation = tokenVerifycationOptional.get();
+            if(tokenVerifycation.getCreateAt().getTime() + 60000 < new Date().getTime()){
+                tokenVerifycation.setCode(String.format("%06d", new Random().nextInt(900000) + 100000));
+                tokenVerifycation.setCreateAt(new Date());
+                verificationRepository.save(tokenVerifycation);
 
-        //send email
-
-        verificationRepository.save(token);
-
-        return token;
+                emailSenderService.sendVerificationEmail(email, tokenVerifycation.getCode());
+                return tokenVerifycation;
+            }else{
+                throw new BadRequest("Please wait for 60s to request new token");
+            }
+        }else{
+            TokenVerifycation token = TokenVerifycation.builder()
+                    .email(email)
+                    .build();
+            verificationRepository.save(token);
+            emailSenderService.sendVerificationEmail(email, token.getCode());
+            return token;
+        }
     }
 }

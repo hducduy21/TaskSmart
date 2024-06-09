@@ -14,15 +14,16 @@ import org.springframework.web.bind.annotation.*;
 public class VerifycationController {
     private final VerifycationService verifycationService;
 
-    @GetMapping
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public boolean verifycationRequest(@RequestParam String code){
-        return verifycationService.verify(code);
+    public boolean verify(@RequestParam String email, @RequestParam String code){
+        return verifycationService.verify(email, code);
     }
 
-    @PostMapping
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public void verifycationRequest(){
-        verifycationService.verifycationRequest();
+    public void verifycationRequest(@RequestParam String email){
+        verifycationService.verifycationRequest(email);
     }
+
 }

@@ -37,11 +37,9 @@ public class UserRegistrationRequest {
     @Email(message = "Invalid email format")
     private String email;
 
-    /** This is the storage field for the user's avatar image. */
-    private String profileImageId;
-
-    /** This is the storage field for the user's background description. */
-    private String profileBackground;
+    @NotBlank(message = "You must provide a verify email code")
+    @Pattern(regexp = "^[0-9]{6}$", message = "Email code must be 6 digits long")
+    private String verifyCode;
 
     /** This is the storage field for the timezone of user area. */
     @Min(value = 0, message = "Invalid time zone format")

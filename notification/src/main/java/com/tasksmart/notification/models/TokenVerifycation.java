@@ -19,10 +19,9 @@ public class TokenVerifycation {
     private String id;
 
     @Builder.Default
-    private String code = String.format("%06d", new Random().nextInt(900000) + 100000);;
+    private String code = String.format("%06d", new Random().nextInt(900000) + 100000);
 
     private String email;
-    private String userId;
 
     @Indexed(expireAfter = "60s")
     @Builder.Default

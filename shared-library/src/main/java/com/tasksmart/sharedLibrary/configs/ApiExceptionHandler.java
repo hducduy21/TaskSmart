@@ -32,7 +32,7 @@ public class ApiExceptionHandler {
     public ErrorResponse unauthenticateException(UnauthenticateException unauthenticateException) {
         return ErrorResponse.builder()
                 .message(unauthenticateException.getMessage())
-                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .statusCode(unauthenticateException.getCode())
                 .build();
     }
 
@@ -47,7 +47,7 @@ public class ApiExceptionHandler {
     public ErrorResponse forbidden(Forbidden forbidden) {
         return ErrorResponse.builder()
                 .message(forbidden.getMessage())
-                .statusCode(HttpStatus.FORBIDDEN.value())
+                .statusCode(forbidden.getCode())
                 .build();
     }
 
@@ -62,7 +62,7 @@ public class ApiExceptionHandler {
     public ErrorResponse resourceNotFound(ResourceNotFound resourceNotFound) {
         return ErrorResponse.builder()
                 .message(resourceNotFound.getMessage())
-                .statusCode(HttpStatus.NOT_FOUND.value())
+                .statusCode(resourceNotFound.getCode())
                 .build();
     }
 
@@ -77,7 +77,7 @@ public class ApiExceptionHandler {
     public ErrorResponse resourceConflict(ResourceConflict resourceConflict) {
         return ErrorResponse.builder()
                 .message(resourceConflict.getMessage())
-                .statusCode(HttpStatus.CONFLICT.value())
+                .statusCode(resourceConflict.getCode())
                 .build();
     }
 
@@ -92,7 +92,7 @@ public class ApiExceptionHandler {
     public ErrorResponse badRequest(BadRequest badRequest) {
         return ErrorResponse.builder()
                 .message(badRequest.getMessage())
-                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .statusCode(badRequest.getCode())
                 .build();
     }
 
@@ -107,7 +107,7 @@ public class ApiExceptionHandler {
     public ErrorResponse internalServerError(InternalServerError internalServerError) {
         return ErrorResponse.builder()
                 .message(internalServerError.getMessage())
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .statusCode(internalServerError.getCode())
                 .build();
     }
 
