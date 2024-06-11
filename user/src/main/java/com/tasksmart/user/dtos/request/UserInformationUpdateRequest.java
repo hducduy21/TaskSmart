@@ -1,5 +1,6 @@
 package com.tasksmart.user.dtos.request;
 
+import com.tasksmart.user.models.enums.EGender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -33,6 +34,12 @@ public class UserInformationUpdateRequest {
     @Email(message = "Invalid email format")
     private String email;
 
-    /** This is the storage field for the user's background description. */
-    private String profileBackground;
+    /** This is the storage field for user's gender */
+    private EGender gender;
+
+    /** This is the storage field for the user's position. */
+    private String position;
+
+    /** This is the storage field for the user's organization. */
+    private String organization;
 }

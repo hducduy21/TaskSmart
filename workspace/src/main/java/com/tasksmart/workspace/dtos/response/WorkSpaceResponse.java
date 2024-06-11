@@ -1,8 +1,8 @@
 package com.tasksmart.workspace.dtos.response;
 
+import com.tasksmart.sharedLibrary.dtos.responses.CategoryResponse;
 import com.tasksmart.workspace.models.UserRelation;
 import com.tasksmart.workspace.models.enums.EWorkSpaceType;
-import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +31,8 @@ public class WorkSpaceResponse {
 
     /** This is the storage field for the workspace's description. */
     private String description;
+
+    private CategoryResponse category;
 
     /** This is the storage field for the workspace's projects. */
     private List<ProjectGeneralResponse> projects;

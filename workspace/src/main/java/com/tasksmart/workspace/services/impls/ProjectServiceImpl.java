@@ -74,7 +74,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     /** {@inheritDoc} */
     @Override
-    public ProjectGeneralResponse createPersonalProject(ProjectRequest projectRequest){
+    public ProjectGeneralResponse createProject(ProjectRequest projectRequest){
         //Get user id from token
         String userId = authenticationUtils.getUserIdAuthenticated();
 
@@ -86,8 +86,11 @@ public class ProjectServiceImpl implements ProjectService {
         UserRelation userRelation = modelMapper.map(userGeneralResponse, UserRelation.class);
         userRelation.setRole(EUserRole.Owner);
 
-        //Fill user information to project
-        project.setWorkSpaceId(userGeneralResponse.getPersonalWorkSpace());
+        //if workspace is empty, set to personal workspace
+        if(StringUtils.isBlank(projectRequest.getWorkspaceId())){
+            project.setWorkSpaceId(userGeneralResponse.getPersonalWorkSpace());
+        }
+
         project.setOwner(userRelation);
 
         //Save to database

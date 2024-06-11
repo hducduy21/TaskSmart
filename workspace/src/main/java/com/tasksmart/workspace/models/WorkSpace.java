@@ -32,6 +32,8 @@ public class WorkSpace {
     /** The name of the WorkSpace. */
     private String name;
 
+    private String categoryId;
+
     /** The type of the WorkSpace. */
     private EWorkSpaceType type;
 

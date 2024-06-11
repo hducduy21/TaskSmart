@@ -49,7 +49,7 @@ public interface ProjectService {
      *
      * @return the created Project.
      */
-    ProjectGeneralResponse createPersonalProject(ProjectRequest projectRequest);
+    ProjectGeneralResponse createProject(ProjectRequest projectRequest);
 
     /**
      * Creates a new List Card.

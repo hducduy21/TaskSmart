@@ -5,6 +5,7 @@ import com.tasksmart.sharedLibrary.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,8 +23,9 @@ public class SecurityConfig {
             "/api/img/**"
     };
 
+    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {"/api/categories/**"};
+
 //    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {};
-//    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PUT_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PATCH_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_DELETE_ENDPOINTS = {};
@@ -38,6 +40,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers(PERMIT_ALL_ENDPOINTS).permitAll()
+                                .requestMatchers(HttpMethod.GET, PERMIT_ONLY_GET_ENDPOINTS).permitAll()
 
                                 .anyRequest().authenticated())
         ;

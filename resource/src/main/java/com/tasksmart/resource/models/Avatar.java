@@ -4,17 +4,14 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document("templates")
+@Document("avatars")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class Template {
+public class Avatar {
     @Id
     private String id;
-    private String name;
-    private String imageId;
-    private String categoryId;
-    private String projectId;
+    private String fileName;
 }

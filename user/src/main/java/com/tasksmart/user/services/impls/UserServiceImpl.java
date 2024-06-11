@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
 
     /** {@inheritDoc} */
     @Override
-    public UserResponse createUserById(UserRegistrationRequest userRegistrationRequest) {
+    public UserResponse createUser(UserRegistrationRequest userRegistrationRequest) {
         if(!userRegistrationRequest.getPassword().equals(userRegistrationRequest.getConfirmPassword())){
             throw new BadRequest("Password and confirm password do not match!");
         }
@@ -133,6 +133,7 @@ public class UserServiceImpl implements UserService {
                     .name(workSpaceGeneralResponse.getName())
                     .build();
             user.setPersonalWorkSpace(personalWorkSpace);
+            userRepository.save(user);
         }catch (Exception e){
             userRepository.delete(user);
             log.error("Error: create user {}", e.getMessage());
@@ -159,7 +160,8 @@ public class UserServiceImpl implements UserService {
         user.setName(userInformationUpdateRequest.getName());
         user.setEmail(userInformationUpdateRequest.getEmail());
         user.setUsername(userInformationUpdateRequest.getUsername());
-        user.setProfileBackground(userInformationUpdateRequest.getProfileBackground());
+        user.setPosition(userInformationUpdateRequest.getPosition());
+        user.setOrganization(userInformationUpdateRequest.getOrganization());
 
         userRepository.save(user);
 
@@ -200,8 +202,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void uploadProfileImage(MultipartFile file) {
         String userId = authenticationUtils.getUserIdAuthenticated();
+        String fileName = "avt-" + userId;
         try {
-            awsS3Service.uploadFile(userId, file);
+            awsS3Service.uploadFile(fileName, file);
+            Optional<User> userOptional = userRepository.findById(userId);
+            if(userOptional.isPresent()){
+                User user = userOptional.get();
+                user.setProfileImageId(fileName);
+                userRepository.save(user);
+            }
+
         }catch (Exception e){
             log.error("Error: upload profile image {}", e.getMessage());
             throw new InternalServerError("Error uploading profile image! Please try later.");

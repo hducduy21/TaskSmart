@@ -67,7 +67,7 @@ public class UserController {
     @PostMapping
     public UserResponse createUser(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest){
         log.info("Create user");
-        return userService.createUserById(userRegistrationRequest);
+        return userService.createUser(userRegistrationRequest);
     }
 
     /**

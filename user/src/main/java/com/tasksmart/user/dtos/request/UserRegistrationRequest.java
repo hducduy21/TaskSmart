@@ -1,5 +1,6 @@
 package com.tasksmart.user.dtos.request;
 
+import com.tasksmart.user.models.enums.EGender;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +37,9 @@ public class UserRegistrationRequest {
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Invalid email format")
     private String email;
+
+    /** This is the storage field for user's gender */
+    private EGender gender;
 
     @NotBlank(message = "You must provide a verify email code")
     @Pattern(regexp = "^[0-9]{6}$", message = "Email code must be 6 digits long")

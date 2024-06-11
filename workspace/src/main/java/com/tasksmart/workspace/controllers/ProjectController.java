@@ -5,7 +5,6 @@ import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.services.ProjectService;
-import com.tasksmart.sharedLibrary.configs.AppConstant;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -55,7 +54,7 @@ public class ProjectController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectGeneralResponse createPersonalProject(@Valid @RequestBody ProjectRequest projectRequest){
-        return projectService.createPersonalProject(projectRequest);
+        return projectService.createProject(projectRequest);
     }
 
     @PutMapping("{projectId}")

@@ -20,4 +20,6 @@ public class WorkSpaceRequest {
 
     /** The description of the WorkSpace. */
     private String description;
+
+    private String categoryId;
 }

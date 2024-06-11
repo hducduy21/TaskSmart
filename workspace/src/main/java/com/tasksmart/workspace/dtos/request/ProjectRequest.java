@@ -23,4 +23,6 @@ public class ProjectRequest {
 
     /** The description of the Project. */
     private String description;
+
+    private String workspaceId;
 }

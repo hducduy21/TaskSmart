@@ -1,5 +1,7 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.dtos.responses.CategoryResponse;
+import com.tasksmart.sharedLibrary.repositories.httpClients.CategoryClient;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
 import com.tasksmart.workspace.dtos.response.*;
@@ -41,6 +43,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final UserClient userClient;
     private final AuthenticationUtils authenticationUtils;
     private final KafkaTemplate<String,Object> kafkaTemplate;
+    private final CategoryClient categoryClient;
 
     @Override
     public List<WorkSpaceGeneralResponse> getAllWorkSpace() {
@@ -62,7 +65,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         UserRelation userRelation = this.getUserRelation(userId);
         userRelation.setRole(EUserRole.Owner);
 
-        WorkSpace workspace = modelMapper.map(workSpaceRequest, WorkSpace.class);
+        WorkSpace workspace = WorkSpace.builder()
+                .name(workSpaceRequest.getName())
+                .description(workSpaceRequest.getDescription())
+                .categoryId(workSpaceRequest.getCategoryId()).build();
         workspace.setType(EWorkSpaceType.Private);
         workspace.setOwner(userRelation);
         workSpaceRepository.save(workspace);
@@ -216,8 +222,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
 
     public WorkSpaceResponse getWorkSpaceResponse(WorkSpace workSpace){
+        CategoryResponse categoryResponse = categoryClient.getCategory(workSpace.getCategoryId());
         WorkSpaceResponse workSpaceResponse = modelMapper.map(workSpace, WorkSpaceResponse.class);
         workSpaceResponse.setProjects(projectService.getAllProjectByWorkSpace(workSpace.getId()));
+        workSpaceResponse.setCategory(categoryResponse);
         return workSpaceResponse;
     }
 

@@ -36,7 +36,7 @@ public interface UserService {
      * @param userRegistrationRequest The request object containing user registration data.
      * @return The created user object.
      */
-    UserResponse createUserById(UserRegistrationRequest userRegistrationRequest);
+    UserResponse createUser(UserRegistrationRequest userRegistrationRequest);
 
     /**
      * Updates a user by their ID.
