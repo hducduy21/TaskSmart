@@ -71,6 +71,21 @@ public class ProjectController {
         return projectService.createListCard(projectId, listCardCreationRequest);
     }
 
+    @PutMapping("{projectId}/{listCardId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ListCardResponse updateListCard(@PathVariable String projectId,
+                                           @PathVariable String listCardId,
+                                           @Valid @RequestBody ListCardCreationRequest listCardCreationRequest){
+        return projectService.updateListCard(projectId, listCardId, listCardCreationRequest);
+    }
+
+    @DeleteMapping("{projectId}/{listCardId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteListCard(@PathVariable String projectId,
+                                           @PathVariable String listCardId){
+        projectService.deleteListCard(projectId, listCardId);
+    }
+
     @PostMapping("{projectId}/{listCardId}")
     @ResponseStatus(HttpStatus.CREATED)
     public CardResponse createCard(@PathVariable String projectId,

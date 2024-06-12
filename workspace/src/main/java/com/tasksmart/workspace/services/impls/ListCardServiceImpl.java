@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.workspace.dtos.request.CardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.response.CardResponse;
@@ -54,13 +55,32 @@ public class ListCardServiceImpl implements ListCardService {
     }
 
     @Override
-    public ListCardResponse editListCard() {
-        return null;
+    public ListCardResponse updateListCard(String listCardId, ListCardCreationRequest listCardCreationRequest) {
+        ListCard listCard = listCardRepository.findById(listCardId).orElseThrow(
+                ()->new ResolutionException("ListCard not found!")
+        );
+
+        listCard.setName(listCardCreationRequest.getName());
+        listCard.setListNumber(listCardCreationRequest.getListNumber());
+        listCard.setCollapse(listCardCreationRequest.isCollapse());
+
+        listCardRepository.save(listCard);
+        return getListCardResponse(listCard);
     }
 
     @Override
-    public void deleteListCard() {
+    public void deleteListCard(String listCardId) {
+        boolean exists = listCardRepository.existsById(listCardId);
+        if(!exists){
+            throw new ResolutionException("ListCard not found!");
+        }
 
+        try {
+            cardService.deleteCardsByListCard(listCardId);
+        } catch (Exception e){
+            throw new InternalServerError("Error when delete cards in list card!");
+        }
+        listCardRepository.deleteById(listCardId);
     }
 
     public ListCardResponse getListCardResponse(ListCard listCard){

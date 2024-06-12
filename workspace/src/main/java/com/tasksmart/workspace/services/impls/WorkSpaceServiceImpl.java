@@ -2,6 +2,7 @@ package com.tasksmart.workspace.services.impls;
 
 import com.tasksmart.sharedLibrary.dtos.responses.CategoryResponse;
 import com.tasksmart.sharedLibrary.repositories.httpClients.CategoryClient;
+import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
 import com.tasksmart.workspace.dtos.response.*;
@@ -219,7 +220,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
         return InviteCodeResponse.builder().inviteCode(invitation.getCode()).build();
     }
-
 
     public WorkSpaceResponse getWorkSpaceResponse(WorkSpace workSpace){
         CategoryResponse categoryResponse = categoryClient.getCategory(workSpace.getCategoryId());

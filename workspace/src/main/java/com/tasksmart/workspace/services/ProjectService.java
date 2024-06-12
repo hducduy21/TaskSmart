@@ -58,6 +58,9 @@ public interface ProjectService {
      */
     ListCardResponse createListCard(String projectId, ListCardCreationRequest listCardCreationRequest);
 
+    ListCardResponse updateListCard(String projectId, String listCardId, ListCardCreationRequest listCardCreationRequest);
+    void deleteListCard(String projectId, String listCardId);
+
     /**
      * Creates a new Card.
      *

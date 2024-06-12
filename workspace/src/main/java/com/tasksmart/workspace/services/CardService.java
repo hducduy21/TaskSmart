@@ -49,5 +49,6 @@ public interface CardService {
     /**
      * Deletes a Card.
      */
-    void deleteCard();
+    void deleteCard(String cardId);
+    void deleteCardsByListCard(String listCardId);
 }

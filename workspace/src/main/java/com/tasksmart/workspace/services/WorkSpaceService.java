@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.services;
 
+import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
 import com.tasksmart.workspace.dtos.response.*;
@@ -74,4 +75,5 @@ public interface WorkSpaceService {
      * @return ProjectResponse
      */
     InviteCodeResponse updateInviteCode(String workspaceId, Boolean isPublic, Boolean refresh);
+
 }

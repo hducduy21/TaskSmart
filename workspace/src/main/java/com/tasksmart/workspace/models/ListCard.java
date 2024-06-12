@@ -1,9 +1,6 @@
 package com.tasksmart.workspace.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class ListCard {
     /** The unique identifier for the ListCard. */
     @Id
@@ -37,5 +35,6 @@ public class ListCard {
     private String projectId;
 
     /** The collapse status of the ListCard. */
-    private boolean isCollapse;
+    @Builder.Default
+    private boolean isCollapse = false ;
 }

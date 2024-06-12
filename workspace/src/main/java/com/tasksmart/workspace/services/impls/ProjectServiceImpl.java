@@ -243,6 +243,40 @@ public class ProjectServiceImpl implements ProjectService {
         return InviteCodeResponse.builder().inviteCode(invitation.getCode()).build();
     }
 
+    @Override
+    public ListCardResponse updateListCard(String projectId, String listCardId, ListCardCreationRequest listCardCreationRequest) {
+        Project workSpace = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
+
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        if(!workSpace.getOwner().getUserId().equals(userId)){
+            if(workSpace.getUsers().stream().noneMatch(userRelation -> userRelation.getUserId().equals(userId))){
+                throw new Forbidden("You are not authorized to update this list card!");
+            }
+        }
+
+        return listCardService.updateListCard(listCardId, listCardCreationRequest);
+    }
+
+    @Override
+    public void deleteListCard(String projectId, String listCardId) {
+        Project workSpace = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
+
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        if(!workSpace.getOwner().getUserId().equals(userId)){
+            if(workSpace.getUsers().stream().noneMatch(userRelation -> userRelation.getUserId().equals(userId))){
+                throw new Forbidden("You are not authorized to update this list card!");
+            }
+        }
+
+        listCardService.deleteListCard(listCardId);
+    }
+
     /**
      * Get ProjectGeneralResponse from Project.
      *

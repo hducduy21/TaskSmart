@@ -47,10 +47,10 @@ public interface ListCardService {
      *
      * @return the edited List Card.
      */
-    ListCardResponse editListCard();
+    ListCardResponse updateListCard(String listCardId, ListCardCreationRequest listCardCreationRequest);
 
     /**
      * Deletes a List Card.
      */
-    void deleteListCard();
+    void deleteListCard(String listCardId);
 }

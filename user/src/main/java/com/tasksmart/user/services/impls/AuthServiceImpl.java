@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 /**
@@ -72,16 +73,36 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequest("Invalid password!");
         }
 
-        UserGeneralResponse userGeneralResponse = modelMapper.map(user, UserGeneralResponse.class);
+        UserGeneralResponse userGeneralResponse = getUserResponse(user);
         return AuthResponse.builder()
                 .user(userGeneralResponse)
-                .accessToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 600))
-                .refreshToken("refresh")
+                .accessToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 1))
+                .refreshToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 24*5))
                 .build();
     }
 
-    public AuthResponse refresh(String auth){
-        return null;
+    @Override
+    public AuthResponse refresh(String refresh){
+        if (refresh == null || !refresh.startsWith("Bearer"))
+            throw new BadRequest("Invalid authorization header.");
+
+        String refreshToken = refresh.substring(7);
+        Jwt jwt = jwtUtil.jwtDecoder().decode(refreshToken);
+        String UserId = jwt.getClaim("userId");
+
+        User user = userRepository.findById(UserId).orElseThrow(
+                () -> new ResourceNotFound("User not found!")
+        );
+
+        UserGeneralResponse userGeneralResponse = getUserResponse(user);
+        return AuthResponse.builder()
+                .user(userGeneralResponse)
+                .accessToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 1))
+                .refreshToken(refresh)
+                .build();
     }
 
+    private UserGeneralResponse getUserResponse(User user){
+        return modelMapper.map(user, UserGeneralResponse.class);
+    }
 }

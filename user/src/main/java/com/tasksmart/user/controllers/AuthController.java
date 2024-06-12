@@ -45,12 +45,13 @@ public class AuthController {
     /**
      * Receive the refresh endpoint.
      *
-     * @param auth The request object containing user sign-in credentials.
+     * @param refresh The request object containing user sign-in credentials.
      * @return The authenticated user object.
      */
     @PostMapping("refresh")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthResponse refresh(@RequestHeader(value = "Authorization", required = false) String auth){
-        return authService.refresh(auth);
+    public AuthResponse refresh(@RequestHeader(value = "Authorization", required = false) String refresh){
+        System.out.println(refresh);
+        return authService.refresh(refresh);
     }
 }

@@ -15,5 +15,5 @@ public interface AuthService {
      */
     AuthResponse login(UserSignInRequest userSignInRequest);
 
-    AuthResponse refresh(String auth);
+    AuthResponse refresh(String refresh);
 }

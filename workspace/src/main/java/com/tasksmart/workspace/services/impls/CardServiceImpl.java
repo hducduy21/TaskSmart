@@ -50,8 +50,18 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void deleteCard() {
+    public void deleteCard(String cardId) {
+        boolean exists = cardRepository.existsById(cardId);
+        if(!exists){
+            throw new ResourceNotFound("Card not found!");
+        }
+        cardRepository.deleteById(cardId);
+    }
 
+    @Override
+    public void deleteCardsByListCard(String listCardId) {
+        List<Card> cards = cardRepository.findByListCardId(listCardId);
+        cardRepository.deleteAll(cards);
     }
 
     public CardResponse getCardResponse(Card card){

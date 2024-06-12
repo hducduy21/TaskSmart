@@ -2,6 +2,7 @@ package com.tasksmart.sharedLibrary.utils;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,7 @@ public class JWTUtil {
                 .issuer("tasksmark.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
+                        Instant.now().plus(millis, ChronoUnit.HOURS).toEpochMilli()
                 ))
                 .build();
 
@@ -64,6 +65,26 @@ public class JWTUtil {
         } catch (JOSEException e){
             log.error("Error signing JWT token", e);
             throw new RuntimeException("Error signing JWT token");
+        }
+    }
+
+    public boolean validateToken(String token){
+        try {
+            JWSObject jwsObject = JWSObject.parse(token);
+            JWSVerifier jwsVerifier = new MACVerifier(secretKey.getBytes());
+
+            if (!jwsObject.verify(jwsVerifier)) {
+                return false;
+            }
+
+            JWTClaimsSet claims = JWTClaimsSet.parse(jwsObject.getPayload().toJSONObject());
+            Date expirationTime = claims.getExpirationTime();
+            return expirationTime == null || !new Date().after(expirationTime);
+
+            // Additional claims verification can be added here
+        } catch (Exception e){
+            log.error("Error validating JWT token", e);
+            return false;
         }
     }
 
