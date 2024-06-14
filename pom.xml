@@ -24,6 +24,8 @@
     <module>notification</module>
     <module>cloud-config</module>
     <module>resource</module>
+
+    <module>note</module>
   </modules>
 
   <properties>
