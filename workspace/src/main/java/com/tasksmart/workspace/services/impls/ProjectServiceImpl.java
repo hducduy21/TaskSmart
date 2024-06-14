@@ -1,8 +1,6 @@
 package com.tasksmart.workspace.services.impls;
 
-import com.tasksmart.workspace.dtos.request.CardCreationRequest;
-import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
-import com.tasksmart.workspace.dtos.request.ProjectRequest;
+import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.models.Invitation;
 import com.tasksmart.workspace.models.Project;
@@ -25,7 +23,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -138,12 +138,24 @@ public class ProjectServiceImpl implements ProjectService {
     /** {@inheritDoc} */
     @Override
     public ListCardResponse createListCard(String projectId, ListCardCreationRequest listCardCreationRequest){
-        boolean isProjectExist = projectRepository.existsById(projectId);
-        if(!isProjectExist){
-            throw new ResourceNotFound("Project not found!");
+        Project workSpace = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
+
+        ListCardResponse listCardResponse = listCardService.createListCard(projectId, listCardCreationRequest);
+        List<String> listCardIds;
+
+        if(CollectionUtils.isEmpty(workSpace.getListCardIds())){
+            listCardIds = new ArrayList<>();
+        }else {
+            listCardIds = workSpace.getListCardIds();
         }
-        //check authorization
-        return listCardService.createListCard(projectId, listCardCreationRequest);
+
+        listCardIds.add(listCardResponse.getId());
+        workSpace.setListCardIds(listCardIds);
+        projectRepository.save(workSpace);
+
+        return listCardResponse;
     }
 
     /** {@inheritDoc} */
@@ -277,6 +289,56 @@ public class ProjectServiceImpl implements ProjectService {
         listCardService.deleteListCard(listCardId);
     }
 
+    @Override
+    public ProjectResponse moveListCard(String projectId, MoveListCardRequest moveListCardRequest) {
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
+
+        if(CollectionUtils.isEmpty(project.getListCardIds())){
+            throw new BadRequest("Project has no list card!");
+        }
+
+        project.getListCardIds().forEach(listCardId -> {
+            if(!moveListCardRequest.getIds().contains(listCardId)){
+                throw new BadRequest("List card not found!");
+            }
+        });
+
+        project.setListCardIds(moveListCardRequest.getIds());
+        projectRepository.save(project);
+
+        return getProjectResponse(project);
+    }
+
+    @Override
+    public ProjectResponse moveCard(String projectId, MoveCardRequest moveCardRequest) {
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
+
+        if(CollectionUtils.isEmpty(project.getListCardIds())){
+            throw new BadRequest("Project has no list card!");
+        }
+
+        List<String> listCardIds = moveCardRequest.getIds().stream().map(MoveCardRequest.MoveCards::getListCardId).toList();
+
+        project.getListCardIds().forEach(listCardId -> {
+            if(!listCardIds.contains(listCardId)){
+                throw new BadRequest("List card not found!");
+            }
+        });
+
+        moveCardRequest.getIds().forEach(moveCards -> {
+            listCardService.moveCard(moveCards.getListCardId(), moveCards.getCardIds());
+        });
+
+        project.setListCardIds(listCardIds);
+        projectRepository.save(project);
+
+        return getProjectResponse(project);
+    }
+
     /**
      * Get ProjectGeneralResponse from Project.
      *
@@ -295,7 +357,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     public ProjectResponse getProjectResponse(Project project){
         ProjectResponse projectResponse = modelMapper.map(project, ProjectResponse.class);
-        projectResponse.setListCards(listCardService.getAllListCardByProject(project.getId()));
+        projectResponse.setListCards(listCardService.getListCardByIdIn(project.getListCardIds()));
         projectResponse.setInviteCode(getInviteCode(project.getInvitation()));
         return projectResponse;
     }

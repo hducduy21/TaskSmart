@@ -1,8 +1,6 @@
 package com.tasksmart.workspace.controllers;
 
-import com.tasksmart.workspace.dtos.request.CardCreationRequest;
-import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
-import com.tasksmart.workspace.dtos.request.ProjectRequest;
+import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.services.ProjectService;
 import jakarta.validation.Valid;
@@ -69,6 +67,21 @@ public class ProjectController {
     public ListCardResponse createListCard(@PathVariable String projectId,
                                            @Valid @RequestBody ListCardCreationRequest listCardCreationRequest){
         return projectService.createListCard(projectId, listCardCreationRequest);
+    }
+
+    @PostMapping("{projectId}/move/listcard")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProjectResponse moveListCard(@PathVariable String projectId,
+                                           @Valid @RequestBody MoveListCardRequest moveListCardRequest){
+        return projectService.moveListCard(projectId, moveListCardRequest);
+    }
+
+    @PostMapping("{projectId}/move/card")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProjectResponse moveCard(@PathVariable String projectId,
+                                        @Valid @RequestBody MoveCardRequest moveCardRequest){
+        System.out.println("moveCardRequest = " + moveCardRequest.getIds());
+        return projectService.moveCard(projectId, moveCardRequest);
     }
 
     @PutMapping("{projectId}/{listCardId}")

@@ -53,4 +53,7 @@ public interface ListCardService {
      * Deletes a List Card.
      */
     void deleteListCard(String listCardId);
+    List<ListCardResponse> getListCardByIdIn(List<String> listCardIds);
+
+    void moveCard(String listCardId, List<String> cardIds);
 }

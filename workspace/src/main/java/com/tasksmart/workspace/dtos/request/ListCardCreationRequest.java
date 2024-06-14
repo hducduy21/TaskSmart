@@ -15,10 +15,9 @@ public class ListCardCreationRequest {
     @NotBlank(message = "The name of list card cannot be blank")
     private String name;
 
-    /** The list number of the ListCard. */
-    private Integer listNumber;
-
     /** The collapse status of the ListCard. */
     private boolean isCollapse;
+
+    private String projectId;
 
 }

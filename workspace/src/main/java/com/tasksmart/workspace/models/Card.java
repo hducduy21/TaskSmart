@@ -2,15 +2,13 @@ package com.tasksmart.workspace.models;
 
 import com.tasksmart.workspace.models.enums.ELevel;
 import com.tasksmart.workspace.models.enums.EStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Card {
     /** The unique identifier for the Card. */
     @Id
@@ -32,8 +31,6 @@ public class Card {
 
     /** The name of the Card. */
     public String name;
-
-    public String listCardId;
 
     /** The color of the Card. */
     public String color;
@@ -57,7 +54,10 @@ public class Card {
     public LocalDateTime estimate;
 
     /** The list of CheckLists associated with the Card. */
-    public List<CheckList> checkLists;
+    @Builder.Default
+    public List<CheckList> checkLists = new ArrayList<>();
+
+    public String projectId;
 
     /**
      * Represents a CheckList in the Card.

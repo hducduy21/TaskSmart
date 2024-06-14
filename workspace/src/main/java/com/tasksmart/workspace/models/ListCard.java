@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,11 +29,10 @@ public class ListCard {
     /** The name of the ListCard. */
     private String name;
 
-    /** The list number of the ListCard. */
-    private Integer listNumber;
-
-    /** The identifier for the project contain. */
     private String projectId;
+
+    @Builder.Default
+    private List<String> cardIds = new ArrayList<>();
 
     /** The collapse status of the ListCard. */
     @Builder.Default

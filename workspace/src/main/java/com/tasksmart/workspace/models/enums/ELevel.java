@@ -6,5 +6,6 @@ public enum ELevel {
     Medium,
     Low,
     Lowest,
-    NotSure
+    NotSure,
+    none
 }
