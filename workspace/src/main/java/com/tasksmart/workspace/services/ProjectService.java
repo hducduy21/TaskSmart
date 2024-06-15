@@ -1,8 +1,6 @@
 package com.tasksmart.workspace.services;
 
-import com.tasksmart.workspace.dtos.request.CardCreationRequest;
-import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
-import com.tasksmart.workspace.dtos.request.ProjectRequest;
+import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.models.Project;
 
@@ -96,4 +94,7 @@ public interface ProjectService {
      * @return ProjectResponse
      */
     InviteCodeResponse updateInviteCode(String projectId, Boolean isPublic, Boolean refresh);
+
+    ProjectResponse moveListCard(String projectId, MoveListCardRequest moveListCardRequest);
+    ProjectResponse moveCard(String projectId, MoveCardRequest moveCardRequest);
 }

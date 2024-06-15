@@ -44,6 +44,9 @@ public class Project {
     private String workSpaceId;
 
     @Builder.Default
+    private List<String> listCardIds = new ArrayList<>();
+
+    @Builder.Default
     private Invitation invitation = Invitation.builder()
                                                 .isPublic(false)
                                                 .code(UUID.randomUUID().toString())

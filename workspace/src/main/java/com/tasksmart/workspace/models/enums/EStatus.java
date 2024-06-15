@@ -6,5 +6,6 @@ public enum EStatus {
     Done,
     InReview,
     Approved,
-    NotSure
+    NotSure,
+    none
 }

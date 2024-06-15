@@ -19,9 +19,6 @@ public class ListCardResponse {
     /** The name of the ListCard. */
     private String name;
 
-    /** The list number of the ListCard. */
-    private Integer listNumber;
-
     /** The collapse status of the ListCard. */
     private boolean isCollapse;
 

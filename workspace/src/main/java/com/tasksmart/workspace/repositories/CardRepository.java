@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface CardRepository extends MongoRepository<Card, String> {
-    List<Card> findByListCardId(String listCardId);
+    List<Card> findByIdIn(List<String> cardIds);
 }

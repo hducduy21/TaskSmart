@@ -24,11 +24,6 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<CardResponse> getCardsByListCard(String listCardId) {
-        return cardRepository.findByListCardId(listCardId).stream().map(this::getCardResponse).toList();
-    }
-
-    @Override
     public CardResponse getCardById(String cardId) {
         Card card = cardRepository.findById(cardId).orElseThrow(
                 ()->new ResourceNotFound("Card not found!")
@@ -37,9 +32,9 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public CardResponse createCard(String listCardId, CardCreationRequest cardCreationRequest){
+    public CardResponse createCard(String projectId, CardCreationRequest cardCreationRequest){
         Card card = modelMapper.map(cardCreationRequest, Card.class);
-        card.setListCardId(listCardId);
+        card.setProjectId(projectId);
         cardRepository.save(card);
         return getCardResponse(card);
     }
@@ -59,9 +54,16 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void deleteCardsByListCard(String listCardId) {
-        List<Card> cards = cardRepository.findByListCardId(listCardId);
-        cardRepository.deleteAll(cards);
+    public void deleteCardsByIds(List<String> cardIds) {
+        cardRepository.deleteAllById(cardIds);
+    }
+
+    @Override
+    public List<CardResponse> getCardsByIdIn(List<String> cardIds) {
+        return cardIds.stream().map(cardId -> getCardResponse(
+                cardRepository.findById(cardId).orElseThrow(
+                        ()->new ResourceNotFound("Card not found!")
+                ))).toList();
     }
 
     public CardResponse getCardResponse(Card card){

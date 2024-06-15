@@ -18,12 +18,6 @@ public interface CardService {
      */
     List<CardResponse> getAllCard();
 
-    /**
-     * Retrieves all card of a listcard.
-     *
-     * @return a list of all Cards.
-     */
-    List<CardResponse> getCardsByListCard(String listCardId);
 
     /**
      * Retrieves a Card by its ID.
@@ -37,7 +31,7 @@ public interface CardService {
      *
      * @return the created Card.
      */
-    CardResponse createCard(String listCardId, CardCreationRequest cardCreationRequest);
+    CardResponse createCard(String projectId, CardCreationRequest cardCreationRequest);
 
     /**
      * Edits an existing Card.
@@ -50,5 +44,7 @@ public interface CardService {
      * Deletes a Card.
      */
     void deleteCard(String cardId);
-    void deleteCardsByListCard(String listCardId);
+    void deleteCardsByIds(List<String> cardIds);
+
+    List<CardResponse> getCardsByIdIn(List<String> cardIds);
 }

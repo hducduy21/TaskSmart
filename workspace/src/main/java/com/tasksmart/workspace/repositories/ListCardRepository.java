@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ListCardRepository extends MongoRepository<ListCard, String> {
     List<ListCard> findAllByProjectId(String projectId);
+    List<ListCard> findByIdIn(List<String> listCardIds);
 }

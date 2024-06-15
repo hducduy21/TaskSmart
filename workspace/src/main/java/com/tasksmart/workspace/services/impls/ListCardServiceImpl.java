@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.workspace.dtos.request.CardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
@@ -13,8 +14,10 @@ import com.tasksmart.sharedLibrary.exceptions.ResourceConflict;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.module.ResolutionException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -51,7 +54,20 @@ public class ListCardServiceImpl implements ListCardService {
         if(!listCard.getProjectId().equals(projectId)){
             throw new ResourceConflict("ListCard not belong to this project!");
         }
-        return cardService.createCard(listCardId, cardCreationRequest);
+
+        CardResponse cardResponse = cardService.createCard(projectId, cardCreationRequest);
+        List<String> cardIds;
+        if(CollectionUtils.isEmpty(listCard.getCardIds())){
+            cardIds = new ArrayList<>();
+        } else {
+            cardIds = listCard.getCardIds();
+        }
+
+        cardIds.add(cardResponse.getId());
+        listCard.setCardIds(cardIds);
+        listCardRepository.save(listCard);
+
+        return cardResponse;
     }
 
     @Override
@@ -61,7 +77,6 @@ public class ListCardServiceImpl implements ListCardService {
         );
 
         listCard.setName(listCardCreationRequest.getName());
-        listCard.setListNumber(listCardCreationRequest.getListNumber());
         listCard.setCollapse(listCardCreationRequest.isCollapse());
 
         listCardRepository.save(listCard);
@@ -69,24 +84,42 @@ public class ListCardServiceImpl implements ListCardService {
     }
 
     @Override
+    public void moveCard(String listCardId, List<String> cardIds) {
+        ListCard listCard = listCardRepository.findById(listCardId).orElseThrow(
+                ()->new ResolutionException("ListCard not found!")
+        );
+        listCard.setCardIds(cardIds);
+        listCardRepository.save(listCard);
+    }
+
+    @Override
     public void deleteListCard(String listCardId) {
-        boolean exists = listCardRepository.existsById(listCardId);
-        if(!exists){
-            throw new ResolutionException("ListCard not found!");
-        }
+        ListCard listCard = listCardRepository.findById(listCardId).orElseThrow(
+                ()->new ResolutionException("ListCard not found!")
+        );
 
         try {
-            cardService.deleteCardsByListCard(listCardId);
+            cardService.deleteCardsByIds(listCard.getCardIds());
         } catch (Exception e){
             throw new InternalServerError("Error when delete cards in list card!");
         }
         listCardRepository.deleteById(listCardId);
     }
 
+    @Override
+    public List<ListCardResponse> getListCardByIdIn(List<String> listCardIds) {
+        return listCardIds.stream().map(listCard->
+            getListCardResponse(listCardRepository.findById(listCard).orElseThrow(
+                    ()->new ResolutionException("ListCard not found!")
+            ))).toList();
+    }
+
     public ListCardResponse getListCardResponse(ListCard listCard){
         ListCardResponse listCardResponse = modelMapper.map(listCard, ListCardResponse.class);
-        List<CardResponse> cards = cardService.getCardsByListCard(listCard.getId());
+
+        List<CardResponse> cards = cardService.getCardsByIdIn(listCard.getCardIds());
         listCardResponse.setCards(cards);
+
         return listCardResponse;
     }
 }

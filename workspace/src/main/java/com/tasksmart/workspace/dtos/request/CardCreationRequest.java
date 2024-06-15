@@ -31,9 +31,6 @@ public class CardCreationRequest {
     /** The status of the Card. */
     public EStatus status;
 
-    /** The priority level of the Card. */
-    public ELevel priority;
-
     /** The risk level of the Card. */
     public ELevel risk;
 
