@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class NoteServiceImpl implements NoteService {
+public class NoteServiceImpl implements NoteService{
 
     private final NoteRepository noteRepository;
     private final ModelMapper modelMapper;
@@ -39,18 +39,6 @@ public class NoteServiceImpl implements NoteService {
         note.setArchived(false);
         noteRepository.save(note);
         return getNoteResponse(note);
-    }
-
-    @Override
-    public List<NoteResponse> getAllNotes() {
-        return noteRepository.findAll().stream().map(this::getNoteResponse).toList();
-    }
-
-    @Override
-    public List<NoteResponse> getNotesByUser() {
-        String userId = authenticationUtils.getUserIdAuthenticated();
-
-        return noteRepository.findByUserId(userId).stream().map(this::getNoteResponse).toList();
     }
 
     @Override
@@ -90,6 +78,30 @@ public class NoteServiceImpl implements NoteService {
                 ()->new ResourceNotFound("Note not found!")
         );
         noteRepository.delete(note);
+    }
+
+    @Override
+    public List<NoteResponse> searchNotes(String keyword) {
+        List<Note> notes = noteRepository.findByTitleContaining(keyword);
+        if (notes != null){
+            return notes.stream().map(this::getNoteResponse).toList();
+        }
+
+    return null;
+    }
+
+    @Override
+    public List<NoteResponse> getAllNotes(Boolean archived) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        if (archived != null && archived){
+            return noteRepository.findByUserId(userId).stream().map(this::getNoteResponse).toList();
+
+        } else {
+            return noteRepository.findByUserId(userId).stream().filter(note -> !note.getArchived()).map(this::getNoteResponse).toList();
+        }
+
+
+
     }
 
 

@@ -14,11 +14,10 @@ import java.util.List;
 
 public interface NoteService {
     NoteResponse createNote(NoteRequest note);
-    List<NoteResponse> getAllNotes();
-    List<NoteResponse> getNotesByUser();
     NoteResponse getNoteById(String noteId);
     NoteResponse editNote(NoteRequest note, String noteId);
     void deleteNote(String noteId);
-
+    List<NoteResponse> searchNotes(String keyword);
+    List<NoteResponse> getAllNotes(Boolean archived);
 
 }

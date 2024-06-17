@@ -2,6 +2,7 @@ package com.tasksmart.note.repositories;
 
 import com.tasksmart.note.models.Note;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
@@ -12,5 +13,6 @@ import java.util.List;
  */
 public interface NoteRepository extends MongoRepository<Note, String> {
     List<Note> findByUserId(String userId);
-
+    @Query("{'title': {$regex: ?0, $options: 'i'}}")
+    List<Note> findByTitleContaining(String keyword);
 }
