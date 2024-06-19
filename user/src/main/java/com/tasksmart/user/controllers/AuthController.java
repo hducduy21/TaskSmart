@@ -1,5 +1,6 @@
 package com.tasksmart.user.controllers;
 
+import com.tasksmart.user.dtos.request.RefreshRequest;
 import com.tasksmart.user.dtos.request.UserSignInRequest;
 import com.tasksmart.user.dtos.response.AuthResponse;
 import com.tasksmart.user.dtos.response.UserGeneralResponse;
@@ -45,13 +46,13 @@ public class AuthController {
     /**
      * Receive the refresh endpoint.
      *
-     * @param refresh The request object containing user sign-in credentials.
+     * @param refreshRequest The request object containing user sign-in credentials.
      * @return The authenticated user object.
      */
     @PostMapping("refresh")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthResponse refresh(@RequestHeader(value = "Authorization", required = false) String refresh){
-        System.out.println(refresh);
-        return authService.refresh(refresh);
+    public AuthResponse refresh(@Valid @RequestBody RefreshRequest refreshRequest){
+        System.out.println(refreshRequest.getRefresh());
+        return authService.refresh(refreshRequest.getRefresh());
     }
 }

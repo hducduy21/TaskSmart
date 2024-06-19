@@ -89,6 +89,8 @@ public class ProjectServiceImpl implements ProjectService {
         UserRelation userRelation = modelMapper.map(userGeneralResponse, UserRelation.class);
         userRelation.setRole(EUserRole.Owner);
 
+        System.out.println(StringUtils.isBlank(projectRequest.getWorkspaceId()));
+        System.out.println(projectRequest.getWorkspaceId());
         //if workspace is empty, set to personal workspace
         if(StringUtils.isBlank(projectRequest.getWorkspaceId())){
             project.setWorkspaceId(userGeneralResponse.getPersonalWorkSpace());

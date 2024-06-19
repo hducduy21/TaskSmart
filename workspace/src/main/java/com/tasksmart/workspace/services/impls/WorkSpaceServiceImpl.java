@@ -47,7 +47,8 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     public List<WorkSpaceGeneralResponse> getAllWorkSpace() {
-        return workSpaceRepository.findAll().stream().map(this::getWorkSpaceGeneralResponse).toList();
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        return workSpaceRepository.findByUserId(userId).stream().map(this::getWorkSpaceGeneralResponse).toList();
     }
 
     @Override
