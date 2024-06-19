@@ -2,7 +2,6 @@ package com.tasksmart.workspace.services.impls;
 
 import com.tasksmart.sharedLibrary.dtos.responses.CategoryResponse;
 import com.tasksmart.sharedLibrary.repositories.httpClients.CategoryClient;
-import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
 import com.tasksmart.workspace.dtos.response.*;
@@ -92,7 +91,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
         Project project = modelMapper.map(projectRequest, Project.class);
         project.setOwner(userRelation);
-        project.setWorkSpaceId(workSpaceId);
+        project.setWorkspaceId(workSpaceId);
 
         kafkaTemplate.send("project-creation",modelMapper.map(project, ProjectMessage.class));
         return projectService.saveProject(project);
@@ -222,10 +221,13 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     public WorkSpaceResponse getWorkSpaceResponse(WorkSpace workSpace){
-        CategoryResponse categoryResponse = categoryClient.getCategory(workSpace.getCategoryId());
         WorkSpaceResponse workSpaceResponse = modelMapper.map(workSpace, WorkSpaceResponse.class);
         workSpaceResponse.setProjects(projectService.getAllProjectByWorkSpace(workSpace.getId()));
-        workSpaceResponse.setCategory(categoryResponse);
+
+        if(!StringUtils.isBlank(workSpace.getCategoryId())){
+            CategoryResponse categoryResponse = categoryClient.getCategory(workSpace.getCategoryId());
+            workSpaceResponse.setCategory(categoryResponse);
+        }
         return workSpaceResponse;
     }
 

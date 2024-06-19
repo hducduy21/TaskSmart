@@ -60,7 +60,10 @@ public class ProjectServiceImpl implements ProjectService {
     /** {@inheritDoc} */
     @Override
     public List<ProjectGeneralResponse> getAllProjectByWorkSpace(String workSpaceId){
-        return projectRepository.findByWorkSpaceId(workSpaceId).stream().map(this::getProjectGeneralResponse).toList();
+        int a = projectRepository.findByWorkspaceId(workSpaceId).stream().map(this::getProjectGeneralResponse).toList().size();
+        System.out.println(a);
+        System.out.println(workSpaceId);
+        return projectRepository.findByWorkspaceId(workSpaceId).stream().map(this::getProjectGeneralResponse).toList();
     }
 
     /** {@inheritDoc} */
@@ -88,7 +91,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         //if workspace is empty, set to personal workspace
         if(StringUtils.isBlank(projectRequest.getWorkspaceId())){
-            project.setWorkSpaceId(userGeneralResponse.getPersonalWorkSpace());
+            project.setWorkspaceId(userGeneralResponse.getPersonalWorkSpace());
         }
 
         project.setOwner(userRelation);

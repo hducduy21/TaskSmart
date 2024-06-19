@@ -1,16 +1,12 @@
 package com.tasksmart.workspace.models;
 
 import com.tasksmart.workspace.models.enums.EUserRole;
-import com.tasksmart.workspace.models.enums.EWorkSpaceType;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
-import jakarta.ws.rs.BadRequestException;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -41,7 +37,7 @@ public class Project {
     private String description;
 
     /** The list of ListCards associated with the Project. */
-    private String workSpaceId;
+    private String workspaceId;
 
     @Builder.Default
     private List<String> listCardIds = new ArrayList<>();

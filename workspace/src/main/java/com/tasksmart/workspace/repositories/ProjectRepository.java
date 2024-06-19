@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProjectRepository extends MongoRepository<Project, String> {
-    List<Project> findByWorkSpaceId(String workSpaceId);
+    List<Project> findByWorkspaceId(String workSpaceId);
 
     @Query("{ 'id': ?0, 'users.userId': ?1 }")
     Optional<Project> findByProjectIdAndUserId(String projectId, String userId);

@@ -80,7 +80,6 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectResponse moveCard(@PathVariable String projectId,
                                         @Valid @RequestBody MoveCardRequest moveCardRequest){
-        System.out.println("moveCardRequest = " + moveCardRequest.getIds());
         return projectService.moveCard(projectId, moveCardRequest);
     }
 
