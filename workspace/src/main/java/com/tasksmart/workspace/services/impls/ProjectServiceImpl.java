@@ -82,15 +82,18 @@ public class ProjectServiceImpl implements ProjectService {
         String userId = authenticationUtils.getUserIdAuthenticated();
 
         //Convert dto to entity
-        Project project = modelMapper.map(projectRequest, Project.class);
+        Project project = Project.builder()
+                .name(projectRequest.getName())
+                .background(projectRequest.getBackground())
+                .description(projectRequest.getDescription())
+                .workspaceId(projectRequest.getWorkspaceId())
+                .build();
 
         //Fetch to get user info
         UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userId);
         UserRelation userRelation = modelMapper.map(userGeneralResponse, UserRelation.class);
         userRelation.setRole(EUserRole.Owner);
 
-        System.out.println(StringUtils.isBlank(projectRequest.getWorkspaceId()));
-        System.out.println(projectRequest.getWorkspaceId());
         //if workspace is empty, set to personal workspace
         if(StringUtils.isBlank(projectRequest.getWorkspaceId())){
             project.setWorkspaceId(userGeneralResponse.getPersonalWorkSpace());
@@ -98,7 +101,6 @@ public class ProjectServiceImpl implements ProjectService {
 
         project.setOwner(userRelation);
 
-        //Save to database
         projectRepository.save(project);
 
         //Notifications to other applications to said that a new project has been created
