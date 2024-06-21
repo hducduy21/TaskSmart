@@ -1,15 +1,14 @@
 package com.tasksmart.workspace.models;
 
+import com.tasksmart.sharedLibrary.models.EFileType;
 import com.tasksmart.workspace.models.enums.ELevel;
 import com.tasksmart.workspace.models.enums.EStatus;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents a Card in the project.
@@ -33,7 +32,8 @@ public class Card {
     public String name;
 
     /** The color of the Card. */
-    public String color;
+    @Builder.Default
+    public String color = "1677ff";
 
     /** The description of the Card. */
     public String description;
@@ -55,27 +55,48 @@ public class Card {
 
     /** The list of CheckLists associated with the Card. */
     @Builder.Default
-    public List<CheckList> checkLists = new ArrayList<>();
+    public List<CheckListGroup> checkLists = new ArrayList<>();
 
     public String projectId;
 
-    /**
-     * Represents a CheckList in the Card.
-     * A CheckList has an id, name, and a checked status.
-     */
+    @Builder.Default
+    public List<Attachment> attachments = new ArrayList<>();
+
+    public Set<String> implementerIds = new HashSet<>();
+
+    public List<Comment> comments = new ArrayList<>();
+
     @NoArgsConstructor
     @AllArgsConstructor
     @Getter
     @Setter
-    public static class CheckList{
+    public static class Attachment{
         /**
-         * The name of the CheckList.
+         * Identity = file name in aws.
          */
-        private String name;
+        private String fileId = java.util.UUID.randomUUID().toString();
 
+        private String title;
+
+        private EFileType type;
+
+        private String description;
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public static class Comment{
         /**
-         * The checked status of the CheckList.
+         * Identity.
          */
-        private boolean checked;
+        private String id = java.util.UUID.randomUUID().toString();
+
+        private String content;
+
+        private String userId;
+
+        private Date createAt = new Date();
     }
 }

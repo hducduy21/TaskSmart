@@ -52,7 +52,6 @@ public class AuthController {
     @PostMapping("refresh")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse refresh(@Valid @RequestBody RefreshRequest refreshRequest){
-        System.out.println(refreshRequest.getRefresh());
         return authService.refresh(refreshRequest.getRefresh());
     }
 }

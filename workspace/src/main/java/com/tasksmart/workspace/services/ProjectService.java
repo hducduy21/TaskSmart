@@ -97,4 +97,6 @@ public interface ProjectService {
 
     ProjectResponse moveListCard(String projectId, MoveListCardRequest moveListCardRequest);
     ProjectResponse moveCard(String projectId, MoveCardRequest moveCardRequest);
+
+    byte[] viewImage(String projectId, String assetId);
 }

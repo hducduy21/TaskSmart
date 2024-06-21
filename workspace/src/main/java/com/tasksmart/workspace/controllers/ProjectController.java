@@ -110,4 +110,10 @@ public class ProjectController {
     public void deleteProject(@PathVariable String projectId){
         projectService.deleteProject(projectId);
     }
+
+    @GetMapping("{projectId}/assets/{assetId}")
+    @ResponseStatus(HttpStatus.OK)
+    public byte[] viewProjectImageAssets(@PathVariable String projectId, @PathVariable String assetId){
+        return projectService.viewImage(projectId,assetId);
+    }
 }

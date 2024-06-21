@@ -1,11 +1,13 @@
 package com.tasksmart.workspace.dtos.response;
 
 import com.tasksmart.workspace.models.Card;
+import com.tasksmart.workspace.models.UserRelation;
 import com.tasksmart.workspace.models.enums.ELevel;
 import com.tasksmart.workspace.models.enums.EStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -41,5 +43,11 @@ public class CardResponse {
     public LocalDateTime estimate;
 
     /** The list of CheckLists associated with the Card. */
-    public List<Card.CheckList> checkLists;
+    public List<CheckListGroupResponse> checkLists;
+
+    public List<CommentResponse> comments;
+
+    public List<AttachmentResponse> attachments;
+
+    public List<UserRelation> implementers;
 }

@@ -33,6 +33,15 @@ public class AwsS3Service {
         PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
     }
 
+    public void uploadFile(String key, String folder, MultipartFile file) throws IOException {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(folder + "/" + key)
+                .build();
+
+        PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
+    }
+
     public byte[] getByte(String key) throws IOException {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
