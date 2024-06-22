@@ -1,5 +1,7 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.models.Invitation;
@@ -50,6 +52,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final AuthenticationUtils authenticationUtils;
+    private final AwsS3Service awsS3Service;
 
     /** {@inheritDoc} */
     @Override
@@ -344,6 +347,22 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(project);
 
         return getProjectResponse(project);
+    }
+
+    @Override
+    public byte[] viewImage(String projectId, String assetId) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
+        if(!project.getUsers().stream().anyMatch(userRelation -> userRelation.getUserId().equals(userId))){
+            throw new Forbidden("You are not authorized to view this image!");
+        }
+        try {
+            return awsS3Service.getByte("projects/" + projectId + "/" + assetId);
+        }catch (Exception e){
+            throw new InternalServerError("Error getting profile image! Please try later.");
+        }
     }
 
     /**
