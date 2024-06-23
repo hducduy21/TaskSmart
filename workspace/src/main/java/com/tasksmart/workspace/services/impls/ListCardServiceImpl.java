@@ -1,7 +1,12 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.dtos.request.CardTemplateRequest;
+import com.tasksmart.sharedLibrary.dtos.request.ListCardTemplateRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.CardTemplateResponse;
+import com.tasksmart.sharedLibrary.dtos.responses.ListCardTemplateResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.workspace.dtos.request.CardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.response.CardResponse;
@@ -114,6 +119,50 @@ public class ListCardServiceImpl implements ListCardService {
             ))).toList();
     }
 
+    @Override
+    public List<ListCardTemplateResponse> getListCardTemplateByIdIn(List<String> listCardIds) {
+        return listCardIds.stream().map(listCard->
+                getListCardTemplateResponse(listCardRepository.findById(listCard).orElseThrow(
+                        ()->new ResolutionException("ListCard not found!")
+                ))).toList();
+    }
+
+    @Override
+    public ListCardTemplateResponse createListCardTemplate(ListCardTemplateRequest listCards) {
+        List<CardTemplateResponse> cardTemplateResponses = new ArrayList<>();
+        for(CardTemplateRequest cardTemplateRequest: listCards.getCards()){
+            CardTemplateResponse cardTemplateResponse = cardService.createCardTemplate(cardTemplateRequest);
+            cardTemplateResponses.add(cardTemplateResponse);
+        }
+        List<String> cardIds = cardTemplateResponses.stream().map(CardTemplateResponse::getId).toList();
+
+        ListCard listCard = modelMapper.map(listCards, ListCard.class);
+        listCard.setCardIds(cardIds);
+        listCardRepository.save(listCard);
+
+        return getListCardTemplateResponse(listCard);
+    }
+
+    @Override
+    public String applyTemplate(String listCardId, String projectId) {
+        ListCard listCardTemplate = listCardRepository.findById(listCardId).orElseThrow(
+                ()->new ResourceNotFound("ListCard not found!")
+        );
+
+        ListCard listCard = listCardTemplate.copyWithoutProject();
+        listCard.setProjectId(projectId);
+        listCardRepository.save(listCard);
+
+        List<String> cardIds = new ArrayList<>();
+        listCardTemplate.getCardIds().forEach(cardId->{
+            String cardExtractId = cardService.applyTemplate(cardId, projectId);
+            cardIds.add(cardExtractId);
+        });
+        listCard.setCardIds(cardIds);
+        listCardRepository.save(listCard);
+        return listCard.getId();
+    }
+
     public ListCardResponse getListCardResponse(ListCard listCard){
         ListCardResponse listCardResponse = modelMapper.map(listCard, ListCardResponse.class);
 
@@ -121,5 +170,14 @@ public class ListCardServiceImpl implements ListCardService {
         listCardResponse.setCards(cards);
 
         return listCardResponse;
+    }
+
+    public ListCardTemplateResponse getListCardTemplateResponse(ListCard listCard){
+        ListCardTemplateResponse listCardTemplaeResponse = modelMapper.map(listCard, ListCardTemplateResponse.class);
+
+        List<CardTemplateResponse> cards = cardService.getCardsTemplateByIdIn(listCard.getCardIds());
+        listCardTemplaeResponse.setCards(cards);
+
+        return listCardTemplaeResponse;
     }
 }

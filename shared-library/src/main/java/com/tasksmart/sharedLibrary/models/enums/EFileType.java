@@ -1,4 +1,4 @@
-package com.tasksmart.sharedLibrary.models;
+package com.tasksmart.sharedLibrary.models.enums;
 
 public enum EFileType {
     image,

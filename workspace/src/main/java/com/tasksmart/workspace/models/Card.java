@@ -1,8 +1,9 @@
 package com.tasksmart.workspace.models;
 
-import com.tasksmart.sharedLibrary.models.EFileType;
-import com.tasksmart.workspace.models.enums.ELevel;
-import com.tasksmart.workspace.models.enums.EStatus;
+import com.tasksmart.sharedLibrary.models.CheckListGroup;
+import com.tasksmart.sharedLibrary.models.enums.EFileType;
+import com.tasksmart.sharedLibrary.models.enums.ELevel;
+import com.tasksmart.sharedLibrary.models.enums.EStatus;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,36 +25,36 @@ import java.util.*;
 @Setter
 @Builder
 public class Card {
-    /** The unique identifier for the Card. */
+    /** The unique identifier for Card. */
     @Id
     private String id;
 
-    /** The name of the Card. */
+    /** The name of Card. */
     public String name;
 
-    /** The color of the Card. */
+    /** The color of Card. */
     @Builder.Default
     public String color = "1677ff";
 
-    /** The description of the Card. */
+    /** The description of Card. */
     public String description;
 
-    /** The status of the Card. */
+    /** The status of Card. */
     public EStatus status;
 
-    /** The priority level of the Card. */
+    /** The priority level of Card. */
     public ELevel priority;
 
-    /** The risk level of the Card. */
+    /** The risk level of Card. */
     public ELevel risk;
 
-    /** The effort level of the Card. */
+    /** The effort level of Card. */
     public ELevel effort;
 
-    /** The estimated completion time for the Card. */
+    /** The estimated completion time for Card. */
     public LocalDateTime estimate;
 
-    /** The list of CheckLists associated with the Card. */
+    /** The list of CheckLists associated with Card. */
     @Builder.Default
     public List<CheckListGroup> checkLists = new ArrayList<>();
 
@@ -65,6 +66,24 @@ public class Card {
     public Set<String> implementerIds = new HashSet<>();
 
     public List<Comment> comments = new ArrayList<>();
+
+    public Card copyWithoutProject(){
+        return Card.builder()
+                .name(this.name)
+                .color(this.color)
+                .description(this.description)
+                .status(this.status)
+                .priority(this.priority)
+                .risk(this.risk)
+                .effort(this.effort)
+                .estimate(this.estimate)
+                .checkLists(this.checkLists)
+                .projectId(projectId)
+                .attachments(this.attachments)
+                .implementerIds(this.implementerIds)
+                .comments(this.comments)
+                .build();
+    }
 
     @NoArgsConstructor
     @AllArgsConstructor

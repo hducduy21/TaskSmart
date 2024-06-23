@@ -1,7 +1,6 @@
 package com.tasksmart.workspace.dtos.response;
 
-import com.tasksmart.workspace.models.Card;
-import com.tasksmart.workspace.models.CheckList;
+import com.tasksmart.sharedLibrary.models.CheckList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

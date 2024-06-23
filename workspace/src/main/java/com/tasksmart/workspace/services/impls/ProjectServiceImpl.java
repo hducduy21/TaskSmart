@@ -24,6 +24,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -63,9 +65,6 @@ public class ProjectServiceImpl implements ProjectService {
     /** {@inheritDoc} */
     @Override
     public List<ProjectGeneralResponse> getAllProjectByWorkSpace(String workSpaceId){
-        int a = projectRepository.findByWorkspaceId(workSpaceId).stream().map(this::getProjectGeneralResponse).toList().size();
-        System.out.println(a);
-        System.out.println(workSpaceId);
         return projectRepository.findByWorkspaceId(workSpaceId).stream().map(this::getProjectGeneralResponse).toList();
     }
 
@@ -364,6 +363,8 @@ public class ProjectServiceImpl implements ProjectService {
             throw new InternalServerError("Error getting profile image! Please try later.");
         }
     }
+
+
 
     /**
      * Get ProjectGeneralResponse from Project.

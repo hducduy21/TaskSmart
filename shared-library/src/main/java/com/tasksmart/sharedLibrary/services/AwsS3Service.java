@@ -42,6 +42,10 @@ public class AwsS3Service {
         PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
     }
 
+    public void deleteFile(String key) {
+        s3Client.deleteObject(builder -> builder.bucket(bucketName).key(key));
+    }
+
     public byte[] getByte(String key) throws IOException {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)

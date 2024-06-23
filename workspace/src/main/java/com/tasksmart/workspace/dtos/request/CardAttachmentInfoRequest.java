@@ -1,6 +1,5 @@
 package com.tasksmart.workspace.dtos.request;
 
-import com.tasksmart.sharedLibrary.models.EFileType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

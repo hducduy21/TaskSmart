@@ -1,7 +1,11 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.dtos.request.CardTemplateRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.CardTemplateResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.models.CheckList;
+import com.tasksmart.sharedLibrary.models.CheckListGroup;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import com.tasksmart.sharedLibrary.utils.FileUtil;
@@ -16,6 +20,7 @@ import com.tasksmart.workspace.repositories.ProjectRepository;
 import com.tasksmart.workspace.services.CardService;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -443,6 +448,51 @@ public class CardServiceImpl implements CardService {
         return getCheckListGroupResponse(checkListGroup);
     }
 
+    @Override
+    public List<CardTemplateResponse> getCardsTemplateByIdIn(List<String> cardIds) {
+        return cardIds.stream().map(cardId -> getCardTemplateResponse(
+                cardRepository.findById(cardId).orElseThrow(
+                        ()->new ResourceNotFound("Card not found!")
+                ))).toList();
+    }
+
+    @Override
+    public CardTemplateResponse createCardTemplate(CardTemplateRequest cardTemplateRequest) {
+        Card card = modelMapper.map(cardTemplateRequest, Card.class);
+        List<CheckListGroup> checkLists = cardTemplateRequest.getCheckLists().stream().map(
+                checkListGroupTemplate -> {
+                    return CheckListGroup.builder()
+                            .id(UUID.randomUUID().toString())
+                            .name(checkListGroupTemplate.getName())
+                            .checkLists(checkListGroupTemplate.getCheckLists().stream().map(
+                                    checkListTemplate -> {
+                                        return CheckList.builder()
+                                                .id(UUID.randomUUID().toString())
+                                                .name(checkListTemplate.getName())
+                                                .checked(checkListTemplate.isChecked())
+                                                .build();
+                                    }
+                            ).toList())
+                            .build();
+                }
+        ).toList();
+        card.setCheckLists(checkLists);
+        cardRepository.save(card);
+        return getCardTemplateResponse(card);
+    }
+
+    @Override
+    public String applyTemplate(String cardId, String projectId) {
+        Card cardTemplate = cardRepository.findById(cardId).orElseThrow(
+                ()->new ResourceNotFound("Card not found!")
+        );
+
+        Card card = cardTemplate.copyWithoutProject();
+        card.setProjectId(projectId);
+        cardRepository.save(card);
+        return card.getId();
+    }
+
     private Project isUserInTheProject(String userId, String projectId){
         Project project = projectRepository.findById(projectId).orElseThrow(
                 ()->new ResourceNotFound("Project not found!")
@@ -509,6 +559,11 @@ public class CardServiceImpl implements CardService {
 
         cardResponse.setComments(commentResponses);
         cardResponse.setImplementers(implementers);
+        return cardResponse;
+    }
+
+    public CardTemplateResponse getCardTemplateResponse (Card card){
+        CardTemplateResponse cardResponse = modelMapper.map(card, CardTemplateResponse.class);
         return cardResponse;
     }
 

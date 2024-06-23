@@ -1,9 +1,12 @@
 package com.tasksmart.workspace.services;
 
+import com.tasksmart.sharedLibrary.dtos.request.ListCardTemplateRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.ListCardTemplateResponse;
 import com.tasksmart.workspace.dtos.request.CardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.response.CardResponse;
 import com.tasksmart.workspace.dtos.response.ListCardResponse;
+import com.tasksmart.workspace.models.ListCard;
 
 import java.util.List;
 
@@ -56,4 +59,10 @@ public interface ListCardService {
     List<ListCardResponse> getListCardByIdIn(List<String> listCardIds);
 
     void moveCard(String listCardId, List<String> cardIds);
+
+    List<ListCardTemplateResponse> getListCardTemplateByIdIn(List<String> listCardIds);
+
+    ListCardTemplateResponse createListCardTemplate(ListCardTemplateRequest listCards);
+
+    String applyTemplate(String listCardId, String projectId);
 }

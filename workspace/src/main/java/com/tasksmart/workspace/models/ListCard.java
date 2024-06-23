@@ -37,4 +37,10 @@ public class ListCard {
     /** The collapse status of the ListCard. */
     @Builder.Default
     private boolean isCollapse = false ;
+
+    public ListCard copyWithoutProject() {
+        return ListCard.builder()
+                .name(this.name)
+                .build();
+    }
 }

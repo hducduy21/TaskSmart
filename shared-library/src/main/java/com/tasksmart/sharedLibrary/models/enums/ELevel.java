@@ -1,4 +1,4 @@
-package com.tasksmart.workspace.models.enums;
+package com.tasksmart.sharedLibrary.models.enums;
 
 public enum ELevel {
     Highest,
