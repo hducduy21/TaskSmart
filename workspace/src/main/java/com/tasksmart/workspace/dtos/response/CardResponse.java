@@ -1,13 +1,11 @@
 package com.tasksmart.workspace.dtos.response;
 
-import com.tasksmart.workspace.models.Card;
 import com.tasksmart.workspace.models.UserRelation;
-import com.tasksmart.workspace.models.enums.ELevel;
-import com.tasksmart.workspace.models.enums.EStatus;
+import com.tasksmart.sharedLibrary.models.enums.ELevel;
+import com.tasksmart.sharedLibrary.models.enums.EStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor

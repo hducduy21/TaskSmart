@@ -1,6 +1,6 @@
 package com.tasksmart.workspace.dtos.response;
 
-import com.tasksmart.sharedLibrary.models.EFileType;
+import com.tasksmart.sharedLibrary.models.enums.EFileType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

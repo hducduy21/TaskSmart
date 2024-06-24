@@ -20,7 +20,7 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
     private static final String[] PERMIT_ALL_ENDPOINTS = {"/api/internal/workspaces/personal"};
-//    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {};
+    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {"/api/internal/projects/**"};
 //    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PUT_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PATCH_ENDPOINTS = {};
@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .formLogin(Customizer.withDefaults())
                 .authorizeHttpRequests(authorizeRequests ->
                     authorizeRequests.requestMatchers(PERMIT_ALL_ENDPOINTS).permitAll()
+                            .requestMatchers(HttpMethod.GET, PERMIT_ONLY_GET_ENDPOINTS).permitAll()
                             .anyRequest().authenticated())
         ;
 

@@ -1,5 +1,7 @@
 package com.tasksmart.workspace.services;
 
+import com.tasksmart.sharedLibrary.dtos.request.CardTemplateRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.CardTemplateResponse;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.AttachmentResponse;
 import com.tasksmart.workspace.dtos.response.CardResponse;
@@ -77,4 +79,10 @@ public interface CardService {
     CheckListGroupResponse updateCheckList(String cardId, String checklistGroupId, String checklistId, CardCheckListUpdationRequest cardCheckListUpdationRequest);
 
     CheckListGroupResponse removeCheckList(String cardId, String checklistGroupId, String checklistId);
+
+    List<CardTemplateResponse> getCardsTemplateByIdIn(List<String> cardIds);
+
+    CardTemplateResponse createCardTemplate(CardTemplateRequest cardTemplateRequest);
+
+    String applyTemplate(String cardId, String projectId);
 }

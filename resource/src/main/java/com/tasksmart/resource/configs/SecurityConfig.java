@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     };
 
-    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {"/api/categories/**"};
+    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {"/api/categories/**", "/api/templates/**"};
 
 //    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PUT_ENDPOINTS = {};

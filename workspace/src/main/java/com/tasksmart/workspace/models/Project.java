@@ -40,6 +40,9 @@ public class Project {
     private String workspaceId;
 
     @Builder.Default
+    private boolean isTemplate = false;
+
+    @Builder.Default
     private List<String> listCardIds = new ArrayList<>();
 
     @Builder.Default
@@ -51,6 +54,14 @@ public class Project {
     /** The list of users associated with the WorkSpace. */
     @Builder.Default
     private List<UserRelation> users = new ArrayList<>();
+
+    public Project copyWithoutWorkSpace() {
+        return Project.builder()
+                .name(this.name)
+                .background(this.background)
+                .description(this.description)
+                .build();
+    }
 
     public UserRelation getOwner() {
         return this.users.stream()

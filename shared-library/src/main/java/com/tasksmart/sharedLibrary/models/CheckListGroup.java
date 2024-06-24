@@ -1,4 +1,4 @@
-package com.tasksmart.workspace.models;
+package com.tasksmart.sharedLibrary.models;
 
 import lombok.*;
 

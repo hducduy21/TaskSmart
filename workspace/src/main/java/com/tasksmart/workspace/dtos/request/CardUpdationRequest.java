@@ -1,15 +1,13 @@
 package com.tasksmart.workspace.dtos.request;
 
-import com.tasksmart.workspace.models.Card;
-import com.tasksmart.workspace.models.enums.ELevel;
-import com.tasksmart.workspace.models.enums.EStatus;
+import com.tasksmart.sharedLibrary.models.enums.ELevel;
+import com.tasksmart.sharedLibrary.models.enums.EStatus;
 import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * This is a dto indicate for card update request.

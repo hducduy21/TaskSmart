@@ -1,6 +1,6 @@
 package com.tasksmart.sharedLibrary.utils;
 
-import com.tasksmart.sharedLibrary.models.EFileType;
+import com.tasksmart.sharedLibrary.models.enums.EFileType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

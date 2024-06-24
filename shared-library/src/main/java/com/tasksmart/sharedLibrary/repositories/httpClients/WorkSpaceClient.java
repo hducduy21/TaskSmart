@@ -1,6 +1,8 @@
 package com.tasksmart.sharedLibrary.repositories.httpClients;
 
 import com.tasksmart.sharedLibrary.configs.interceptors.FeignRequestInterceptor;
+import com.tasksmart.sharedLibrary.dtos.request.ProjectTemplateRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.WorkSpaceGeneralResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -13,4 +15,16 @@ public interface WorkSpaceClient {
 
     @PostMapping(value = "api/internal/workspaces/personal", produces = MediaType.APPLICATION_JSON_VALUE)
     WorkSpaceGeneralResponse createPersonalWorkSpace(@RequestParam String userId, @RequestParam String name,@RequestParam String username);
+
+    @PostMapping(value = "api/internal/projects/apply", produces = MediaType.APPLICATION_JSON_VALUE)
+    String applyTemplate(@RequestParam String projectId, @RequestParam String workspaceId);
+
+    @PostMapping(value = "api/internal/projects", produces = MediaType.APPLICATION_JSON_VALUE)
+    ProjectTemplateResponse createProjectTemplate(@RequestBody ProjectTemplateRequest projectTemplateRequest);
+
+    @PutMapping(value = "api/internal/projects", produces = MediaType.APPLICATION_JSON_VALUE)
+    ProjectTemplateResponse updateProjectTemplate(@RequestBody ProjectTemplateRequest projectTemplateRequest);
+
+    @GetMapping(value = "api/internal/projects/{projectId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ProjectTemplateResponse getProjectTemplate(@PathVariable String projectId);
 }
