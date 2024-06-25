@@ -1,7 +1,6 @@
 package com.tasksmart.sharedLibrary.dtos.messages;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 import java.util.Set;
 
@@ -30,7 +29,7 @@ public class UserMessage {
         private Set<String> role;
 
         /** This is the storage field for the user's avatar image. */
-        private String profileImageId;
+        private String profileImagePath;
 
         /** This is the storage field for the user's background description. */
         private String profileBackground;

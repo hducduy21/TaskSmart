@@ -283,19 +283,21 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteListCard(String projectId, String listCardId) {
-        Project workSpace = projectRepository.findById(projectId).orElseThrow(
+        Project project = projectRepository.findById(projectId).orElseThrow(
                 ()->new ResourceNotFound("WorkSpace not found!")
         );
 
         String userId = authenticationUtils.getUserIdAuthenticated();
 
-        if(!workSpace.getOwner().getUserId().equals(userId)){
-            if(workSpace.getUsers().stream().noneMatch(userRelation -> userRelation.getUserId().equals(userId))){
+        if(!project.getOwner().getUserId().equals(userId)){
+            if(project.getUsers().stream().noneMatch(userRelation -> userRelation.getUserId().equals(userId))){
                 throw new Forbidden("You are not authorized to update this list card!");
             }
         }
 
         listCardService.deleteListCard(listCardId);
+        project.getListCardIds().remove(listCardId);
+        projectRepository.save(project);
     }
 
     @Override

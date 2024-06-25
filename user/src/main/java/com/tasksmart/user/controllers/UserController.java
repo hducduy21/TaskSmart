@@ -102,13 +102,8 @@ public class UserController {
         userService.deleteById(userId);
     }
 
-    @GetMapping("/profileImage")
-    public byte[] getProfileImage(){
-        return userService.getProfileImage();
-    }
-
     @PostMapping("/profileImage")
-    public void uploadProfileImage(@RequestParam MultipartFile file){
+    public void uploadProfileImage(@RequestPart MultipartFile file){
         userService.uploadProfileImage(file);
     }
 }

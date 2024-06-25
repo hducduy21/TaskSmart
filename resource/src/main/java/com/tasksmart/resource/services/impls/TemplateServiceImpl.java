@@ -10,6 +10,7 @@ import com.tasksmart.resource.models.Template;
 import com.tasksmart.resource.repositories.CategoryRepository;
 import com.tasksmart.resource.repositories.TemplateRepository;
 import com.tasksmart.resource.services.TemplateService;
+import com.tasksmart.sharedLibrary.configs.AppConstant;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
@@ -104,18 +105,13 @@ public class TemplateServiceImpl implements TemplateService {
         );
 
         //validate image
-        if (image.getSize() > 2 * 1024 * 1024) { // 2MB
-            throw new IllegalArgumentException("File size must be less than 2MB.");
-        }
-        String contentType = image.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new BadRequest("Invalid file type. Please upload an image file.");
-        }
+        fileUtil.requireMaxSize(image, 2);
+        fileUtil.requireImage(image);
 
-        String imageId = UUID.randomUUID().toString() + "." + fileUtil.getFileExtension(image);
+        String imageId = UUID.randomUUID() + "." + fileUtil.getFileExtension(image);
 
         try {
-            awsS3Service.uploadFile(imageId,"templates", image);
+            awsS3Service.uploadFile(imageId, AppConstant.IMG_TEMPLATE_FOLDER, image);
             template.setImageId(imageId);
             templateRepository.save(template);
             return getTemplateResponse(template);
@@ -128,7 +124,7 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public byte[] getTemplateImage(String imageId) {
         try {
-            return awsS3Service.getByte("templates/"+imageId);
+            return awsS3Service.getByte(imageId, AppConstant.IMG_TEMPLATE_FOLDER);
         }catch (Exception e){
             log.error("Error getting image from s3", e);
             throw new InternalServerError("Error getting image from s3");
@@ -142,19 +138,14 @@ public class TemplateServiceImpl implements TemplateService {
         );
 
         //validate image
-        if (image.getSize() > 2 * 1024 * 1024) { // 2MB
-            throw new IllegalArgumentException("File size must be less than 2MB.");
-        }
-        String contentType = image.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new BadRequest("Invalid file type. Please upload an image file.");
-        }
+        fileUtil.requireMaxSize(image, 2);
+        fileUtil.requireImage(image);
 
         String imageId = UUID.randomUUID().toString() + "." + fileUtil.getFileExtension(image);
 
         try {
-            awsS3Service.deleteFile("templates/"+template.getImageId());
-            awsS3Service.uploadFile(imageId,"templates", image);
+            awsS3Service.deleteFile(template.getImageId(), AppConstant.IMG_TEMPLATE_FOLDER);
+            awsS3Service.uploadFile(imageId, AppConstant.IMG_TEMPLATE_FOLDER, image);
             template.setImageId(imageId);
             templateRepository.save(template);
             return getTemplateResponse(template);
@@ -224,7 +215,7 @@ public class TemplateServiceImpl implements TemplateService {
     private TemplateGeneralResponse getTemplateGeneralResponse(Template template) {
         TemplateGeneralResponse templateResponse = modelMapper.map(template, TemplateGeneralResponse.class);
 
-        templateResponse.setImageUrl("/templates/"+template.getImageId());
+        templateResponse.setImageUrl("templates/"+template.getImageId());
 
         Category category = categoryRepository.findById(template.getCategoryId()).orElseThrow(
                 () -> new ResourceNotFound("Category not found")
@@ -239,7 +230,7 @@ public class TemplateServiceImpl implements TemplateService {
         TemplateResponse templateResponse = modelMapper.map(template, TemplateResponse.class);
 
         if(template.getImageId() != null)
-            templateResponse.setImageUrl("/templates/img/"+template.getImageId());
+            templateResponse.setImagePath("templates/"+template.getImageId());
 
         Category category = categoryRepository.findById(template.getCategoryId()).orElseThrow(
                 () -> new ResourceNotFound("Category not found")
@@ -257,7 +248,7 @@ public class TemplateServiceImpl implements TemplateService {
         TemplateResponse templateResponse = modelMapper.map(template, TemplateResponse.class);
         templateResponse.setProject(projectTemplateResponse);
         if(template.getImageId() != null)
-            templateResponse.setImageUrl("/templates/img/"+template.getImageId());
+            templateResponse.setImagePath("templates/"+template.getImageId());
 
         Category category = categoryRepository.findById(template.getCategoryId()).orElseThrow(
                 () -> new ResourceNotFound("Category not found")

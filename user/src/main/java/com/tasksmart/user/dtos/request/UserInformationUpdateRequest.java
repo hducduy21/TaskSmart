@@ -1,6 +1,6 @@
 package com.tasksmart.user.dtos.request;
 
-import com.tasksmart.user.models.enums.EGender;
+import com.tasksmart.sharedLibrary.models.enums.EGender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

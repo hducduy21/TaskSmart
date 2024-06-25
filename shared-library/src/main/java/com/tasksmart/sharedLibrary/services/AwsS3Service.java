@@ -46,10 +46,23 @@ public class AwsS3Service {
         s3Client.deleteObject(builder -> builder.bucket(bucketName).key(key));
     }
 
+    public void deleteFile(String key, String folder) {
+        s3Client.deleteObject(builder -> builder.bucket(bucketName).key(folder + "/" + key));
+    }
+
     public byte[] getByte(String key) throws IOException {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
+                .build();
+        ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
+        return response.readAllBytes();
+    }
+
+    public byte[] getByte(String key, String folder) throws IOException {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(folder + "/" + key)
                 .build();
         ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
         return response.readAllBytes();

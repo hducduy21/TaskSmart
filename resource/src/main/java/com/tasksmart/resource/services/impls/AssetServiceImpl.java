@@ -1,6 +1,7 @@
 package com.tasksmart.resource.services.impls;
 
 import com.tasksmart.resource.services.AssetService;
+import com.tasksmart.sharedLibrary.configs.AppConstant;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,18 @@ public class AssetServiceImpl implements AssetService {
 
     @Override
     public byte[] getImage(String imgId) {
-
-        System.out.println("Getting image from S3: "+ imgId);
         try {
             return awsS3Service.getByte(imgId);
+        }catch (Exception e){
+            log.error("Error getting image from S3: {}", e.getMessage());
+            throw new ResourceNotFound("Error getting image from S3");
+        }
+    }
+
+    @Override
+    public byte[] getUserProfileImage(String imgId) {
+        try {
+            return awsS3Service.getByte(imgId, AppConstant.IMG_USER_FOLDER+"/" + imgId);
         }catch (Exception e){
             log.error("Error getting image from S3: {}", e.getMessage());
             throw new ResourceNotFound("Error getting image from S3");
