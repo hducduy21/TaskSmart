@@ -1,5 +1,6 @@
 package com.tasksmart.resource.models;
 
+import com.tasksmart.sharedLibrary.models.enums.EGender;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,5 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Avatar {
     @Id
     private String id;
-    private String fileName;
+    private EGender gender;
+    private String imageId;
 }

@@ -18,7 +18,7 @@ public class TemplateResponse {
     private String description;
     private int viewCount;
     private int useCount;
-    private String imageUrl;
+    private String imagePath;
     private CategoryResponse category;
     private ProjectTemplateResponse project;
     private Date createdDate;

@@ -61,5 +61,4 @@ public interface UserService {
     void deleteById(String id);
 
     void uploadProfileImage(MultipartFile file);
-    byte[] getProfileImage();
 }

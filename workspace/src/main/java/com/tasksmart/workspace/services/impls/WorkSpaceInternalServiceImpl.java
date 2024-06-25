@@ -9,14 +9,11 @@ import com.tasksmart.workspace.services.ProjectService;
 import com.tasksmart.workspace.services.WorkSpaceInternalService;
 import com.tasksmart.sharedLibrary.dtos.messages.UserMessage;
 import com.tasksmart.sharedLibrary.dtos.responses.WorkSpaceGeneralResponse;
-import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
-import com.tasksmart.sharedLibrary.exceptions.UnauthenticateException;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -72,7 +69,7 @@ public class WorkSpaceInternalServiceImpl implements WorkSpaceInternalService {
                     {
                         if(StringUtils.equals(userRelation.getUserId(), userMessage.getId())){
                             userRelation.setName(userMessage.getName());
-                            userRelation.setUsername(userMessage.getProfileImageId());
+                            userRelation.setUsername(userMessage.getProfileImagePath());
                             userRelation.setUsername(userMessage.getUsername());
                         }
                     });

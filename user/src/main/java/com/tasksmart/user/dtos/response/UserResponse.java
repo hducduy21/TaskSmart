@@ -1,7 +1,7 @@
 package com.tasksmart.user.dtos.response;
 
 import com.tasksmart.user.models.User;
-import com.tasksmart.user.models.enums.EGender;
+import com.tasksmart.sharedLibrary.models.enums.EGender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,7 +38,7 @@ public class UserResponse {
     private Set<String> role;
 
     /** This is the storage field for the user's avatar image. */
-    private String profileImageId;
+    private String profileImagePath;
 
     /** This is the storage field for the user's position. */
     private String position;

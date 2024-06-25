@@ -20,13 +20,13 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
     private static final String[] PERMIT_ALL_ENDPOINTS = {
-            "/api/img/**",
+        "/api/img/**",
     "/api/categories/**",
-    "/api/unsplash/**"
-
+    "/api/unsplash/**",
+        "/api/image/**"
     };
 
-    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {"/api/categories/**", "/api/templates/**"};
+    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {"/api/categories/**", "/api/templates/**", "/api/avatars/**"};
 
 //    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PUT_ENDPOINTS = {};

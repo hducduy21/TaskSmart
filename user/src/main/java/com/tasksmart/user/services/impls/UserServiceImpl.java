@@ -2,6 +2,7 @@ package com.tasksmart.user.services.impls;
 
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.repositories.httpClients.AvatarClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.NotificationClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.user.dtos.request.UserInformationUpdateRequest;
@@ -51,6 +52,7 @@ public class UserServiceImpl implements UserService {
     private final KafkaTemplate<String,Object> kafkaTemplate;
     private final AuthenticationUtils authenticationUtils;
     private final AwsS3Service awsS3Service;
+    private final AvatarClient avatarClient;
 
     /** {@inheritDoc} */
     @PreAuthorize("hasRole('ADMIN')")
@@ -116,6 +118,7 @@ public class UserServiceImpl implements UserService {
         if(!validEmailCode){
             throw new BadRequest(1031,"The email verification code is incorrect or has expired!");
         }
+        String avatar = avatarClient.getAvatarPathRandom(userRegistrationRequest.getGender());
 
         HashSet<String> roles = new HashSet<>();
         roles.add(AppConstant.Role_User);
@@ -124,6 +127,7 @@ public class UserServiceImpl implements UserService {
         user.setRole(roles);
         user.setEnabled(true);
         user.setLocked(false);
+        user.setProfileImagePath(avatar);
         userRepository.save(user);
         try {
             System.out.println("User: " + user.getId());
@@ -189,26 +193,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public byte[] getProfileImage() {
-        String userId = authenticationUtils.getUserIdAuthenticated();
-        try {
-            return awsS3Service.getByte(userId);
-        }catch (Exception e){
-            log.error("Error: get profile image {}", e.getMessage());
-            throw new InternalServerError("Error getting profile image! Please try later.");
-        }
-    }
-
-    @Override
     public void uploadProfileImage(MultipartFile file) {
         String userId = authenticationUtils.getUserIdAuthenticated();
-        String fileName = "avt-" + userId;
+        String fileId = userId;
         try {
-            awsS3Service.uploadFile(fileName, file);
+            awsS3Service.uploadFile(fileId, AppConstant.IMG_USER_FOLDER + "/" + userId, file);
             Optional<User> userOptional = userRepository.findById(userId);
             if(userOptional.isPresent()){
                 User user = userOptional.get();
-                user.setProfileImageId(fileName);
+                user.setProfileImagePath("user/" + fileId);
                 userRepository.save(user);
             }
 

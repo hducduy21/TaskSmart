@@ -1,6 +1,6 @@
 package com.tasksmart.user.models;
 
-import com.tasksmart.user.models.enums.EGender;
+import com.tasksmart.sharedLibrary.models.enums.EGender;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -41,13 +41,14 @@ public class User {
     private String email;
 
     /** This is the storage field for the user's gender. */
-    private EGender gender;
+    @Builder.Default
+    private EGender gender = EGender.male;
 
     /** This is the storage field for the user's role. */
     private Set<String> role;
 
     /** This is the storage field for the user's avatar image. */
-    private String profileImageId;
+    private String profileImagePath;
 
     /** This is the storage field for the user's position. */
     private String position;
