@@ -1,5 +1,6 @@
 package com.tasksmart.user.services;
 
+import com.tasksmart.user.dtos.request.UpdateEmailRequest;
 import com.tasksmart.user.dtos.request.UserInformationUpdateRequest;
 import com.tasksmart.user.dtos.request.UserRegistrationRequest;
 import com.tasksmart.user.dtos.response.UserResponse;
@@ -29,6 +30,8 @@ public interface UserService {
     UserResponse getUserByIdOrUsername(String id);
 
     UserResponse getProfile();
+
+    UserResponse updateEmail(UpdateEmailRequest updateEmailRequest);
 
     /**
      * Creates a new user based on the provided registration request.
@@ -61,4 +64,5 @@ public interface UserService {
     void deleteById(String id);
 
     void uploadProfileImage(MultipartFile file);
+
 }

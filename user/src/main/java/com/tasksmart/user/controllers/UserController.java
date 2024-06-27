@@ -1,5 +1,6 @@
 package com.tasksmart.user.controllers;
 
+import com.tasksmart.user.dtos.request.UpdateEmailRequest;
 import com.tasksmart.user.dtos.request.UserInformationUpdateRequest;
 import com.tasksmart.user.dtos.request.UserRegistrationRequest;
 import com.tasksmart.user.dtos.response.UserResponse;
@@ -90,6 +91,11 @@ public class UserController {
     public UserResponse changePassword(){
         //wait to authentication function.
         return null;
+    }
+
+    @PatchMapping("email")
+    public UserResponse updateUserEmail(@Valid @RequestBody UpdateEmailRequest updateEmailRequest){
+        return userService.updateEmail(updateEmailRequest);
     }
 
     /**

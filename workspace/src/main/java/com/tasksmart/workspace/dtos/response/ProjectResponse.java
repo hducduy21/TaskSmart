@@ -2,11 +2,7 @@ package com.tasksmart.workspace.dtos.response;
 
 import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
 import com.tasksmart.workspace.models.UserRelation;
-import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -34,6 +30,8 @@ public class ProjectResponse {
     /** This is the storage field for the project's description. */
     private String description;
 
+    private WorkspaceResponse workspace;
+
     /** This is the storage field for the project's invite code. */
     @Builder.Default
     private String inviteCode = "";
@@ -43,4 +41,11 @@ public class ProjectResponse {
 
     /** This is the storage field for the project's list of users. */
     private List<UserRelation> users;
+
+    @Getter
+    @Setter
+    public static class WorkspaceResponse {
+        private String id;
+        private String name;
+    }
 }
