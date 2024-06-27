@@ -3,8 +3,10 @@ package com.tasksmart.workspace.services.impls;
 import com.tasksmart.sharedLibrary.dtos.request.ProjectTemplateRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.ListCardTemplateResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
+import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
+import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import com.tasksmart.workspace.models.Project;
@@ -17,6 +19,7 @@ import com.tasksmart.workspace.repositories.WorkSpaceRepository;
 import com.tasksmart.workspace.services.ListCardService;
 import com.tasksmart.workspace.services.ProjectInternalService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,7 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
     private final ModelMapper modelMapper;
     private final AuthenticationUtils authenticationUtils;
     private final WorkSpaceRepository workSpaceRepository;
+    private final UnsplashClient unsplashClient;
 
     @Override
     public ProjectTemplateResponse getProjectTemplate(String projectId) {
@@ -101,6 +105,15 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
     private ProjectTemplateResponse getProjectTemplateResponse(Project project){
         ProjectTemplateResponse projectResponse = modelMapper.map(project, ProjectTemplateResponse.class);
         projectResponse.setListCards(listCardService.getListCardTemplateByIdIn(project.getListCardIds()));
+
+        if(StringUtils.isNotBlank(project.getBackground())){
+            if(isColor(project.getBackground())) {
+                projectResponse.setBackgroundColor(project.getBackground());
+            }else{
+                UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(project.getBackground());
+                projectResponse.setBackgroundUnsplash(unsplashResponse);
+            }
+        }
         return projectResponse;
     }
 
@@ -113,5 +126,9 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
     private UserRelation getUserRelation(String userId){
         UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userId);
         return modelMapper.map(userGeneralResponse, UserRelation.class);
+    }
+
+    private boolean isColor(String background) {
+        return StringUtils.startsWith(background, "#") && background.length() == 7;
     }
 }

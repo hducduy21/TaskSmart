@@ -2,6 +2,7 @@ package com.tasksmart.user.services.impls;
 
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.models.enums.EGender;
 import com.tasksmart.sharedLibrary.repositories.httpClients.AvatarClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.NotificationClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
@@ -21,6 +22,7 @@ import com.tasksmart.sharedLibrary.repositories.httpClients.WorkSpaceClient;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -118,7 +120,12 @@ public class UserServiceImpl implements UserService {
         if(!validEmailCode){
             throw new BadRequest(1031,"The email verification code is incorrect or has expired!");
         }
-        String avatar = avatarClient.getAvatarPathRandom(userRegistrationRequest.getGender());
+
+        String avatar = "";
+        if(userRegistrationRequest.getGender()!=null) {
+            avatar = avatarClient.getAvatarPathRandom(userRegistrationRequest.getGender());
+        }else
+            avatar = avatarClient.getAvatarPathRandom(EGender.male);
 
         HashSet<String> roles = new HashSet<>();
         roles.add(AppConstant.Role_User);
@@ -130,7 +137,6 @@ public class UserServiceImpl implements UserService {
         user.setProfileImagePath(avatar);
         userRepository.save(user);
         try {
-            System.out.println("User: " + user.getId());
             WorkSpaceGeneralResponse workSpaceGeneralResponse = workSpaceClient.createPersonalWorkSpace(user.getId(), user.getName(), user.getUsername());
             User.WorkSpace personalWorkSpace = User.WorkSpace.builder()
                     .id(workSpaceGeneralResponse.getId())

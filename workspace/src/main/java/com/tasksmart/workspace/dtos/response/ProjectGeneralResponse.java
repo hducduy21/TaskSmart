@@ -22,9 +22,6 @@ public class ProjectGeneralResponse {
     /** This is the storage field for the project's name. */
     private String name;
 
-    /** This is the storage field for the project's background image. */
-    private String background;
-
     /** This is the storage field for the project's description. */
     private String description;
 }

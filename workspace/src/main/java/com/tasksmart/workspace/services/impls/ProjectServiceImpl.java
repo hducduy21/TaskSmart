@@ -1,6 +1,8 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
@@ -55,6 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final AuthenticationUtils authenticationUtils;
     private final AwsS3Service awsS3Service;
+    private final UnsplashClient unsplashClient;
 
     /** {@inheritDoc} */
     @Override
@@ -388,6 +391,16 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectResponse projectResponse = modelMapper.map(project, ProjectResponse.class);
         projectResponse.setListCards(listCardService.getListCardByIdIn(project.getListCardIds()));
         projectResponse.setInviteCode(getInviteCode(project.getInvitation()));
+
+        if(StringUtils.isNotBlank(project.getBackground())){
+            if(isColor(project.getBackground())) {
+                projectResponse.setBackgroundColor(project.getBackground());
+            }else{
+                UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(project.getBackground());
+                projectResponse.setBackgroundUnsplash(unsplashResponse);
+            }
+        }
+
         return projectResponse;
     }
 
@@ -413,5 +426,9 @@ public class ProjectServiceImpl implements ProjectService {
     private UserRelation getUserRelation(String userId){
         UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userId);
         return modelMapper.map(userGeneralResponse, UserRelation.class);
+    }
+
+    private boolean isColor(String background) {
+        return StringUtils.startsWith(background, "#") && background.length() == 7;
     }
 }

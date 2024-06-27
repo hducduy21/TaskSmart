@@ -1,11 +1,16 @@
 package com.tasksmart.resource.services.impls;
 
+import com.tasksmart.resource.dtos.responses.UnsplashPagination;
+import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
 import com.tasksmart.resource.services.UnsplashService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import com.tasksmart.sharedLibrary.exceptions.BadRequest;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.List;
 
 /**
  * UnsplashServiceImpl
@@ -13,48 +18,48 @@ import org.springframework.web.reactive.function.client.WebClient;
  * This class is responsible for making requests to Unsplash API
  * @author Duc Nguyen
  */
-
+@RequiredArgsConstructor
 @Service
 public class UnsplashServiceImpl implements UnsplashService {
 
-    @Value("${unsplash.api.url}")
-    private String apiUrl;
-
-    @Value("${unsplash.access.key}")
-    private String accessKey;
-
     private final WebClient webClient;
 
-
-    public UnsplashServiceImpl(WebClient.Builder webClientBuilder,
-                           @Value("${unsplash.api.url}") String apiUrl,
-                           @Value("${unsplash.access.key}") String accessKey) {
-        this.apiUrl = apiUrl;
-        this.accessKey = accessKey;
-        this.webClient = webClientBuilder
-            .baseUrl(apiUrl)
-            .defaultHeader("Authorization", "Client-ID " + accessKey)
-            .build();
-    }
-
     @Override
-    public Mono<String> getPhotos(String query) {
+    public Mono<List<UnsplashResponse>> getPhotos(String query, int page, int per_page) {
+        if(StringUtils.isBlank(query)){
+            return this.getRandomPhotos(page*per_page);
+        }
+
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/search/photos")
+                .uri(uriBuilder -> uriBuilder.path("/search/photos")
                 .queryParam("query", query)
+                .queryParam("page", page)
+                .queryParam("per_page", per_page)
                 .build())
-            .retrieve()
-            .bodyToMono(String.class);
+                .retrieve()
+                .bodyToMono(UnsplashPagination.class)
+                .map(UnsplashPagination::getResults);
 
     }
 
     @Override
-    public Mono<String> getRandomPhotos() {
+    public Mono<UnsplashResponse> getPhotoById(String unsplashId) {
+        if(StringUtils.isBlank(unsplashId)){
+            throw new BadRequest("Unsplash ID is required");
+        }
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/photos/random")
-                .queryParam("count", 10)
-                .build())
-            .retrieve()
-            .bodyToMono(String.class);
+                .uri(uriBuilder -> uriBuilder.path("/photos/"+unsplashId)
+                        .build())
+                .retrieve()
+                .bodyToMono(UnsplashResponse.class);
+    }
+
+    public Mono<List<UnsplashResponse>> getRandomPhotos(int count) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/photos/random")
+                        .queryParam("count", count)
+                        .build())
+                .retrieve()
+                .bodyToFlux(UnsplashResponse.class).collectList();
     }
 }

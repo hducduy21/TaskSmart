@@ -16,7 +16,8 @@ public class ProjectTemplateResponse {
 
     private String name;
 
-    private String background;
+    private String backgroundColor;
+    private UnsplashResponse backgroundUnsplash;
 
     private String description;
 

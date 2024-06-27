@@ -79,11 +79,9 @@ public class AvatarServiceImpl implements AvatarService {
 
     @Override
     public String randomAvatarByGender(EGender gender) {
-//        EGender genderEnum = EGender.valueOf(gender);
-//        System.out.println(genderEnum);
         List<Avatar> avatar = avatarRepository.findAllByGender(gender);
         if(CollectionUtils.isEmpty(avatar)){
-            throw new ResourceNotFound("Avatar default is empty!");
+            return "";
         }
         Avatar randomAvatar = avatar.get((int) (Math.random() * avatar.size()));
         AvatarResponse avatarResponse = getAvatarResponse(randomAvatar);
