@@ -29,11 +29,6 @@ public class UserInformationUpdateRequest {
     @Pattern(regexp = "^[a-zA-Z0-9_-]*$", message = "Username must contain only letters, numbers, underscores, and hyphens")
     private String username;
 
-    /** This is the storage field for the user's email. */
-    @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Invalid email format")
-    private String email;
-
     /** This is the storage field for user's gender */
     private EGender gender;
 

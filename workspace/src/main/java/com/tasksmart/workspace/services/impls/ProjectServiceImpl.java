@@ -7,8 +7,10 @@ import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.models.Invitation;
 import com.tasksmart.workspace.models.Project;
 import com.tasksmart.workspace.models.UserRelation;
+import com.tasksmart.workspace.models.WorkSpace;
 import com.tasksmart.workspace.models.enums.EUserRole;
 import com.tasksmart.workspace.repositories.ProjectRepository;
+import com.tasksmart.workspace.repositories.WorkSpaceRepository;
 import com.tasksmart.workspace.services.ListCardService;
 import com.tasksmart.workspace.services.ProjectService;
 import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
@@ -24,8 +26,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -46,6 +46,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     /** The ModelMapper instance for mapper dto.*/
     private final ModelMapper modelMapper;
+
+    private final WorkSpaceRepository workSpaceRepository;
 
     /** The ListCardService instance.*/
     private final ListCardService listCardService;
@@ -388,6 +390,11 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectResponse projectResponse = modelMapper.map(project, ProjectResponse.class);
         projectResponse.setListCards(listCardService.getListCardByIdIn(project.getListCardIds()));
         projectResponse.setInviteCode(getInviteCode(project.getInvitation()));
+        WorkSpace workSpace = workSpaceRepository.findById(project.getWorkspaceId()).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
+        ProjectResponse.WorkspaceResponse workspaceResponse = modelMapper.map(workSpace, ProjectResponse.WorkspaceResponse.class);
+        projectResponse.setWorkspace(workspaceResponse);
         return projectResponse;
     }
 

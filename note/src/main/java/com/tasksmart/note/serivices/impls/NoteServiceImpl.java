@@ -100,10 +100,7 @@ public class NoteServiceImpl implements NoteService{
             return noteRepository.findByUserId(userId).stream().filter(note -> !note.getArchived()).map(this::getNoteResponse).toList();
         }
 
-
-
     }
-
 
     public NoteResponse getNoteResponse(Note note){
         return modelMapper.map(note, NoteResponse.class);

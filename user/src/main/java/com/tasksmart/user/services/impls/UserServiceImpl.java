@@ -5,6 +5,7 @@ import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.sharedLibrary.repositories.httpClients.AvatarClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.NotificationClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
+import com.tasksmart.user.dtos.request.UpdateEmailRequest;
 import com.tasksmart.user.dtos.request.UserInformationUpdateRequest;
 import com.tasksmart.user.dtos.request.UserRegistrationRequest;
 import com.tasksmart.user.dtos.response.UserResponse;
@@ -21,6 +22,7 @@ import com.tasksmart.sharedLibrary.repositories.httpClients.WorkSpaceClient;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -114,7 +116,7 @@ public class UserServiceImpl implements UserService {
         }
 
         boolean validEmailCode = notificationClient.verifyEmail(userRegistrationRequest.getEmail(), userRegistrationRequest.getVerifyCode());
-        System.out.println("validEmailCode: " + validEmailCode);
+
         if(!validEmailCode){
             throw new BadRequest(1031,"The email verification code is incorrect or has expired!");
         }
@@ -161,8 +163,17 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userOptional.get();
+
+        if(!StringUtils.isBlank(userInformationUpdateRequest.getUsername())){
+            if (user.getUsername().equals(userInformationUpdateRequest.getUsername())){
+                user.setUsername(userInformationUpdateRequest.getUsername());
+            }
+            else if(userRepository.existsByUsername(userInformationUpdateRequest.getUsername())){
+                throw new ResourceConflict("Username already exists!");
+            }
+        }
+
         user.setName(userInformationUpdateRequest.getName());
-        user.setEmail(userInformationUpdateRequest.getEmail());
         user.setUsername(userInformationUpdateRequest.getUsername());
         user.setPosition(userInformationUpdateRequest.getPosition());
         user.setOrganization(userInformationUpdateRequest.getOrganization());
@@ -173,6 +184,32 @@ public class UserServiceImpl implements UserService {
         kafkaTemplate.send("user-updation", modelMapper.map(user, UserMessage.class));
 
         return this.getUserResponse(user);
+    }
+
+    @Override
+    public UserResponse updateEmail(UpdateEmailRequest updateEmailRequest) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        Optional<User> userOptional = userRepository.findById(userId);
+        if(userOptional.isEmpty()){
+            throw new ResourceNotFound("User not found!");
+        }
+
+        if(userRepository.existsByEmail(updateEmailRequest.getEmail())){
+            throw new ResourceConflict("Email already exists!");
+        }
+
+        boolean validEmailCode = notificationClient.verifyEmail(updateEmailRequest.getEmail(), updateEmailRequest.getVerifyCode());
+
+        if(!validEmailCode){
+            throw new BadRequest(1031,"The email verification code is incorrect or has expired!");
+        }
+
+        User user = userOptional.get();
+        user.setEmail(updateEmailRequest.getEmail());
+        userRepository.save(user);
+        return this.getUserResponse(user);
+
     }
 
     /** {@inheritDoc} */
