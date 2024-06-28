@@ -1,6 +1,6 @@
 package com.tasksmart.resource.controllers;
 
-import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.resource.services.UnsplashService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

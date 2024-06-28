@@ -163,6 +163,11 @@ public class ListCardServiceImpl implements ListCardService {
         return listCard.getId();
     }
 
+    @Override
+    public void deleteAllListCardByProject(String projectId) {
+        listCardRepository.deleteAllByProjectId(projectId);
+    }
+
     public ListCardResponse getListCardResponse(ListCard listCard){
         ListCardResponse listCardResponse = modelMapper.map(listCard, ListCardResponse.class);
 

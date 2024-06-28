@@ -1,6 +1,6 @@
 package com.tasksmart.resource.services;
 
-import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

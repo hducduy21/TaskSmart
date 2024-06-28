@@ -76,4 +76,5 @@ public interface WorkSpaceService {
      */
     InviteCodeResponse updateInviteCode(String workspaceId, Boolean isPublic, Boolean refresh);
 
+    WorkSpaceGeneralResponse setUnsplashBackground(String workSpaceId, String unsplashId);
 }

@@ -86,6 +86,8 @@ public class UserInternalServiceImpl implements UserInternalService {
             User.Project project = User.Project.builder()
                     .id(projectMessage.getId())
                     .name(projectMessage.getName())
+                    .backgroundColor(projectMessage.getBackgroundColor())
+                    .backgroundUnsplash(projectMessage.getBackgroundUnsplash())
                     .build();
 
             user.addProject(project);
@@ -176,6 +178,7 @@ public class UserInternalServiceImpl implements UserInternalService {
             user.getWorkspaces().forEach(workSpace -> {
                 if(StringUtils.equals(workSpace.getId(), workSpaceMessage.getId())){
                     workSpace.setName(workSpaceMessage.getName());
+                    workSpace.setBackgroundUnsplash(workSpaceMessage.getBackgroundUnsplash());
                     log.info("User-{} updated workspace-{}",userId, workSpaceMessage.getId());
                 }
             });
@@ -191,6 +194,8 @@ public class UserInternalServiceImpl implements UserInternalService {
             user.getProjects().forEach(project -> {
                 if(StringUtils.equals(project.getId(), projectMessage.getId())){
                     project.setName(projectMessage.getName());
+                    project.setBackgroundUnsplash(projectMessage.getBackgroundUnsplash());
+                    project.setBackgroundColor(projectMessage.getBackgroundColor());
                     log.info("User-{} updated project-{}",userId, projectMessage.getId());
                 }
             });

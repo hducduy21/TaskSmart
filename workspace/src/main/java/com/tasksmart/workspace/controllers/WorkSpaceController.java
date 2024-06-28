@@ -52,6 +52,12 @@ public class WorkSpaceController {
         return  workSpaceService.createWorkSpace(workSpaceRequest);
     }
 
+    @PostMapping("{workSpaceId}/background")
+    @ResponseStatus(HttpStatus.CREATED)
+    public WorkSpaceGeneralResponse createWorkSpace(@PathVariable String workSpaceId, @RequestParam String unsplashId){
+        return  workSpaceService.setUnsplashBackground(workSpaceId, unsplashId);
+    }
+
 //    @PostMapping("{workSpaceId}/members")
 //    @ResponseStatus(HttpStatus.CREATED)
 //    public SuccessResponse addMembers(@PathVariable String workSpaceId, @Valid @RequestBody MembersAdditionalRequest membersAdditionalRequest){

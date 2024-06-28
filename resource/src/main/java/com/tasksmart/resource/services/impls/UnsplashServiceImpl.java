@@ -1,7 +1,7 @@
 package com.tasksmart.resource.services.impls;
 
 import com.tasksmart.resource.dtos.responses.UnsplashPagination;
-import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.resource.services.UnsplashService;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import lombok.RequiredArgsConstructor;

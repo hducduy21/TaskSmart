@@ -7,6 +7,7 @@ import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.response.CardResponse;
 import com.tasksmart.workspace.dtos.response.ListCardResponse;
 import com.tasksmart.workspace.models.ListCard;
+import com.tasksmart.workspace.models.Project;
 
 import java.util.List;
 
@@ -65,4 +66,6 @@ public interface ListCardService {
     ListCardTemplateResponse createListCardTemplate(ListCardTemplateRequest listCards);
 
     String applyTemplate(String listCardId, String projectId);
+
+    void deleteAllListCardByProject(String projectId);
 }

@@ -99,4 +99,6 @@ public interface ProjectService {
     ProjectResponse moveCard(String projectId, MoveCardRequest moveCardRequest);
 
     byte[] viewImage(String projectId, String assetId);
+
+    void deleteAllProjectByWorkSpace(String workSpaceId);
 }

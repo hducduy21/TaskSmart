@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CardRepository extends MongoRepository<Card, String> {
     List<Card> findByIdIn(List<String> cardIds);
+    void deleteAllByProjectId(String projectId);
 }

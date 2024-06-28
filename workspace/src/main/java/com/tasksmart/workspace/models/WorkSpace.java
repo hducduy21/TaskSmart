@@ -40,6 +40,8 @@ public class WorkSpace {
     /** The description of the WorkSpace. */
     private String description;
 
+    private String backgroundUnsplashId;
+
     @Builder.Default
     private Invitation invitation = Invitation.builder()
             .isPublic(false)

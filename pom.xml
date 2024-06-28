@@ -24,6 +24,7 @@
     <module>notification</module>
     <module>cloud-config</module>
     <module>resource</module>
+    <module>activity-tracker</module>
 
     <module>note</module>
   </modules>
