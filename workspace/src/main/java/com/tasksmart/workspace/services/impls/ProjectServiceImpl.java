@@ -380,7 +380,16 @@ public class ProjectServiceImpl implements ProjectService {
      * @return the ProjectGeneralResponse.
      */
     public ProjectGeneralResponse getProjectGeneralResponse(Project project){
-        return modelMapper.map(project, ProjectGeneralResponse.class);
+        ProjectGeneralResponse projectResponse = modelMapper.map(project, ProjectGeneralResponse.class);
+        if(StringUtils.isNotBlank(project.getBackground())){
+            if(isColor(project.getBackground())) {
+                projectResponse.setBackgroundColor(project.getBackground());
+            }else{
+                UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(project.getBackground());
+                projectResponse.setBackgroundUnsplash(unsplashResponse);
+            }
+        }
+        return projectResponse;
     }
 
     /**

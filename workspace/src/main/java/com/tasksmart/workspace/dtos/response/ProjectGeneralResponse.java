@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.dtos.response;
 
+import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +25,7 @@ public class ProjectGeneralResponse {
 
     /** This is the storage field for the project's description. */
     private String description;
+
+    private String backgroundColor;
+    private UnsplashResponse backgroundUnsplash;
 }
