@@ -31,4 +31,8 @@ public class WorkSpaceMessage {
     private String description;
 
     private List<UserRelation> users;
+
+    private String interactorId;
+
+    private UnsplashResponse backgroundUnsplash;
 }

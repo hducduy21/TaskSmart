@@ -1,6 +1,6 @@
 package com.tasksmart.workspace.dtos.response;
 
-import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.workspace.models.UserRelation;
 import lombok.*;
 
@@ -30,7 +30,7 @@ public class ProjectResponse {
     /** This is the storage field for the project's description. */
     private String description;
 
-    private WorkspaceResponse workspace;
+    private WorkSpaceGeneralResponse workspace;
 
     /** This is the storage field for the project's invite code. */
     @Builder.Default
@@ -41,11 +41,4 @@ public class ProjectResponse {
 
     /** This is the storage field for the project's list of users. */
     private List<UserRelation> users;
-
-    @Getter
-    @Setter
-    public static class WorkspaceResponse {
-        private String id;
-        private String name;
-    }
 }

@@ -1,5 +1,6 @@
 package com.tasksmart.user.models;
 
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.models.enums.EGender;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -96,6 +97,8 @@ public class User {
 
         /** The name of the WorkSpace. */
         private String name;
+
+        private UnsplashResponse backgroundUnsplash;
     }
 
     @NoArgsConstructor
@@ -109,5 +112,8 @@ public class User {
 
         /** The name of the Project. */
         private String name;
+
+        private UnsplashResponse backgroundUnsplash;
+        private String backgroundColor;
     }
 }

@@ -1,7 +1,10 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.dtos.messages.UserJoinWorkSpaceMessage;
 import com.tasksmart.sharedLibrary.dtos.responses.CategoryResponse;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.repositories.httpClients.CategoryClient;
+import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
 import com.tasksmart.workspace.dtos.response.*;
@@ -15,7 +18,6 @@ import com.tasksmart.workspace.repositories.WorkSpaceRepository;
 import com.tasksmart.workspace.services.ProjectService;
 import com.tasksmart.workspace.services.WorkSpaceService;
 import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
-import com.tasksmart.sharedLibrary.dtos.messages.UserJoinProjectMessage;
 import com.tasksmart.sharedLibrary.dtos.messages.WorkSpaceMessage;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
@@ -44,6 +46,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final AuthenticationUtils authenticationUtils;
     private final KafkaTemplate<String,Object> kafkaTemplate;
     private final CategoryClient categoryClient;
+    private final UnsplashClient unsplashClient;
 
     @Override
     public List<WorkSpaceGeneralResponse> getAllWorkSpace() {
@@ -75,7 +78,11 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceRepository.save(workspace);
 
         //kafka to user service add workspace to user
-        kafkaTemplate.send("workspace-creation",modelMapper.map(workspace, WorkSpaceMessage.class));
+        WorkSpaceGeneralResponse workSpaceGeneralResponse = getWorkSpaceGeneralResponse(workspace);
+        WorkSpaceMessage workSpaceMessage = modelMapper.map(workspace, WorkSpaceMessage.class);
+        workSpaceMessage.setInteractorId(userId);
+        workSpaceMessage.setBackgroundUnsplash(workSpaceGeneralResponse.getBackgroundUnsplash());
+        kafkaTemplate.send("workspace-creation",workSpaceMessage);
         return getWorkSpaceGeneralResponse(workspace);
     }
 
@@ -94,8 +101,15 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         project.setOwner(userRelation);
         project.setWorkspaceId(workSpaceId);
 
-        kafkaTemplate.send("project-creation",modelMapper.map(project, ProjectMessage.class));
-        return projectService.saveProject(project);
+        ProjectGeneralResponse projectGeneralResponse = getProjectGeneralResponse(project);
+
+        ProjectMessage projectMessage = modelMapper.map(project, ProjectMessage.class);
+        projectMessage.setInteractorId(userId);
+        projectMessage.setBackgroundColor(projectGeneralResponse.getBackgroundColor());
+        projectMessage.setBackgroundUnsplash(projectGeneralResponse.getBackgroundUnsplash());
+        kafkaTemplate.send("project-creation",projectMessage);
+
+        return projectGeneralResponse;
     }
 
     @Override
@@ -115,8 +129,11 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpace.setDescription(workSpaceRequest.getDescription());
         workSpaceRepository.save(workSpace);
 
-        kafkaTemplate.send("workspace-updation",modelMapper.map(workSpace, WorkSpaceMessage.class));
 
+        WorkSpaceGeneralResponse workSpaceGeneralResponse = getWorkSpaceGeneralResponse(workSpace);
+        WorkSpaceMessage workSpaceMessage = modelMapper.map(workSpace, WorkSpaceMessage.class);
+        workSpaceMessage.setInteractorId(userId);
+        kafkaTemplate.send("workspace-updation",workSpaceMessage);
         return getWorkSpaceGeneralResponse(workSpace);
     }
 
@@ -125,6 +142,9 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         WorkSpace workSpace = workSpaceRepository.findById(workSpaceId).orElseThrow(
                 ()->new ResourceNotFound("WorkSpace not found!")
         );
+
+        projectService.deleteAllProjectByWorkSpace(workSpaceId);
+
         UserRelation owner = workSpace.getOwner();
 
         String userId = authenticationUtils.getUserIdAuthenticated();
@@ -138,10 +158,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     @Override
     public boolean isWorkSpaceExist(String workSpaceId) {
         return workSpaceRepository.existsById(workSpaceId);
-    }
-
-    public WorkSpaceGeneralResponse getWorkSpaceGeneralResponse(WorkSpace workSpace){
-        return modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
     }
 
     @Override
@@ -176,12 +192,12 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceRepository.save(workSpace);
 
         //Notifications to other applications to said that a user has been joined to project
-        UserJoinProjectMessage userJoinProjectMessage = UserJoinProjectMessage.builder()
+        UserJoinWorkSpaceMessage userJoinWorkSpaceMessage = UserJoinWorkSpaceMessage.builder()
                 .id(workSpace.getId())
                 .name(workSpace.getName())
                 .userId(userId)
                 .build();
-        kafkaTemplate.send("workspace-add-member", userJoinProjectMessage);
+        kafkaTemplate.send("workspace-add-member", userJoinWorkSpaceMessage);
 
         return getWorkSpaceResponse(workSpace);
     }
@@ -221,6 +237,26 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return InviteCodeResponse.builder().inviteCode(invitation.getCode()).build();
     }
 
+    @Override
+    public WorkSpaceGeneralResponse setUnsplashBackground(String workSpaceId, String unsplashId) {
+        WorkSpace workSpace = workSpaceRepository.findById(workSpaceId).orElseThrow(
+                ()->new ResourceNotFound("WorkSpace not found!")
+        );
+
+        workSpace.setBackgroundUnsplashId(unsplashId);
+        workSpaceRepository.save(workSpace);
+        return getWorkSpaceGeneralResponse(workSpace);
+    }
+
+    public WorkSpaceGeneralResponse getWorkSpaceGeneralResponse(WorkSpace workSpace){
+        WorkSpaceGeneralResponse workSpaceResponse = modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
+        if(StringUtils.isNotBlank(workSpace.getBackgroundUnsplashId())){
+            UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(workSpace.getBackgroundUnsplashId());
+            workSpaceResponse.setBackgroundUnsplash(unsplashResponse);
+        }
+        return modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
+    }
+
     public WorkSpaceResponse getWorkSpaceResponse(WorkSpace workSpace){
         WorkSpaceResponse workSpaceResponse = modelMapper.map(workSpace, WorkSpaceResponse.class);
         workSpaceResponse.setProjects(projectService.getAllProjectByWorkSpace(workSpace.getId()));
@@ -229,11 +265,29 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
             CategoryResponse categoryResponse = categoryClient.getCategory(workSpace.getCategoryId());
             workSpaceResponse.setCategory(categoryResponse);
         }
+
+        if(StringUtils.isNotBlank(workSpace.getBackgroundUnsplashId())){
+            UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(workSpace.getBackgroundUnsplashId());
+            workSpaceResponse.setBackgroundUnsplash(unsplashResponse);
+        }
         return workSpaceResponse;
     }
 
     private UserRelation getUserRelation(String userId){
         UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userId);
         return modelMapper.map(userGeneralResponse, UserRelation.class);
+    }
+
+    public ProjectGeneralResponse getProjectGeneralResponse(Project project){
+        ProjectGeneralResponse projectResponse = modelMapper.map(project, ProjectGeneralResponse.class);
+        if(StringUtils.isNotBlank(project.getBackground())){
+            if(StringUtils.startsWith((project.getBackground()), "#") && (project.getBackground()).length() == 7) {
+                projectResponse.setBackgroundColor(project.getBackground());
+            }else{
+                UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(project.getBackground());
+                projectResponse.setBackgroundUnsplash(unsplashResponse);
+            }
+        }
+        return projectResponse;
     }
 }

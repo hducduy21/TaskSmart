@@ -1,4 +1,4 @@
-package com.tasksmart.sharedLibrary.dtos.responses;
+package com.tasksmart.sharedLibrary.dtos.messages;
 
 import lombok.*;
 

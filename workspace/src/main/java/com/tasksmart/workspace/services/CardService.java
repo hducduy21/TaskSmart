@@ -85,4 +85,6 @@ public interface CardService {
     CardTemplateResponse createCardTemplate(CardTemplateRequest cardTemplateRequest);
 
     String applyTemplate(String cardId, String projectId);
+
+    void deleteAllCardByProject(String id);
 }

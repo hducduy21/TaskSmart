@@ -1,6 +1,6 @@
 package com.tasksmart.workspace.dtos.response;
 
-import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,4 +28,5 @@ public class ProjectGeneralResponse {
 
     private String backgroundColor;
     private UnsplashResponse backgroundUnsplash;
+
 }

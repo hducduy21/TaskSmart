@@ -16,6 +16,7 @@ import com.tasksmart.workspace.dtos.response.CheckListGroupResponse;
 import com.tasksmart.workspace.dtos.response.CommentResponse;
 import com.tasksmart.workspace.models.*;
 import com.tasksmart.workspace.repositories.CardRepository;
+import com.tasksmart.workspace.repositories.ListCardRepository;
 import com.tasksmart.workspace.repositories.ProjectRepository;
 import com.tasksmart.workspace.services.CardService;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
@@ -32,6 +33,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
+    private final ListCardRepository listCardRepository;
     private final ModelMapper modelMapper;
     private final ProjectRepository projectRepository;
     private final AuthenticationUtils authenticationUtils;
@@ -66,10 +68,15 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public void deleteCard(String cardId) {
-        boolean exists = cardRepository.existsById(cardId);
-        if(!exists){
-            throw new ResourceNotFound("Card not found!");
+        Card card = cardRepository.findById(cardId).orElseThrow(
+                ()->new ResourceNotFound("Card not found!")
+        );
+        List<ListCard> listCards = listCardRepository.findAllByProjectIdAndCardIdsContains(card.getProjectId(), cardId);
+        for(ListCard listCard: listCards){
+            listCard.getCardIds().remove(cardId);
+            listCardRepository.save(listCard);
         }
+
         cardRepository.deleteById(cardId);
     }
 
@@ -491,6 +498,11 @@ public class CardServiceImpl implements CardService {
         card.setProjectId(projectId);
         cardRepository.save(card);
         return card.getId();
+    }
+
+    @Override
+    public void deleteAllCardByProject(String id) {
+        cardRepository.deleteAllByProjectId(id);
     }
 
     private Project isUserInTheProject(String userId, String projectId){

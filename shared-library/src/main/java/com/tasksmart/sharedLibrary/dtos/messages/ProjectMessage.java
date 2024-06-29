@@ -21,5 +21,12 @@ public class ProjectMessage {
     /** The description of the WorkSpace. */
     private String description;
 
+    private String workspaceId;
+
+    private String interactorId;
+
     private List<UserRelation> users;
+
+    private UnsplashResponse backgroundUnsplash;
+    private String backgroundColor;
 }

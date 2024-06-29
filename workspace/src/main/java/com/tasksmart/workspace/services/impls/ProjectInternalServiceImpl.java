@@ -1,9 +1,10 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
 import com.tasksmart.sharedLibrary.dtos.request.ProjectTemplateRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.ListCardTemplateResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
-import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
@@ -11,9 +12,6 @@ import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import com.tasksmart.workspace.models.Project;
 import com.tasksmart.workspace.models.UserRelation;
-import com.tasksmart.workspace.models.WorkSpace;
-import com.tasksmart.workspace.models.enums.EUserRole;
-import com.tasksmart.workspace.repositories.CardRepository;
 import com.tasksmart.workspace.repositories.ProjectRepository;
 import com.tasksmart.workspace.repositories.WorkSpaceRepository;
 import com.tasksmart.workspace.services.ListCardService;
@@ -21,9 +19,9 @@ import com.tasksmart.workspace.services.ProjectInternalService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +36,7 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
     private final AuthenticationUtils authenticationUtils;
     private final WorkSpaceRepository workSpaceRepository;
     private final UnsplashClient unsplashClient;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public ProjectTemplateResponse getProjectTemplate(String projectId) {
@@ -98,6 +97,10 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
 
         project.setListCardIds(listCardIds);
         projectRepository.save(project);
+
+        ProjectMessage projectMessage = modelMapper.map(project, ProjectMessage.class);
+        projectMessage.setInteractorId(userId);
+        kafkaTemplate.send("project-creation",modelMapper.map(project, ProjectMessage.class));
 
         return project.getId()  ;
     }

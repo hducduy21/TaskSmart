@@ -1,7 +1,6 @@
 package com.tasksmart.sharedLibrary.repositories.httpClients;
 
-import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
-import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;

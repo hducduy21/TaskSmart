@@ -1,6 +1,6 @@
 package com.tasksmart.workspace.services.impls;
 
-import com.tasksmart.sharedLibrary.dtos.responses.UnsplashResponse;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
@@ -13,6 +13,7 @@ import com.tasksmart.workspace.models.WorkSpace;
 import com.tasksmart.workspace.models.enums.EUserRole;
 import com.tasksmart.workspace.repositories.ProjectRepository;
 import com.tasksmart.workspace.repositories.WorkSpaceRepository;
+import com.tasksmart.workspace.services.CardService;
 import com.tasksmart.workspace.services.ListCardService;
 import com.tasksmart.workspace.services.ProjectService;
 import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
@@ -53,6 +54,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     /** The ListCardService instance.*/
     private final ListCardService listCardService;
+    private final CardService cardService;
 
     private final UserClient userClient;
 
@@ -110,10 +112,16 @@ public class ProjectServiceImpl implements ProjectService {
 
         projectRepository.save(project);
 
-        //Notifications to other applications to said that a new project has been created
-        kafkaTemplate.send("project-creation",modelMapper.map(project, ProjectMessage.class));
+        ProjectGeneralResponse projectGeneralResponse = getProjectGeneralResponse(project);
 
-        return getProjectGeneralResponse(project);
+        //Notifications to other applications to said that a new project has been created
+        ProjectMessage projectMessage = modelMapper.map(project, ProjectMessage.class);
+        projectMessage.setInteractorId(userId);
+        projectMessage.setBackgroundColor(projectGeneralResponse.getBackgroundColor());
+        projectMessage.setBackgroundUnsplash(projectGeneralResponse.getBackgroundUnsplash());
+        kafkaTemplate.send("project-creation",projectMessage);
+
+        return projectGeneralResponse;
     }
 
     /** {@inheritDoc} */
@@ -145,8 +153,16 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(project);
 
         //Notifications to other applications to said that a project has been updated
-        kafkaTemplate.send("project-updation", modelMapper.map(project, ProjectMessage.class));
-        return getProjectGeneralResponse(project);
+        ProjectGeneralResponse projectGeneralResponse = getProjectGeneralResponse(project);
+
+        //Notifications to other applications to said that a new project has been created
+        ProjectMessage projectMessage = modelMapper.map(project, ProjectMessage.class);
+        projectMessage.setInteractorId(userId);
+        projectMessage.setBackgroundColor(projectGeneralResponse.getBackgroundColor());
+        projectMessage.setBackgroundUnsplash(projectGeneralResponse.getBackgroundUnsplash());
+        kafkaTemplate.send("project-updation",projectMessage);
+
+        return projectGeneralResponse;
     }
 
     /** {@inheritDoc} */
@@ -189,6 +205,10 @@ public class ProjectServiceImpl implements ProjectService {
         if(!projectRepository.existsById(projectId)){
             throw new ResourceNotFound("Project not found!");
         }
+
+        listCardService.deleteAllListCardByProject(projectId);
+        cardService.deleteAllCardByProject(projectId);
+
         projectRepository.deleteById(projectId);
     }
 
@@ -371,7 +391,15 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-
+    @Override
+    public void deleteAllProjectByWorkSpace(String workSpaceId) {
+        List<Project> projects = projectRepository.findByWorkspaceId(workSpaceId);
+        projects.forEach(project -> {
+            listCardService.deleteAllListCardByProject(project.getId());
+            cardService.deleteAllCardByProject(project.getId());
+        });
+        projectRepository.deleteAll(projects);
+    }
 
     /**
      * Get ProjectGeneralResponse from Project.
@@ -415,7 +443,11 @@ public class ProjectServiceImpl implements ProjectService {
         WorkSpace workSpace = workSpaceRepository.findById(project.getWorkspaceId()).orElseThrow(
                 ()->new ResourceNotFound("WorkSpace not found!")
         );
-        ProjectResponse.WorkspaceResponse workspaceResponse = modelMapper.map(workSpace, ProjectResponse.WorkspaceResponse.class);
+        WorkSpaceGeneralResponse workspaceResponse = modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
+        if(StringUtils.isNotBlank(workSpace.getBackgroundUnsplashId())){
+            UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(workSpace.getBackgroundUnsplashId());
+            workspaceResponse.setBackgroundUnsplash(unsplashResponse);
+        }
         projectResponse.setWorkspace(workspaceResponse);
         return projectResponse;
     }
