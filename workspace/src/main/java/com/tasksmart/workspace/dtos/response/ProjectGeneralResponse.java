@@ -1,6 +1,7 @@
 package com.tasksmart.workspace.dtos.response;
 
 
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
