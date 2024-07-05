@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface TemplateRepository extends MongoRepository<Template, String> {
     List<Template> findAllByEnabledTrue();
+    List<Template> findAllByNameAndEnabledTrue(String name);
     List<Template> findAllByEnabledFalse();
     List<Template> findAllByCategoryIdAndEnabledTrue(String categoryId);
     List<Template> findAllByCategoryIdInAndEnabledTrue(List<String> categoryIds);

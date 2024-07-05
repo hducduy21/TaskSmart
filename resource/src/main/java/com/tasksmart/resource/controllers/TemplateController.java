@@ -35,6 +35,12 @@ public class TemplateController {
         return templateService.getTemplateById(templateId);
     }
 
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public List<TemplateResponse> searchTemplate(@RequestParam String keyword){
+        return templateService.searchTemplate(keyword);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TemplateResponse createTemplate(@Valid @RequestBody TemplateRequest templateRequest){

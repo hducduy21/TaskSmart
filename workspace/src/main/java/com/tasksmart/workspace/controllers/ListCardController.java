@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("${url_base}/${url_list_card}")
+@RequestMapping("${url_base}/${url_listcard}")
 @RequiredArgsConstructor
 public class ListCardController {
     private final ListCardService listCardService;
-
 }
