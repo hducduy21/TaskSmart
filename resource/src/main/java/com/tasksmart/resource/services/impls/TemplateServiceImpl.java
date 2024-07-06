@@ -69,6 +69,9 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public List<TemplateResponse> searchTemplate(String keyword) {
+        if (StringUtils.isBlank(keyword)) {
+            return templateRepository.findAllByEnabledTrue().stream().map(this::getTemplateResponse).toList();
+        }
         return templateRepository.findAllByNameAndEnabledTrue(keyword).stream().map(this::getTemplateResponse).toList();
     }
 
