@@ -68,11 +68,11 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public List<TemplateResponse> searchTemplate(String keyword) {
-        if (StringUtils.isBlank(keyword)) {
-            return templateRepository.findAllByEnabledTrue().stream().map(this::getTemplateResponse).toList();
-        }
-        return templateRepository.findAllByNameAndEnabledTrue(keyword).stream().map(this::getTemplateResponse).toList();
+    public List<TemplateGeneralResponse> searchTemplate(String keyword) {
+            return templateRepository.findByNameContaining(keyword).stream()
+                    .map(this::getTemplateGeneralResponse)
+                    .toList();
+
     }
 
     @Override
@@ -208,6 +208,7 @@ public class TemplateServiceImpl implements TemplateService {
         if(!template.isEnabled()){
             throw new BadRequest("Template is disabled");
         }
+
 
         String projectApplyId = workSpaceClient.applyTemplate(template.getProjectId(), workspaceId);
         return ProjectApplyResponse.builder()

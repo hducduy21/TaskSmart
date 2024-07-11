@@ -21,6 +21,8 @@ public interface UserService {
      */
     List<UserResponse> getAllUser();
 
+    List<UserResponse> searchUser(String keyword);
+
     /**
      * Retrieves a user by their ID.
      *

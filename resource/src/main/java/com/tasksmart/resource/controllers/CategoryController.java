@@ -30,6 +30,11 @@ public class CategoryController {
         return categoryService.getCategoryById(id);
     }
 
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CategoryResponse> searchCategories(@RequestParam String keyword){
+        return categoryService.searchCategories(keyword);
+    }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryResponse createCategory(@Valid @RequestBody CategoryRequest categoryRequest){

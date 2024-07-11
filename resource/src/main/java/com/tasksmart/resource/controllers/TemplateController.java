@@ -37,7 +37,7 @@ public class TemplateController {
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<TemplateResponse> searchTemplate(@RequestParam String keyword){
+    public List<TemplateGeneralResponse> searchTemplate(@RequestParam String keyword){
         return templateService.searchTemplate(keyword);
     }
 
@@ -78,5 +78,11 @@ public class TemplateController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectApplyResponse applyTemplate(@PathVariable String templateId, @RequestParam String workspaceId){
         return templateService.applyTemplate(templateId, workspaceId);
+    }
+
+    @PutMapping("{templateId}/status")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void disableTemplate(@PathVariable String templateId){
+        templateService.disableTemplate(templateId);
     }
 }

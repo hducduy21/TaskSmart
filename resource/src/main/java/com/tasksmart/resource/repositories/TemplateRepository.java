@@ -2,13 +2,15 @@ package com.tasksmart.resource.repositories;
 
 import com.tasksmart.resource.models.Template;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
 public interface TemplateRepository extends MongoRepository<Template, String> {
     List<Template> findAllByEnabledTrue();
-    List<Template> findAllByNameAndEnabledTrue(String name);
     List<Template> findAllByEnabledFalse();
     List<Template> findAllByCategoryIdAndEnabledTrue(String categoryId);
     List<Template> findAllByCategoryIdInAndEnabledTrue(List<String> categoryIds);
+    @Query("{'name': {$regex: ?0, $options: 'i'}, 'enabled': true}")
+    List<Template> findByNameContaining(String keyword);
 }

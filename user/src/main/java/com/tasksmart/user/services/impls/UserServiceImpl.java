@@ -72,6 +72,13 @@ public class UserServiceImpl implements UserService {
         return users.stream().map(this::getUserResponse).toList();
     }
 
+    @Override
+    public List<UserResponse> searchUser(String keyword) {
+        return userRepository.findByNameContainingOrEmailContaining(keyword).stream()
+                .map(this::getUserResponse)
+                .toList();
+    }
+
     /** {@inheritDoc} */
     @Override
     public UserResponse getUserByIdOrUsername(String idOrUsername) {

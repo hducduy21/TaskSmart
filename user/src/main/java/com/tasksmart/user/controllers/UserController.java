@@ -37,6 +37,10 @@ public class UserController {
         return userService.getAllUser();
     }
 
+    @GetMapping("/search")
+    public List<UserResponse> searchUser(@RequestParam String keyword){
+        return userService.searchUser(keyword);
+    }
     /**
      * Retrieves the profile of the currently authenticated user.
      *

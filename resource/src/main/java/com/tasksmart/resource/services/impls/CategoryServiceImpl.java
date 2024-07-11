@@ -29,6 +29,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<CategoryResponse> searchCategories(String keyword) {
+        return categoryRepository.findByNameContaining(keyword).stream()
+                .map(this::convertToCategoryResponse)
+                .toList();
+    }
+
+    @Override
     public CategoryResponse getCategoryById(String id){
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFound("Category not found!")
