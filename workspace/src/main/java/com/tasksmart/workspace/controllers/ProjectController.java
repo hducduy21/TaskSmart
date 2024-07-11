@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -115,5 +116,23 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public byte[] viewProjectImageAssets(@PathVariable String projectId, @PathVariable String assetId){
         return projectService.viewImage(projectId,assetId);
+    }
+
+    @GetMapping("{projectId}/document")
+    @ResponseStatus(HttpStatus.OK)
+    public byte[] getProjectDocument(@PathVariable String projectId){
+        return projectService.getProjectDocument(projectId);
+    }
+
+    @PostMapping("{projectId}/document")
+    @ResponseStatus(HttpStatus.OK)
+    public String putProjectDocument(@PathVariable String projectId, @RequestPart MultipartFile file){
+        return projectService.putProjectDocument(projectId,file);
+    }
+
+    @GetMapping("{projectId}/generate-task")
+    @ResponseStatus(HttpStatus.OK)
+    public String generateTask(@PathVariable String projectId){
+        return projectService.generateTask(projectId);
     }
 }

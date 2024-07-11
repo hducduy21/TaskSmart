@@ -36,6 +36,10 @@ public class Project {
     /** The description of the Project. */
     private String description;
 
+    /** The specification document of project. */
+    @Builder.Default
+    private boolean speDoc = false;
+
     /** The list of ListCards associated with the Project. */
     private String workspaceId;
 

@@ -2,6 +2,7 @@ package com.tasksmart.workspace.services.impls;
 
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.repositories.httpClients.PyHelperClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.workspace.dtos.request.*;
@@ -31,6 +32,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +64,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final AuthenticationUtils authenticationUtils;
     private final AwsS3Service awsS3Service;
     private final UnsplashClient unsplashClient;
+    private final PyHelperClient pyHelperClient;
 
     /** {@inheritDoc} */
     @Override
@@ -401,6 +404,62 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.deleteAll(projects);
     }
 
+    @Override
+    public byte[] getProjectDocument(String projectId) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
+        if(project.getUsers().stream().noneMatch(userRelation -> userRelation.getUserId().equals(userId))){
+            throw new Forbidden("You are not authorized to view this document!");
+        }
+
+        if(!project.isSpeDoc())
+            throw new ResourceNotFound("Please upload the project document!");
+
+        try {
+            return awsS3Service.getByte("projects/" + projectId + "/" + "spe.pdf");
+        }catch (Exception e){
+            throw new InternalServerError("Error getting document! Please try later.");
+        }
+    }
+
+    @Override
+    public String putProjectDocument(String projectId, MultipartFile file) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
+        if(!StringUtils.equals(project.getOwner().getUserId(), userId)){
+            throw new Forbidden("You do not have permission to access this document!");
+        }
+        try {
+            if(project.isSpeDoc()){
+                awsS3Service.deleteFile("spe.pdf", "projects/" + projectId);
+            }
+            awsS3Service.uploadFile("spe.pdf", "projects/" + projectId, file);
+            project.setSpeDoc(true);
+            projectRepository.save(project);
+            return "api/projects/" + projectId + "/document";
+        }catch (Exception e){
+            throw new InternalServerError("Error getting profile image! Please try later.");
+        }
+    }
+
+    @Override
+    public String generateTask(String projectId) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new ResourceNotFound("Project not found!")
+        );
+        if(!StringUtils.equals(project.getOwner().getUserId(), userId)){
+            throw new Forbidden("You do not have permission to access this feature!");
+        }
+        if(!project.isSpeDoc())
+            throw new ResourceNotFound("Please upload the project document!");
+        return pyHelperClient.generateTask(projectId);
+    }
+
     /**
      * Get ProjectGeneralResponse from Project.
      *
@@ -449,6 +508,10 @@ public class ProjectServiceImpl implements ProjectService {
             workspaceResponse.setBackgroundUnsplash(unsplashResponse);
         }
         projectResponse.setWorkspace(workspaceResponse);
+
+        if(project.isSpeDoc()){
+            projectResponse.setSpeDocPath("api/projects/" + project.getId() + "/document");
+        }
         return projectResponse;
     }
 

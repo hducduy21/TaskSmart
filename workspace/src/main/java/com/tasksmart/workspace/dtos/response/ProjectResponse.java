@@ -36,6 +36,8 @@ public class ProjectResponse {
     @Builder.Default
     private String inviteCode = "";
 
+    private String speDocPath;
+
     /** This is the storage field for the project's list of cards. */
     private List<ListCardResponse> listCards;
 

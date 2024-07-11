@@ -3,6 +3,7 @@ package com.tasksmart.workspace.services;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.models.Project;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -101,4 +102,10 @@ public interface ProjectService {
     byte[] viewImage(String projectId, String assetId);
 
     void deleteAllProjectByWorkSpace(String workSpaceId);
+
+    byte[] getProjectDocument(String projectId);
+
+    String putProjectDocument(String projectId, MultipartFile file);
+
+    String generateTask(String projectId);
 }
