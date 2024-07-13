@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.models;
 
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.workspace.models.enums.EUserRole;
 import com.tasksmart.workspace.models.enums.EWorkSpaceType;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
@@ -40,7 +41,7 @@ public class WorkSpace {
     /** The description of the WorkSpace. */
     private String description;
 
-    private String backgroundUnsplashId;
+    private UnsplashResponse backgroundUnsplash;
 
     @Builder.Default
     private Invitation invitation = Invitation.builder()

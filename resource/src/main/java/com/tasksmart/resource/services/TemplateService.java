@@ -4,14 +4,14 @@ import com.tasksmart.resource.dtos.requests.TemplateRequest;
 import com.tasksmart.resource.dtos.responses.ProjectApplyResponse;
 import com.tasksmart.resource.dtos.responses.TemplateGeneralResponse;
 import com.tasksmart.resource.dtos.responses.TemplateResponse;
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface TemplateService {
     List<TemplateGeneralResponse> getALlTemplates(String categoryId, String category);
-    List<TemplateResponse> getDisableTemplate();
-    List<TemplateGeneralResponse> searchTemplate(String keyword);
+    SearchAllResponse searchTemplate(String keyword);
     TemplateResponse getTemplateById(String id);
     TemplateResponse createTemplate(TemplateRequest templateRequest);
     TemplateResponse updateTemplate(String id, TemplateRequest templateRequest);
@@ -19,11 +19,7 @@ public interface TemplateService {
     void enableTemplate(String id);
     void deleteTemplate(String id);
 
-    TemplateResponse uploadTemplateImage(String templateId ,MultipartFile image);
-
-    byte[] getTemplateImage(String templateId);
-
-    TemplateResponse changeTemplateImage(String templateId, MultipartFile image);
+    List<TemplateResponse> getDisableTemplate();
 
     ProjectApplyResponse applyTemplate(String templateId, String workspaceId);
 }

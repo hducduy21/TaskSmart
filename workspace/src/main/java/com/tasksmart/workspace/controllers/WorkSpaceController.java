@@ -1,8 +1,10 @@
 package com.tasksmart.workspace.controllers;
 
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.workspace.dtos.request.MembersAdditionalRequest;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
+import com.tasksmart.workspace.dtos.request.WorkspaceUpdateImage;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.services.WorkSpaceService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
@@ -24,6 +26,12 @@ public class WorkSpaceController {
     @ResponseStatus(HttpStatus.OK)
     public List<WorkSpaceGeneralResponse> getAllWorkSpace(){
         return workSpaceService.getAllWorkSpace();
+    }
+
+    @GetMapping("search")
+    @ResponseStatus(HttpStatus.OK)
+    public SearchAllResponse search(@RequestParam String query){
+        return workSpaceService.search(query);
     }
 
     @GetMapping("/invite/{projectId}/{inviteCode}")
@@ -52,10 +60,10 @@ public class WorkSpaceController {
         return  workSpaceService.createWorkSpace(workSpaceRequest);
     }
 
-    @PostMapping("{workSpaceId}/background")
-    @ResponseStatus(HttpStatus.CREATED)
-    public WorkSpaceGeneralResponse createWorkSpace(@PathVariable String workSpaceId, @RequestParam String unsplashId){
-        return  workSpaceService.setUnsplashBackground(workSpaceId, unsplashId);
+    @PutMapping("{workSpaceId}/background")
+    @ResponseStatus(HttpStatus.OK)
+    public WorkSpaceGeneralResponse updateBackgroundWorkSpace(@PathVariable String workSpaceId, @RequestBody WorkspaceUpdateImage image){
+        return  workSpaceService.setUnsplashBackground(workSpaceId, image);
     }
 
 //    @PostMapping("{workSpaceId}/members")

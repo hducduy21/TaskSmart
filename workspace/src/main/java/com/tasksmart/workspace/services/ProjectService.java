@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.services;
 
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.models.Project;
@@ -108,4 +109,7 @@ public interface ProjectService {
     String putProjectDocument(String projectId, MultipartFile file);
 
     String generateTask(String projectId);
+
+    ProjectResponse updateBackground(String projectId, String background);
+    SearchAllResponse search(String query);
 }

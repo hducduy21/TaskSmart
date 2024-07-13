@@ -135,4 +135,10 @@ public class ProjectController {
     public String generateTask(@PathVariable String projectId){
         return projectService.generateTask(projectId);
     }
+
+    @PutMapping("{projectId}/background")
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectResponse changeBackground(@PathVariable String projectId, @RequestParam String background){
+        return projectService.updateBackground(projectId, background);
+    }
 }

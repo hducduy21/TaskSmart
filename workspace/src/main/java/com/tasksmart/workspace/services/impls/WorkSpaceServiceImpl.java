@@ -3,10 +3,12 @@ package com.tasksmart.workspace.services.impls;
 import com.tasksmart.sharedLibrary.dtos.messages.UserJoinWorkSpaceMessage;
 import com.tasksmart.sharedLibrary.dtos.responses.CategoryResponse;
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.sharedLibrary.repositories.httpClients.CategoryClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
+import com.tasksmart.workspace.dtos.request.WorkspaceUpdateImage;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.models.Invitation;
 import com.tasksmart.workspace.models.Project;
@@ -238,22 +240,38 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     @Override
-    public WorkSpaceGeneralResponse setUnsplashBackground(String workSpaceId, String unsplashId) {
+    public WorkSpaceGeneralResponse setUnsplashBackground(String workSpaceId, WorkspaceUpdateImage unsplash) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
         WorkSpace workSpace = workSpaceRepository.findById(workSpaceId).orElseThrow(
                 ()->new ResourceNotFound("WorkSpace not found!")
         );
 
-        workSpace.setBackgroundUnsplashId(unsplashId);
+        if(!StringUtils.equals(workSpace.getOwner().getUserId(), userId)){
+            throw new UnauthenticateException("You do not have permission to make this request!");
+        }
+
+        workSpace.setBackgroundUnsplash(unsplash.getBackgroundUnsplash());
         workSpaceRepository.save(workSpace);
         return getWorkSpaceGeneralResponse(workSpace);
     }
 
+    @Override
+    public SearchAllResponse search(String query) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        List<SearchAllResponse.WorkSpaceResponse> searchAllWSPResponses = workSpaceRepository.findByUserIdAndNameContain(userId, query).stream()
+                .map(workSpace -> SearchAllResponse.WorkSpaceResponse.builder()
+                        .id(workSpace.getId())
+                        .name(workSpace.getName())
+                        .backgroundUnsplash(workSpace.getBackgroundUnsplash())
+                        .build())
+                .toList();
+        SearchAllResponse searchAllProjectResponse = projectService.search(query);
+        searchAllProjectResponse.setWorkspaces(searchAllWSPResponses);
+        return searchAllProjectResponse;
+    }
+
     public WorkSpaceGeneralResponse getWorkSpaceGeneralResponse(WorkSpace workSpace){
-        WorkSpaceGeneralResponse workSpaceResponse = modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
-        if(StringUtils.isNotBlank(workSpace.getBackgroundUnsplashId())){
-            UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(workSpace.getBackgroundUnsplashId());
-            workSpaceResponse.setBackgroundUnsplash(unsplashResponse);
-        }
         return modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
     }
 
@@ -265,11 +283,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
             CategoryResponse categoryResponse = categoryClient.getCategory(workSpace.getCategoryId());
             workSpaceResponse.setCategory(categoryResponse);
         }
-
-        if(StringUtils.isNotBlank(workSpace.getBackgroundUnsplashId())){
-            UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(workSpace.getBackgroundUnsplashId());
-            workSpaceResponse.setBackgroundUnsplash(unsplashResponse);
-        }
         return workSpaceResponse;
     }
 
@@ -279,15 +292,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     }
 
     public ProjectGeneralResponse getProjectGeneralResponse(Project project){
-        ProjectGeneralResponse projectResponse = modelMapper.map(project, ProjectGeneralResponse.class);
-        if(StringUtils.isNotBlank(project.getBackground())){
-            if(StringUtils.startsWith((project.getBackground()), "#") && (project.getBackground()).length() == 7) {
-                projectResponse.setBackgroundColor(project.getBackground());
-            }else{
-                UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(project.getBackground());
-                projectResponse.setBackgroundUnsplash(unsplashResponse);
-            }
-        }
-        return projectResponse;
+        return modelMapper.map(project, ProjectGeneralResponse.class);
     }
 }

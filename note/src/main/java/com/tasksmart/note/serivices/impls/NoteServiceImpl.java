@@ -5,6 +5,7 @@ import com.tasksmart.note.dtos.response.NoteResponse;
 import com.tasksmart.note.models.Note;
 import com.tasksmart.note.repositories.NoteRepository;
 import com.tasksmart.note.serivices.NoteService;
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
@@ -81,13 +82,19 @@ public class NoteServiceImpl implements NoteService{
     }
 
     @Override
-    public List<NoteResponse> searchNotes(String keyword) {
-        List<Note> notes = noteRepository.findByTitleContaining(keyword);
-        if (notes != null){
-            return notes.stream().map(this::getNoteResponse).toList();
-        }
+    public SearchAllResponse searchNotes(String keyword) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        List<Note> notes = noteRepository.findAllByUserIdAndTitleContainingIgnoreCaseOrContentContainingIgnoreCase(userId,keyword,keyword);
+        List<SearchAllResponse.NoteResponse> searchAllResponse = notes.stream().map(
+                note -> SearchAllResponse.NoteResponse.builder()
+                        .id(note.getId())
+                        .title(note.getTitle())
+                        .build()
+        ).toList();
 
-    return null;
+        return SearchAllResponse.builder()
+                .notes(searchAllResponse)
+                .build();
     }
 
     @Override

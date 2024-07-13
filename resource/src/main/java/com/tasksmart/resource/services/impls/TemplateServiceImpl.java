@@ -11,10 +11,13 @@ import com.tasksmart.resource.repositories.CategoryRepository;
 import com.tasksmart.resource.repositories.TemplateRepository;
 import com.tasksmart.resource.services.TemplateService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
+import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.WorkSpaceClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.sharedLibrary.utils.FileUtil;
@@ -39,6 +42,7 @@ public class TemplateServiceImpl implements TemplateService {
     private final CategoryRepository categoryRepository;
     private final AwsS3Service awsS3Service;
     private final FileUtil fileUtil;
+    private final UnsplashClient unsplashClient;
 
 
     @Override
@@ -68,11 +72,26 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public List<TemplateGeneralResponse> searchTemplate(String keyword) {
-            return templateRepository.findByNameContaining(keyword).stream()
-                    .map(this::getTemplateGeneralResponse)
-                    .toList();
+    public SearchAllResponse searchTemplate(String keyword) {
+        List<Template> templates = templateRepository.findAllByNameContainsIgnoreCaseAndEnabledTrue(keyword);
+        return SearchAllResponse.builder()
+                .templates(templates.stream().map(
+                        template-> {
+                            Category category = categoryRepository.findById(template.getCategoryId()).orElseThrow(
+                                    () -> new ResourceNotFound("Category not found")
+                            );
 
+                            return SearchAllResponse.TemplateResponse.builder()
+                                    .id(template.getId())
+                                    .name(template.getName())
+                                    .image(template.getImage())
+                                    .category(
+                                            modelMapper.map(category, com.tasksmart.sharedLibrary.dtos.responses.CategoryResponse.class)
+                                    )
+                                    .build();
+                        }
+                ).toList())
+                .build();
     }
 
     @Override
@@ -95,73 +114,16 @@ public class TemplateServiceImpl implements TemplateService {
                 .description(templateRequest.getDescription())
                 .categoryId(templateRequest.getCategoryId())
                 .projectId(projectTemplateResponse.getId())
-                .imageId("")
                 .viewCount(0)
                 .useCount(0)
                 .enabled(true)
                 .build();
-
+        UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(templateRequest.getImageUnsplashId());
+        template.setImage(unsplashResponse);
         templateRepository.save(template);
         return getTemplateResponse(template,projectTemplateResponse);
     }
 
-    @Override
-    @PreAuthorize("hasRole('ADMIN')")
-    public TemplateResponse uploadTemplateImage(String id, MultipartFile image) {
-        Template template = templateRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFound("Template not found")
-        );
-
-        //validate image
-        fileUtil.requireMaxSize(image, 2);
-        fileUtil.requireImage(image);
-
-        String imageId = UUID.randomUUID() + "." + fileUtil.getFileExtension(image);
-
-        try {
-            awsS3Service.uploadFile(imageId, AppConstant.IMG_TEMPLATE_FOLDER, image);
-            template.setImageId(imageId);
-            templateRepository.save(template);
-            return getTemplateResponse(template);
-        }catch (Exception e){
-            log.error("Error uploading image to s3", e);
-            throw new InternalServerError("Error uploading image to s3");
-        }
-    }
-
-    @Override
-    public byte[] getTemplateImage(String imageId) {
-        try {
-            return awsS3Service.getByte(imageId, AppConstant.IMG_TEMPLATE_FOLDER);
-        }catch (Exception e){
-            log.error("Error getting image from s3", e);
-            throw new InternalServerError("Error getting image from s3");
-        }
-    }
-
-    @Override
-    public TemplateResponse changeTemplateImage(String templateId, MultipartFile image) {
-        Template template = templateRepository.findById(templateId).orElseThrow(
-                () -> new ResourceNotFound("Template not found")
-        );
-
-        //validate image
-        fileUtil.requireMaxSize(image, 2);
-        fileUtil.requireImage(image);
-
-        String imageId = UUID.randomUUID().toString() + "." + fileUtil.getFileExtension(image);
-
-        try {
-            awsS3Service.deleteFile(template.getImageId(), AppConstant.IMG_TEMPLATE_FOLDER);
-            awsS3Service.uploadFile(imageId, AppConstant.IMG_TEMPLATE_FOLDER, image);
-            template.setImageId(imageId);
-            templateRepository.save(template);
-            return getTemplateResponse(template);
-        }catch (Exception e){
-            log.error("Error uploading image to s3", e);
-            throw new InternalServerError("Error uploading image to s3");
-        }
-    }
 
     @Override
     public TemplateResponse updateTemplate(String id, TemplateRequest templateRequest) {
@@ -224,8 +186,6 @@ public class TemplateServiceImpl implements TemplateService {
     private TemplateGeneralResponse getTemplateGeneralResponse(Template template) {
         TemplateGeneralResponse templateResponse = modelMapper.map(template, TemplateGeneralResponse.class);
 
-        templateResponse.setImageUrl("templates/"+template.getImageId());
-
         Category category = categoryRepository.findById(template.getCategoryId()).orElseThrow(
                 () -> new ResourceNotFound("Category not found")
         );
@@ -237,9 +197,6 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateResponse getTemplateResponse(Template template) {
         TemplateResponse templateResponse = modelMapper.map(template, TemplateResponse.class);
-
-        if(template.getImageId() != null)
-            templateResponse.setImagePath("templates/"+template.getImageId());
 
         Category category = categoryRepository.findById(template.getCategoryId()).orElseThrow(
                 () -> new ResourceNotFound("Category not found")
@@ -256,8 +213,6 @@ public class TemplateServiceImpl implements TemplateService {
     private TemplateResponse getTemplateResponse(Template template, ProjectTemplateResponse projectTemplateResponse) {
         TemplateResponse templateResponse = modelMapper.map(template, TemplateResponse.class);
         templateResponse.setProject(projectTemplateResponse);
-        if(template.getImageId() != null)
-            templateResponse.setImagePath("templates/"+template.getImageId());
 
         Category category = categoryRepository.findById(template.getCategoryId()).orElseThrow(
                 () -> new ResourceNotFound("Category not found")

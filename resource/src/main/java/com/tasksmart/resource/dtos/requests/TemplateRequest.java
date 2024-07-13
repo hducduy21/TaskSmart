@@ -14,6 +14,7 @@ import java.util.Date;
 public class TemplateRequest {
     private String name;
     private String description;
+    private String imageUnsplashId;
     private ProjectTemplateRequest project;
     private String categoryId;
 }

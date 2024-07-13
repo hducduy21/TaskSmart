@@ -15,4 +15,6 @@ public interface NoteRepository extends MongoRepository<Note, String> {
     List<Note> findByUserId(String userId);
     @Query("{'title': {$regex: ?0, $options: 'i'}}")
     List<Note> findByTitleContaining(String keyword);
+
+    List<Note> findAllByUserIdAndTitleContainingIgnoreCaseOrContentContainingIgnoreCase(String userId, String title, String content);
 }

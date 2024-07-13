@@ -1,8 +1,10 @@
 package com.tasksmart.workspace.services;
 
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
+import com.tasksmart.workspace.dtos.request.WorkspaceUpdateImage;
 import com.tasksmart.workspace.dtos.response.*;
 
 import java.util.List;
@@ -76,5 +78,7 @@ public interface WorkSpaceService {
      */
     InviteCodeResponse updateInviteCode(String workspaceId, Boolean isPublic, Boolean refresh);
 
-    WorkSpaceGeneralResponse setUnsplashBackground(String workSpaceId, String unsplashId);
+    WorkSpaceGeneralResponse setUnsplashBackground(String workSpaceId, WorkspaceUpdateImage unsplashId);
+
+    SearchAllResponse search(String query);
 }

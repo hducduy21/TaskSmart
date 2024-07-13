@@ -3,6 +3,7 @@ package com.tasksmart.sharedLibrary.repositories.httpClients;
 import com.tasksmart.sharedLibrary.configs.interceptors.FeignRequestInterceptor;
 import com.tasksmart.sharedLibrary.dtos.request.ProjectTemplateRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.WorkSpaceGeneralResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -27,4 +28,7 @@ public interface WorkSpaceClient {
 
     @GetMapping(value = "api/internal/projects/{projectId}", produces = MediaType.APPLICATION_JSON_VALUE)
     ProjectTemplateResponse getProjectTemplate(@PathVariable String projectId);
+
+    @GetMapping(value = "api/workspaces/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    SearchAllResponse search(@RequestParam String query);
 }

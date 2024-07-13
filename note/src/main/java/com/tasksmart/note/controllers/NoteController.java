@@ -4,6 +4,7 @@ import com.tasksmart.note.dtos.request.NoteRequest;
 import com.tasksmart.note.dtos.response.CustomResponse;
 import com.tasksmart.note.dtos.response.NoteResponse;
 import com.tasksmart.note.serivices.NoteService;
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -65,14 +66,8 @@ public class NoteController {
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CustomResponse<List<NoteResponse>>> searchNotes(@RequestParam String keyword){
-        CustomResponse<List<NoteResponse>> response = new CustomResponse<>(
-                "Notes retrieved successfully",
-                200,
-                noteService.searchNotes(keyword).size(),
-                noteService.searchNotes(keyword)
-        );
-        return ResponseEntity.ok(response);
+    public SearchAllResponse searchNotes(@RequestParam String query){
+        return noteService.searchNotes(query);
     }
 
     @PatchMapping("{noteId}")

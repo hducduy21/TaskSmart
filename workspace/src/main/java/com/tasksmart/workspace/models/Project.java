@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.models;
 
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.workspace.models.enums.EUserRole;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import lombok.*;
@@ -31,7 +32,8 @@ public class Project {
     private String name;
 
     /** The background of the Project. */
-    private String background;
+    private String backgroundColor;
+    private UnsplashResponse backgroundUnsplash;
 
     /** The description of the Project. */
     private String description;
@@ -62,7 +64,8 @@ public class Project {
     public Project copyWithoutWorkSpace() {
         return Project.builder()
                 .name(this.name)
-                .background(this.background)
+                .backgroundUnsplash(this.backgroundUnsplash)
+                .backgroundColor(this.backgroundColor)
                 .description(this.description)
                 .build();
     }

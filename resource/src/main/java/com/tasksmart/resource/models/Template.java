@@ -1,5 +1,6 @@
 package com.tasksmart.resource.models;
 
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,7 +20,7 @@ public class Template {
     private String description;
     private int viewCount;
     private int useCount;
-    private String imageId;
+    private UnsplashResponse image;
     private String categoryId;
     private String projectId;
 

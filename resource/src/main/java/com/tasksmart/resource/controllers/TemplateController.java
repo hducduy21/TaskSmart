@@ -5,6 +5,7 @@ import com.tasksmart.resource.dtos.responses.ProjectApplyResponse;
 import com.tasksmart.resource.dtos.responses.TemplateGeneralResponse;
 import com.tasksmart.resource.dtos.responses.TemplateResponse;
 import com.tasksmart.resource.services.TemplateService;
+import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +38,8 @@ public class TemplateController {
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<TemplateGeneralResponse> searchTemplate(@RequestParam String keyword){
-        return templateService.searchTemplate(keyword);
+    public SearchAllResponse searchTemplate(@RequestParam String query){
+        return templateService.searchTemplate(query);
     }
 
     @PostMapping
@@ -51,27 +52,6 @@ public class TemplateController {
     @ResponseStatus(HttpStatus.CREATED)
     public TemplateResponse updateTemplate(@PathVariable String templateId, @Valid @RequestBody TemplateRequest templateRequest){
         return templateService.updateTemplate(templateId, templateRequest);
-    }
-
-    @GetMapping(
-            value = "/img/{imageId}",
-            produces = MediaType.IMAGE_PNG_VALUE
-    )
-    @ResponseStatus(HttpStatus.OK)
-    public byte[] getTemplateImage(@PathVariable String imageId){
-        return templateService.getTemplateImage(imageId);
-    }
-
-    @PostMapping("{templateId}/img")
-    @ResponseStatus(HttpStatus.CREATED)
-    public TemplateResponse uploadImageTemplate(@PathVariable String templateId,@RequestPart MultipartFile image){
-        return templateService.uploadTemplateImage(templateId, image);
-    }
-
-    @PutMapping("{templateId}/img")
-    @ResponseStatus(HttpStatus.CREATED)
-    public TemplateResponse changeImageTemplate(@PathVariable String templateId,@RequestPart MultipartFile image){
-        return templateService.changeTemplateImage(templateId, image);
     }
 
     @PostMapping("{templateId}/apply")

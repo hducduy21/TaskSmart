@@ -5,7 +5,6 @@ import com.tasksmart.resource.services.AvatarService;
 import com.tasksmart.resource.services.TemplateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -35,11 +34,5 @@ public class AssetController {
     @ResponseStatus(HttpStatus.OK)
     public byte[] getImageAvatar(@PathVariable String imgId){
         return avatarService.getAvatarImage(imgId);
-    }
-
-    @GetMapping(value = "templates/{imgId}", produces = MediaType.IMAGE_JPEG_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public byte[] getImageTemplate(@PathVariable String imgId){
-        return templateService.getTemplateImage(imgId);
     }
 }

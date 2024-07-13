@@ -108,15 +108,6 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
     private ProjectTemplateResponse getProjectTemplateResponse(Project project){
         ProjectTemplateResponse projectResponse = modelMapper.map(project, ProjectTemplateResponse.class);
         projectResponse.setListCards(listCardService.getListCardTemplateByIdIn(project.getListCardIds()));
-
-        if(StringUtils.isNotBlank(project.getBackground())){
-            if(isColor(project.getBackground())) {
-                projectResponse.setBackgroundColor(project.getBackground());
-            }else{
-                UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(project.getBackground());
-                projectResponse.setBackgroundUnsplash(unsplashResponse);
-            }
-        }
         return projectResponse;
     }
 
