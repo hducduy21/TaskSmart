@@ -519,8 +519,8 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         if (StringUtils.isNotBlank(background)) {
-            if (isColor(background)) {
-                project.setBackgroundColor(background);
+            if (isColorParam(background)) {
+                project.setBackgroundColor("#" + background);
             } else {
                 UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(background);
                 project.setBackgroundUnsplash(unsplashResponse);
@@ -643,5 +643,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     private boolean isColor(String background) {
         return StringUtils.startsWith(background, "#") && background.length() == 7;
+    }
+
+    private boolean isColorParam(String background) {
+        return StringUtils.isNotEmpty(background) && background.length() == 6;
     }
 }
