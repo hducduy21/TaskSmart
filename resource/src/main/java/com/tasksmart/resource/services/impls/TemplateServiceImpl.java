@@ -12,6 +12,7 @@ import com.tasksmart.resource.repositories.TemplateRepository;
 import com.tasksmart.resource.services.TemplateService;
 import com.tasksmart.sharedLibrary.configs.AppConstant;
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
+import com.tasksmart.sharedLibrary.dtos.request.ProjectTemplateRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
@@ -107,7 +108,10 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public TemplateResponse createTemplate(TemplateRequest templateRequest) {
-        ProjectTemplateResponse projectTemplateResponse = workSpaceClient.createProjectTemplate(templateRequest.getProject());
+        UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(templateRequest.getImageUnsplashId());
+        ProjectTemplateRequest projectTemplateRequest = templateRequest.getProject();
+        projectTemplateRequest.setBackgroundUnsplash(unsplashResponse);
+        ProjectTemplateResponse projectTemplateResponse = workSpaceClient.createProjectTemplate(projectTemplateRequest);
 
         Template template = Template.builder()
                 .name(templateRequest.getName())
@@ -118,7 +122,6 @@ public class TemplateServiceImpl implements TemplateService {
                 .useCount(0)
                 .enabled(true)
                 .build();
-        UnsplashResponse unsplashResponse = unsplashClient.getUnsplashPhotoById(templateRequest.getImageUnsplashId());
         template.setImage(unsplashResponse);
         templateRepository.save(template);
         return getTemplateResponse(template,projectTemplateResponse);

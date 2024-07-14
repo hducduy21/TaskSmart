@@ -31,6 +31,12 @@ public class CardController {
         return cardService.updateCard(cardId, cardUpdationRequest);
     }
 
+    @DeleteMapping("{cardId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteCard(@PathVariable String cardId) {
+        cardService.deleteCard(cardId);
+    }
+
     @PostMapping("{cardId}/attachment")
     @ResponseStatus(HttpStatus.OK)
     public List<AttachmentResponse> uploadAttachmentFile(@PathVariable String cardId, @RequestPart("files") MultipartFile[] files) {

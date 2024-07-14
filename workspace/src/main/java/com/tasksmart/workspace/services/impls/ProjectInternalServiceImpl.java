@@ -35,7 +35,6 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
     private final ModelMapper modelMapper;
     private final AuthenticationUtils authenticationUtils;
     private final WorkSpaceRepository workSpaceRepository;
-    private final UnsplashClient unsplashClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override

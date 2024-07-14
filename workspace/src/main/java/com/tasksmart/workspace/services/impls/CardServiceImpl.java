@@ -76,7 +76,6 @@ public class CardServiceImpl implements CardService {
             listCard.getCardIds().remove(cardId);
             listCardRepository.save(listCard);
         }
-
         cardRepository.deleteById(cardId);
     }
 

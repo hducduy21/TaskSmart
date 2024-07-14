@@ -1,5 +1,6 @@
 package com.tasksmart.sharedLibrary.dtos.request;
 
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class ProjectTemplateRequest {
     private String name;
 
     /** The background of the Project. */
-    private String background;
+    private UnsplashResponse backgroundUnsplash;
 
     /** The description of the Project. */
     private String description;

@@ -1,5 +1,6 @@
 package com.tasksmart.resource.dtos.responses;
 
+import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,7 @@ public class TemplateGeneralResponse {
     private String description;
     private int viewCount;
     private int useCount;
-    private String imageUrl;
+    private UnsplashResponse image;
     private CategoryResponse category;
     private Date createdDate;
 }
