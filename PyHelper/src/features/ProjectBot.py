@@ -32,13 +32,14 @@ def entry_db(project_id: str):
 
     text_splitter = CharacterTextSplitter(
         separator="CHAPTER",
-        chunk_size=10000,
+        chunk_size=2000,
         chunk_overlap=50,
         is_separator_regex=False,
     )
     chunks = text_splitter.split_text(text)
 
     chroma = Chroma.from_texts(texts=chunks, embedding=embedding_model)
+    print(chroma.similarity_search("Requirements"))
     return chroma
 
 def load_llm():
@@ -46,7 +47,7 @@ def load_llm():
     return llm
 
 def create_prompt(parser):
-    template = "You are a project management AI bot, based on the software development process, allocate group tasks to members, at least 15 card. Use this information: {context}. Answer the user query.\n{format_instructions}\n{question}\n."
+    template = "You are an AI bot managing the project, requires at least 15 tasks, assigning tasks to groups based on the software development process (do not assign to groups such as in progress or in review,... because no tasks have started yet). Use this information: {context}. Answer the user query.\n{format_instructions}\n{question}\n."
     prompt = PromptTemplate(
         template=template,
         input_variables=['context','question'],
