@@ -56,8 +56,8 @@ public class TemplateController {
 
     @PostMapping("{templateId}/apply")
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectApplyResponse applyTemplate(@PathVariable String templateId, @RequestParam String workspaceId){
-        return templateService.applyTemplate(templateId, workspaceId);
+    public ProjectApplyResponse applyTemplate(@PathVariable String templateId, @RequestParam String workspaceId, @RequestParam String projectName){
+        return templateService.applyTemplate(templateId, workspaceId, projectName);
     }
 
     @PutMapping("{templateId}/status")

@@ -8,5 +8,5 @@ public interface ProjectInternalService {
     ProjectTemplateResponse createProjectTemplate(ProjectTemplateRequest projectTemplateRequest);
     ProjectTemplateResponse updateProjectTemplate(String projectId, ProjectTemplateRequest projectTemplateRequest);
 
-    String applyTemplate(String projectId, String workspaceId);
+    String applyTemplate(String projectId, String workspaceId, String projectName);
 }

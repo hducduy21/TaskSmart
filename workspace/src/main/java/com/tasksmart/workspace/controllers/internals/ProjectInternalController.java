@@ -29,8 +29,8 @@ public class ProjectInternalController {
 
     @PostMapping("apply")
     @ResponseStatus(HttpStatus.CREATED)
-    public String applyTemplate(@RequestParam String projectId, @RequestParam String workspaceId){
-        return projectInternalService.applyTemplate(projectId, workspaceId);
+    public String applyTemplate(@RequestParam String projectId, @RequestParam String workspaceId, @RequestParam String projectName){
+        return projectInternalService.applyTemplate(projectId, workspaceId, projectName);
     }
 
     @PostMapping

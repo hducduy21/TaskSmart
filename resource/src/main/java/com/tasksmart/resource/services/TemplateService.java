@@ -21,5 +21,5 @@ public interface TemplateService {
 
     List<TemplateResponse> getDisableTemplate();
 
-    ProjectApplyResponse applyTemplate(String templateId, String workspaceId);
+    ProjectApplyResponse applyTemplate(String templateId, String workspaceId, String projectName);
 }

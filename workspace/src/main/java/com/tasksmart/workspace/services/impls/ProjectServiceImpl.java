@@ -2,6 +2,7 @@ package com.tasksmart.workspace.services.impls;
 
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
+import com.tasksmart.sharedLibrary.dtos.responses.TaskGenResponse;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.sharedLibrary.repositories.httpClients.PyHelperClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
@@ -495,7 +496,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public String generateTask(String projectId) {
+    public TaskGenResponse generateTask(String projectId) {
         String userId = authenticationUtils.getUserIdAuthenticated();
         Project project = projectRepository.findById(projectId).orElseThrow(
                 () -> new ResourceNotFound("Project not found!")

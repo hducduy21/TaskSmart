@@ -71,7 +71,7 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
     }
 
     @Override
-    public String applyTemplate(String projectId, String workspaceId) {
+    public String applyTemplate(String projectId, String workspaceId, String projectName) {
         String userId = authenticationUtils.getUserIdAuthenticated();
         workSpaceRepository.findById(workspaceId).orElseThrow(
                 () -> new ResourceNotFound("Workspace not found")
@@ -85,6 +85,7 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
         project.setWorkspaceId(workspaceId);
         UserRelation userRelation = getUserRelation(userId);
         project.setOwner(userRelation);
+        project.setName(projectName);
 
         projectRepository.save(project);
 

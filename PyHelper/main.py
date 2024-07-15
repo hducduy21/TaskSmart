@@ -36,6 +36,5 @@ async def upload_file(file: UploadFile = File(...)):
 
 @app.get("/api/pyhelper/projects/{project_id}/generate-task")
 async def generate_content(project_id: str):
-    text = LLMChain.generate_task(project_id)
-    return {"project": text}
+    return LLMChain.generate_task(project_id)
 

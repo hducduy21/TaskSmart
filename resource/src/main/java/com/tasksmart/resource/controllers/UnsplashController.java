@@ -5,7 +5,6 @@ import com.tasksmart.resource.services.UnsplashService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class UnsplashController {
 
     @GetMapping("/photos")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<List<UnsplashResponse>> getPhotos(
+    public List<UnsplashResponse> getPhotos(
             @RequestParam(required = false) String query,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int per_page
@@ -28,7 +27,7 @@ public class UnsplashController {
 
     @GetMapping("/photos/{unsplashId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<UnsplashResponse> getPhotoById(
+    public UnsplashResponse getPhotoById(
             @PathVariable String unsplashId
     ) {
         return unsplashService.getPhotoById(unsplashId);

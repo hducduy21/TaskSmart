@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.controllers;
 
+import com.tasksmart.sharedLibrary.dtos.responses.TaskGenResponse;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.services.ProjectService;
@@ -132,7 +133,7 @@ public class ProjectController {
 
     @GetMapping("{projectId}/generate-task")
     @ResponseStatus(HttpStatus.OK)
-    public String generateTask(@PathVariable String projectId){
+    public TaskGenResponse generateTask(@PathVariable String projectId){
         return projectService.generateTask(projectId);
     }
 

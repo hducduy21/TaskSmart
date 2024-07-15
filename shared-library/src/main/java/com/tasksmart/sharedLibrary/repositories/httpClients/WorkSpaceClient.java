@@ -18,7 +18,7 @@ public interface WorkSpaceClient {
     WorkSpaceGeneralResponse createPersonalWorkSpace(@RequestParam String userId, @RequestParam String name,@RequestParam String username);
 
     @PostMapping(value = "api/internal/projects/apply", produces = MediaType.APPLICATION_JSON_VALUE)
-    String applyTemplate(@RequestParam String projectId, @RequestParam String workspaceId);
+    String applyTemplate(@RequestParam String projectId, @RequestParam String workspaceId, @RequestParam String projectName);
 
     @PostMapping(value = "api/internal/projects", produces = MediaType.APPLICATION_JSON_VALUE)
     ProjectTemplateResponse createProjectTemplate(@RequestBody ProjectTemplateRequest projectTemplateRequest);

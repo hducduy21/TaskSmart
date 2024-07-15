@@ -3,6 +3,7 @@ from langchain_community .document_loaders import PyPDFLoader, S3FileLoader,Dire
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores.chroma import Chroma
 import chromadb
+import uuid
 from langchain_community.embeddings.gpt4all import GPT4AllEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
@@ -61,7 +62,6 @@ def create_simple_chain(prompt, llm, db):
         return_source_documents=False,
         chain_type_kwargs={"prompt": prompt}
     )
-    # print(prompt)
     return chain
 
 class LLMChain:
@@ -73,5 +73,5 @@ class LLMChain:
 
         project_query = "Requirements"
         response = llm_chain.invoke({'query': project_query})
-        parser_output = parser.invoke(response.get('result'))
+        parser_output= parser.invoke(response.get('result'))
         return parser_output

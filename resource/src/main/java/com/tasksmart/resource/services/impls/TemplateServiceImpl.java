@@ -165,7 +165,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public ProjectApplyResponse applyTemplate(String templateId, String workspaceId) {
+    public ProjectApplyResponse applyTemplate(String templateId, String workspaceId, String projectName) {
         Template template = templateRepository.findById(templateId).orElseThrow(
                 () -> new ResourceNotFound("Template not found")
         );
@@ -174,8 +174,12 @@ public class TemplateServiceImpl implements TemplateService {
             throw new BadRequest("Template is disabled");
         }
 
+        if(StringUtils.isBlank(projectName)){
+            throw new BadRequest("Project name is required");
+        }
 
-        String projectApplyId = workSpaceClient.applyTemplate(template.getProjectId(), workspaceId);
+
+        String projectApplyId = workSpaceClient.applyTemplate(template.getProjectId(), workspaceId, projectName);
         return ProjectApplyResponse.builder()
                 .projectId(projectApplyId)
                 .build();
