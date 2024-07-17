@@ -89,6 +89,7 @@ public class NoteServiceImpl implements NoteService{
                 note -> SearchAllResponse.NoteResponse.builder()
                         .id(note.getId())
                         .title(note.getTitle())
+                        .content(note.getContent())
                         .build()
         ).toList();
 
@@ -96,6 +97,8 @@ public class NoteServiceImpl implements NoteService{
                 .notes(searchAllResponse)
                 .build();
     }
+
+
 
     @Override
     public List<NoteResponse> getAllNotes(Boolean archived) {
@@ -107,6 +110,13 @@ public class NoteServiceImpl implements NoteService{
             return noteRepository.findByUserId(userId).stream().filter(note -> !note.getArchived()).map(this::getNoteResponse).toList();
         }
 
+    }
+
+    @Override
+    public List<NoteResponse> searchOnlyNotes(String keyword) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        List<Note> notes = noteRepository.findAllByUserIdAndTitleContainingIgnoreCaseOrContentContainingIgnoreCase(userId, keyword, keyword);
+        return notes.stream().map(this::getNoteResponse).toList();
     }
 
     public NoteResponse getNoteResponse(Note note){

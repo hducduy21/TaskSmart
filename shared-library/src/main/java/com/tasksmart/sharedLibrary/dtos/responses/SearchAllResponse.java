@@ -92,5 +92,6 @@ public class SearchAllResponse {
     public static class NoteResponse{
         private String id;
         private String title;
+        private String content;
     }
 }

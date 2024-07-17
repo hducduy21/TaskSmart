@@ -70,6 +70,12 @@ public class NoteController {
         return noteService.searchNotes(query);
     }
 
+    @GetMapping("/search/notes")
+    @ResponseStatus(HttpStatus.OK)
+    public List<NoteResponse> searchOnlyNotes(@RequestParam String query){
+        return noteService.searchOnlyNotes(query);
+    }
+
     @PatchMapping("{noteId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<CustomResponse<NoteResponse>> editNote(@RequestBody NoteRequest note, @PathVariable String noteId){

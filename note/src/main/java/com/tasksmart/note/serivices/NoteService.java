@@ -20,5 +20,6 @@ public interface NoteService {
     void deleteNote(String noteId);
     SearchAllResponse searchNotes(String keyword);
     List<NoteResponse> getAllNotes(Boolean archived);
+    List<NoteResponse> searchOnlyNotes(String keyword);
 
 }
