@@ -113,4 +113,6 @@ public interface ProjectService {
 
     ProjectResponse updateBackground(String projectId, String background);
     SearchAllResponse search(String query);
+
+    List<ProjectGeneralResponse> searchProject(String query, String workSpaceId);
 }

@@ -30,6 +30,12 @@ public class ProjectController {
         return projectService.getAllProject();
     }
 
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ProjectGeneralResponse> searchProject(@RequestParam String query, @RequestParam(required = false) String workSpaceId){
+        return projectService.searchProject(query, workSpaceId);
+    }
+
     @GetMapping("/invite/{projectId}/{inviteCode}")
     @ResponseStatus(HttpStatus.OK)
     public ProjectResponse joinProject(@PathVariable String projectId, @PathVariable String inviteCode){

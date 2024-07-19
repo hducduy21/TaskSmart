@@ -581,6 +581,14 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
     }
 
+    @Override
+    public List<ProjectGeneralResponse> searchProject(  String name, String workspaceId) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+
+        return projectRepository.findByUserIdAndNameContainingAndWorkspaceId(userId, name, workspaceId).stream()
+                .map(this::getProjectGeneralResponse).toList();
+    }
+
     /**
      * Get ProjectGeneralResponse from Project.
      *

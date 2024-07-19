@@ -19,4 +19,7 @@ public interface ProjectRepository extends MongoRepository<Project, String> {
 
     @Query("{ 'users.userId': ?0, 'name': { $regex: ?1, $options: 'i' } }")
     List<Project> findByUserIdAndNameContain(String userId, String name);
+
+    @Query("{ 'users.userId': ?0, 'name': { $regex: ?1, $options: 'i' }, 'workspaceId': ?2 }")
+    List<Project> findByUserIdAndNameContainingAndWorkspaceId(String userId, String name, String workspaceId);
 }
