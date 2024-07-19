@@ -15,5 +15,8 @@ public interface AuthService {
      */
     AuthResponse login(UserSignInRequest userSignInRequest);
 
+    AuthResponse googleAuthenticate(String code);
+    AuthResponse githubAuthenticate(String code);
+
     AuthResponse refresh(String refresh);
 }

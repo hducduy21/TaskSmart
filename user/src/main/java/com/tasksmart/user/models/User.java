@@ -2,12 +2,14 @@ package com.tasksmart.user.models;
 
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.models.enums.EGender;
+import com.tasksmart.user.models.enums.EUserType;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +42,9 @@ public class User {
     /** This is the storage field for the user's email. */
     @Indexed(unique = true)
     private String email;
+
+//    @Builder.Default
+//    private Set<EUserType> accountType = new HashSet<>(Collections.singleton(EUserType.Default));
 
     /** This is the storage field for the user's gender. */
     @Builder.Default

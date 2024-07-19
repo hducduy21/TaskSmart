@@ -4,6 +4,7 @@ import com.tasksmart.user.dtos.request.UpdateEmailRequest;
 import com.tasksmart.user.dtos.request.UserInformationUpdateRequest;
 import com.tasksmart.user.dtos.request.UserRegistrationRequest;
 import com.tasksmart.user.dtos.response.UserResponse;
+import com.tasksmart.user.models.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -42,6 +43,8 @@ public interface UserService {
      * @return The created user object.
      */
     UserResponse createUser(UserRegistrationRequest userRegistrationRequest);
+
+    User createUserOAuth(String name, String email, String pictureUrl, String username);
 
     /**
      * Updates a user by their ID.

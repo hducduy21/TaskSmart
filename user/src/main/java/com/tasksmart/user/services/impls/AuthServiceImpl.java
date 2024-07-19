@@ -1,5 +1,11 @@
 package com.tasksmart.user.services.impls;
 
+import com.tasksmart.sharedLibrary.dtos.request.ExchangeGitHubTokenRequest;
+import com.tasksmart.sharedLibrary.dtos.request.ExchangeGoogleTokenRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.*;
+import com.tasksmart.sharedLibrary.repositories.httpClients.OAuth.GitHubAuthClient;
+import com.tasksmart.sharedLibrary.repositories.httpClients.OAuth.GitHubClient;
+import com.tasksmart.sharedLibrary.repositories.httpClients.OAuth.GoogleAuthClient;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
 import com.tasksmart.user.dtos.request.UserSignInRequest;
 import com.tasksmart.user.dtos.response.AuthResponse;
@@ -10,13 +16,17 @@ import com.tasksmart.user.services.AuthService;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.utils.JWTUtil;
+import com.tasksmart.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Implementation of the AuthService interface.
@@ -41,6 +51,32 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationUtils authenticationUtils;
 
+    private final GoogleAuthClient googleAuthClient;
+    private final GitHubAuthClient gitHubAuthClient;
+    private final GitHubClient gitHubClient;
+    private final UserService userService;
+
+    @Value("${oauth.google.clientId}")
+    private String GOOGLE_CLIENT_ID;
+
+    @Value("${oauth.google.clientSecret}")
+    private String GOOGLE_CLIENT_SECRET;
+
+    @Value("${oauth.google.redirectUri}")
+    private String GOOGLE_REDIRECT_URI;
+
+    @Value("${oauth.google.grantType}")
+    private String GOOGLE_GRANT_TYPE;
+
+    @Value("${oauth.github.clientId}")
+    private String GITHUB_CLIENT_ID;
+
+    @Value("${oauth.github.clientSecret}")
+    private String GITHUB_CLIENT_SECRET;
+
+    @Value("${oauth.github.redirectUri}")
+    private String GITHUB_REDIRECT_URI;
+
     @Override
     public UserGeneralResponse introspect() {
         String userId = authenticationUtils.getUserIdAuthenticated();
@@ -48,6 +84,69 @@ public class AuthServiceImpl implements AuthService {
                 () -> new ResourceNotFound("User not found!")
         );
         return modelMapper.map(user, UserGeneralResponse.class);
+    }
+
+    public AuthResponse googleAuthenticate(String code){
+        ExchangeGoogleTokenResponse exchangeGoogleTokenResponse = googleAuthClient.exchangeToken(ExchangeGoogleTokenRequest
+                .builder()
+                .code(code)
+                        .clientId(GOOGLE_CLIENT_ID)
+                        .clientSecret(GOOGLE_CLIENT_SECRET)
+                        .redirectUri(GOOGLE_REDIRECT_URI)
+                        .grantType(GOOGLE_GRANT_TYPE)
+                .build());
+        GoogleUserResponse googleUserResponse = googleAuthClient.tokenInfo(exchangeGoogleTokenResponse.getId_token());
+        User user;
+        if(!userRepository.existsByEmail(googleUserResponse.getEmail())){
+            user = userService.createUserOAuth(googleUserResponse.getEmail(), googleUserResponse.getName(), googleUserResponse.getPicture(), "");
+        }else{
+            user = userRepository.findByEmail(googleUserResponse.getEmail()).orElseThrow(
+                    () -> new ResourceNotFound("User not found!")
+            );
+            if(StringUtils.equals(user.getProfileImagePath(), googleUserResponse.getPicture())){
+                user.setProfileImagePath(googleUserResponse.getPicture());
+                userRepository.save(user);
+            }
+        }
+        UserGeneralResponse userGeneralResponse = getUserResponse(user);
+        return AuthResponse.builder()
+                .user(userGeneralResponse)
+                .accessToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 1))
+                .refreshToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 24*5))
+                .build();
+    }
+
+    public AuthResponse githubAuthenticate(String code){
+        ExchangeGithubTokenResponse exchange = gitHubAuthClient.exchangeToken(ExchangeGitHubTokenRequest
+                .builder()
+                .code(code)
+                .client_id(GITHUB_CLIENT_ID)
+                .client_secret(GITHUB_CLIENT_SECRET)
+                .redirect_uri(GITHUB_REDIRECT_URI)
+                .build());
+        System.out.println(exchange.getAccess_token());
+
+        GitHubUserResponse gitHubUserResponse = gitHubClient.getUserInfo("Bearer "+ exchange.getAccess_token());
+        List<GitHubUserEmailResponse> emails = gitHubClient.getUserEmail("Bearer "+ exchange.getAccess_token());
+        String email = getEmailPrimary(emails);
+
+        User user;
+        if(!userRepository.existsByEmail(email)){
+            user = userService.createUserOAuth(email, gitHubUserResponse.getName(), gitHubUserResponse.getAvatar_url(), gitHubUserResponse.getLogin());
+        }else{
+            user = userRepository.findByEmail(email).orElseThrow(
+                    () -> new ResourceNotFound("User not found!")
+            );
+            if(StringUtils.equals(user.getProfileImagePath(), gitHubUserResponse.getAvatar_url())){
+                user.setProfileImagePath(gitHubUserResponse.getAvatar_url());
+                userRepository.save(user);
+            }
+        }
+        return AuthResponse.builder()
+                .user(getUserResponse(user))
+                .accessToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 1))
+                .refreshToken(jwtUtil.generateToken(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getRole(), 24*5))
+                .build();
     }
 
     /** {@inheritDoc} */
@@ -63,6 +162,11 @@ public class AuthServiceImpl implements AuthService {
             user = userRepository.findByEmail(userSignInRequest.getEmail()).orElseThrow(
                     () -> new ResourceNotFound("User not found!")
             );
+//            if(!CollectionUtils.isEmpty(user.getAccountType())) {
+//                List<EUserType> accountTypes = user.getAccountType().stream().toList();
+//                if(!accountTypes.contains(EUserType.Default))
+//                    throw new BadRequest("User not found!");
+//            }
         } else {
             user = userRepository.findByUsername(userSignInRequest.getUsername()).orElseThrow(
                     () -> new ResourceNotFound("User not found!")
@@ -70,7 +174,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if(! passwordEncoder.matches(userSignInRequest.getPassword(), user.getPassword())){
-            throw new BadRequest("Invalid password!");
+            throw new BadRequest("Invalid username/email or password!");
         }
 
         UserGeneralResponse userGeneralResponse = getUserResponse(user);
@@ -104,5 +208,12 @@ public class AuthServiceImpl implements AuthService {
 
     private UserGeneralResponse getUserResponse(User user){
         return modelMapper.map(user, UserGeneralResponse.class);
+    }
+    private String getEmailPrimary(List<GitHubUserEmailResponse> emails){
+        for(GitHubUserEmailResponse email : emails){
+            if(email.isPrimary())
+                return email.getEmail();
+        }
+        return null;
     }
 }

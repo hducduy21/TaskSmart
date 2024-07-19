@@ -31,6 +31,22 @@ public class AuthController {
         return authService.introspect();
     }
 
+    @PostMapping("/oauth/google")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponse googleAuthenticate(
+            @RequestParam("code") String code
+    ){
+        return authService.googleAuthenticate(code);
+    }
+
+    @PostMapping("/oauth/github")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponse githubAuthenticate(
+            @RequestParam("code") String code
+    ){
+        return authService.githubAuthenticate(code);
+    }
+
     /**
      * Handles the login endpoint.
      *

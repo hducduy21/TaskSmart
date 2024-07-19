@@ -25,7 +25,7 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
     private static final String[] PERMIT_ALL_ENDPOINTS = {
-            "/api/auth/login", "/api/auth/refresh"
+            "/api/auth/**"
     };
 
     private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {

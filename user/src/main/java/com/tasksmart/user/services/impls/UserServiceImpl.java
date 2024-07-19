@@ -36,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Implementation of the UserService interface.
@@ -162,6 +163,49 @@ public class UserServiceImpl implements UserService {
         kafkaTemplate.send("user-registration", modelMapper.map(user, UserMessage.class));
 
         return this.getUserResponse(user);
+    }
+
+    @Override
+    public User createUserOAuth(String name, String email, String pictureUrl, String username) {
+        String uniqueUsername = username;
+        if(StringUtils.isNotBlank(username)){
+            if(userRepository.existsByUsername(username)){
+                uniqueUsername = username + UUID.randomUUID();
+            }
+        }else{
+            uniqueUsername = username + UUID.randomUUID();
+        }
+        HashSet<String> roles = new HashSet<>();
+        roles.add(AppConstant.Role_User);
+
+        User user = User.builder()
+                .name(name)
+                .email(email)
+                .username(uniqueUsername)
+                .role(roles)
+                .enabled(true)
+                .locked(false)
+                .profileImagePath(pictureUrl)
+                .build();
+        userRepository.save(user);
+        try {
+            WorkSpaceGeneralResponse workSpaceGeneralResponse = workSpaceClient.createPersonalWorkSpace(user.getId(), user.getName(), user.getUsername());
+            User.WorkSpace personalWorkSpace = User.WorkSpace.builder()
+                    .id(workSpaceGeneralResponse.getId())
+                    .name(workSpaceGeneralResponse.getName())
+                    .build();
+            user.setPersonalWorkSpace(personalWorkSpace);
+            userRepository.save(user);
+        }catch (Exception e){
+            userRepository.delete(user);
+            log.error("Error: create user {}", e.getMessage());
+            throw new ResourceConflict("Error creating user! Please try later.");
+        }
+
+        kafkaTemplate.setMessageConverter(new KafkaMessageConverter());
+        kafkaTemplate.send("user-registration", modelMapper.map(user, UserMessage.class));
+
+        return user;
     }
 
     /** {@inheritDoc} */
