@@ -589,6 +589,26 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(this::getProjectGeneralResponse).toList();
     }
 
+    @Override
+    public ProjectResponse applyProjectGenerate(String projectId, TaskGenerateRequest taskGenerateRequest) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                () -> new ResourceNotFound("Project not found!")
+        );
+        if (!StringUtils.equals(project.getOwner().getUserId(), userId)) {
+            throw new Forbidden("You do not have permission to access this feature!");
+        }
+        if(taskGenerateRequest.getListCards() == null || taskGenerateRequest.getListCards().isEmpty()){
+            throw new BadRequest("Require provide task!");
+        }
+        List<String> listCardIdsAddition = listCardService.applyGenerate(projectId, taskGenerateRequest.getListCards());
+        List<String> listCardIds = project.getListCardIds();
+        listCardIds.addAll(listCardIdsAddition);
+        project.setListCardIds(listCardIds);
+        projectRepository.save(project);
+        return getProjectResponse(project);
+    }
+
     /**
      * Get ProjectGeneralResponse from Project.
      *

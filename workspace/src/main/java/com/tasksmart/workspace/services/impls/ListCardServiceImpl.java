@@ -9,6 +9,7 @@ import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.workspace.dtos.request.CardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
+import com.tasksmart.workspace.dtos.request.TaskGenerateRequest;
 import com.tasksmart.workspace.dtos.response.CardResponse;
 import com.tasksmart.workspace.dtos.response.ListCardResponse;
 import com.tasksmart.workspace.models.ListCard;
@@ -166,6 +167,23 @@ public class ListCardServiceImpl implements ListCardService {
     @Override
     public void deleteAllListCardByProject(String projectId) {
         listCardRepository.deleteAllByProjectId(projectId);
+    }
+
+    @Override
+    public List<String> applyGenerate(String projectId, List<TaskGenerateRequest.ListCardGenerateRequest> listCards) {
+        List<String> listCardsId = new ArrayList<>();
+        for(TaskGenerateRequest.ListCardGenerateRequest listCardGenerateRequest: listCards){
+            ListCard listCard = modelMapper.map(listCardGenerateRequest, ListCard.class);
+            listCard.setProjectId(projectId);
+            if(listCardGenerateRequest.getCards() != null){
+                List<String> cardIds = cardService.applyGenerate(projectId, listCardGenerateRequest.getCards());
+                listCard.setCardIds(cardIds);
+            }
+            listCardRepository.save(listCard);
+
+            listCardsId.add(listCard.getId());
+        }
+        return listCardsId;
     }
 
     public ListCardResponse getListCardResponse(ListCard listCard){

@@ -10,6 +10,8 @@ from langchain.chains import RetrievalQA
 from langchain_core.output_parsers import JsonOutputParser
 from src.utils.outputParser import Project
 
+from langchain_google_genai import ChatGoogleGenerativeAI
+
 
 AWS_S3_ACCESS_KEY = "AKIAY42F3KJNL5JRGJMD"
 AWS_S3_SECRET_ACCESS_KEY = "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"
@@ -43,7 +45,8 @@ def entry_db(project_id: str):
     return chroma
 
 def load_llm():
-    llm = ChatOpenAI(api_key="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")
+    # llm = ChatOpenAI(api_key="sk-proj-hgdE6s8Y9IS9sYnDzUELT3BlbkFJfrswtg4SAWNnZwLL7Wve")
+    llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyBRmzrMqjc-FvOlPhHT_sFm1O1fbUme8Ec")
     return llm
 
 def create_prompt(parser):

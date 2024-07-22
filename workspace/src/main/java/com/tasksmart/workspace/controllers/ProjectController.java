@@ -148,4 +148,10 @@ public class ProjectController {
     public ProjectResponse changeBackground(@PathVariable String projectId, @RequestParam String background){
         return projectService.updateBackground(projectId, background);
     }
+
+    @PostMapping("{projectId}/apply-generate")
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectResponse applyProjectGenerate(@PathVariable String projectId, @Valid @RequestBody TaskGenerateRequest taskGenerateRequest){
+        return projectService.applyProjectGenerate(projectId,taskGenerateRequest);
+    }
 }

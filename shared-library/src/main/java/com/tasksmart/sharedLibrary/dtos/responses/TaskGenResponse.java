@@ -22,6 +22,9 @@ public class TaskGenResponse {
     @AllArgsConstructor
     public static class CheckList {
         private String name;
+
+        @Builder.Default
+        private boolean checked = false;
     }
 
     @Data

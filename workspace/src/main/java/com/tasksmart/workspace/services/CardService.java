@@ -87,4 +87,6 @@ public interface CardService {
     String applyTemplate(String cardId, String projectId);
 
     void deleteAllCardByProject(String id);
+
+    List<String> applyGenerate(String projectId, List<TaskGenerateRequest.CardGenerateRequest> cards);
 }

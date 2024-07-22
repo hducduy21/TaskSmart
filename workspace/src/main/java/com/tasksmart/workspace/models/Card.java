@@ -40,16 +40,20 @@ public class Card {
     public String description;
 
     /** The status of Card. */
-    public EStatus status;
+    @Builder.Default
+    public EStatus status = EStatus.none;
 
     /** The priority level of Card. */
-    public ELevel priority;
+    @Builder.Default
+    public ELevel priority = ELevel.none;
 
     /** The risk level of Card. */
-    public ELevel risk;
+    @Builder.Default
+    public ELevel risk = ELevel.none;
 
     /** The effort level of Card. */
-    public ELevel effort;
+    @Builder.Default
+    public ELevel effort = ELevel.none;
 
     /** The estimated completion time for Card. */
     public LocalDateTime estimate;

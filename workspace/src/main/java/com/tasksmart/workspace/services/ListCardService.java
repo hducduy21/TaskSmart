@@ -4,6 +4,7 @@ import com.tasksmart.sharedLibrary.dtos.request.ListCardTemplateRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.ListCardTemplateResponse;
 import com.tasksmart.workspace.dtos.request.CardCreationRequest;
 import com.tasksmart.workspace.dtos.request.ListCardCreationRequest;
+import com.tasksmart.workspace.dtos.request.TaskGenerateRequest;
 import com.tasksmart.workspace.dtos.response.CardResponse;
 import com.tasksmart.workspace.dtos.response.ListCardResponse;
 import com.tasksmart.workspace.models.ListCard;
@@ -68,4 +69,6 @@ public interface ListCardService {
     String applyTemplate(String listCardId, String projectId);
 
     void deleteAllListCardByProject(String projectId);
+
+    List<String> applyGenerate(String projectId, List<TaskGenerateRequest.ListCardGenerateRequest> listCards);
 }

@@ -115,4 +115,6 @@ public interface ProjectService {
     SearchAllResponse search(String query);
 
     List<ProjectGeneralResponse> searchProject(String query, String workSpaceId);
+
+    ProjectResponse applyProjectGenerate(String projectId, TaskGenerateRequest taskGenerateRequest);
 }

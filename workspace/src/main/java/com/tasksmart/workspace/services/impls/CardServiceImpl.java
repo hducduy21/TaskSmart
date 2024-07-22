@@ -504,6 +504,40 @@ public class CardServiceImpl implements CardService {
         cardRepository.deleteAllByProjectId(id);
     }
 
+    @Override
+    public List<String> applyGenerate(String projectId, List<TaskGenerateRequest.CardGenerateRequest> cards) {
+        List<String> cardIds = new ArrayList<>();
+        for(TaskGenerateRequest.CardGenerateRequest cardGenerateRequest: cards){
+            Card card = modelMapper.map(cardGenerateRequest, Card.class);
+            card.setProjectId(projectId);
+            if(cardGenerateRequest.getCheckLists() != null){
+                List<CheckListGroup> checkListGroup = card.getCheckLists().stream().map(checkListGroupGenerateRequest -> {
+                    CheckListGroup group = CheckListGroup.builder()
+                            .id(UUID.randomUUID().toString())
+                            .name(checkListGroupGenerateRequest.getName())
+                            .build();
+                    if(checkListGroupGenerateRequest.getCheckLists() != null){
+                        group.setCheckLists(checkListGroupGenerateRequest.getCheckLists().stream().map(
+                                checkListGenerateRequest -> {
+                                    return CheckList.builder()
+                                            .id(UUID.randomUUID().toString())
+                                            .name(checkListGenerateRequest.getName())
+                                            .checked(checkListGenerateRequest.isChecked())
+                                            .build();
+                                }).toList());
+                    }
+                    return group;
+                }).toList();
+
+                card.setCheckLists(checkListGroup);
+            }
+
+            cardRepository.save(card);
+            cardIds.add(card.getId());
+        }
+        return cardIds;
+    }
+
     private Project isUserInTheProject(String userId, String projectId){
         Project project = projectRepository.findById(projectId).orElseThrow(
                 ()->new ResourceNotFound("Project not found!")
