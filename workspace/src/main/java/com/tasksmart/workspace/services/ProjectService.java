@@ -1,7 +1,9 @@
 package com.tasksmart.workspace.services;
 
-import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
-import com.tasksmart.sharedLibrary.dtos.responses.TaskGenResponse;
+import com.tasksmart.sharedLibrary.dtos.request.DBRagRequest;
+import com.tasksmart.sharedLibrary.dtos.request.RagUriRequest;
+import com.tasksmart.sharedLibrary.dtos.request.URIRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.*;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.models.Project;
@@ -117,4 +119,16 @@ public interface ProjectService {
     List<ProjectGeneralResponse> searchProject(String query, String workSpaceId);
 
     ProjectResponse applyProjectGenerate(String projectId, TaskGenerateRequest taskGenerateRequest);
+
+    DatabaseStatementResponse databaseRAG(String projectId, DBRagRequest dbRagRequest);
+
+    StatementResponse generateDBStructure(String projectId,String database);
+
+    void saveDbStructure(String projectId, DBStructureRequest dbStructureRequest);
+
+    StatementResponse getDBStructure(String projectId);
+
+    DatabaseConnectResponse connectSQLDB(String projectId, URIRequest uriRequest);
+
+    StatementRunableResponse DBRagByURI(String projectId, RagUriRequest ragUriRequest);
 }

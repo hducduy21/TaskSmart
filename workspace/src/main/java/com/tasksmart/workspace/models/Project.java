@@ -49,6 +49,9 @@ public class Project {
     private boolean isTemplate = false;
 
     @Builder.Default
+    private String databaseStructure = "";
+
+    @Builder.Default
     private List<String> listCardIds = new ArrayList<>();
 
     @Builder.Default

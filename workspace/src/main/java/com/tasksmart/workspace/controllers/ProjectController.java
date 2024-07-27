@@ -1,6 +1,9 @@
 package com.tasksmart.workspace.controllers;
 
-import com.tasksmart.sharedLibrary.dtos.responses.TaskGenResponse;
+import com.tasksmart.sharedLibrary.dtos.request.DBRagRequest;
+import com.tasksmart.sharedLibrary.dtos.request.RagUriRequest;
+import com.tasksmart.sharedLibrary.dtos.request.URIRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.*;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.services.ProjectService;
@@ -50,31 +53,82 @@ public class ProjectController {
         return projectService.updateInviteCode(projectId, isPublic, refresh);
     }
 
-
-    @GetMapping("{projectId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ProjectResponse getProjectById(@PathVariable String projectId){
-        return projectService.getProjectById(projectId);
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectGeneralResponse createPersonalProject(@Valid @RequestBody ProjectRequest projectRequest){
         return projectService.createProject(projectRequest);
     }
 
-    @PutMapping("{projectId}")
+    @GetMapping("{projectId}/assets/{assetId}")
     @ResponseStatus(HttpStatus.OK)
-    public ProjectGeneralResponse editProject(@PathVariable String projectId,
-                                              @Valid @RequestBody ProjectRequest projectRequest){
-        return projectService.editProject(projectId, projectRequest);
+    public byte[] viewProjectImageAssets(@PathVariable String projectId, @PathVariable String assetId){
+        return projectService.viewImage(projectId,assetId);
     }
 
-    @PostMapping("{projectId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ListCardResponse createListCard(@PathVariable String projectId,
-                                           @Valid @RequestBody ListCardCreationRequest listCardCreationRequest){
-        return projectService.createListCard(projectId, listCardCreationRequest);
+    @GetMapping("{projectId}/document")
+    @ResponseStatus(HttpStatus.OK)
+    public byte[] getProjectDocument(@PathVariable String projectId){
+        return projectService.getProjectDocument(projectId);
+    }
+
+    @PostMapping("{projectId}/document")
+    @ResponseStatus(HttpStatus.OK)
+    public String putProjectDocument(@PathVariable String projectId, @RequestPart MultipartFile file){
+        return projectService.putProjectDocument(projectId,file);
+    }
+
+    @GetMapping("{projectId}/generate-task")
+    @ResponseStatus(HttpStatus.OK)
+    public TaskGenResponse generateTask(@PathVariable String projectId){
+        return projectService.generateTask(projectId);
+    }
+
+    @PutMapping("{projectId}/background")
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectResponse changeBackground(@PathVariable String projectId, @RequestParam String background){
+        return projectService.updateBackground(projectId, background);
+    }
+
+    @PostMapping("{projectId}/apply-generate")
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectResponse applyProjectGenerate(@PathVariable String projectId, @Valid @RequestBody TaskGenerateRequest taskGenerateRequest){
+        return projectService.applyProjectGenerate(projectId,taskGenerateRequest);
+    }
+
+    @GetMapping("{projectId}/get-db-structure")
+    @ResponseStatus(HttpStatus.OK)
+    public StatementResponse getDBStructure(@PathVariable String projectId){
+        return projectService.getDBStructure(projectId);
+    }
+
+    @PostMapping("{projectId}/save-db-structure")
+    @ResponseStatus(HttpStatus.OK)
+    public void saveDbStructure(@PathVariable String projectId, @Valid @RequestBody DBStructureRequest dbStructureRequest){
+        projectService.saveDbStructure(projectId,dbStructureRequest);
+    }
+
+    @PostMapping("{projectId}/get-structure-by-uri")
+    @ResponseStatus(HttpStatus.OK)
+    public DatabaseConnectResponse connectDb(@PathVariable String projectId, @Valid @RequestBody URIRequest uriRequest){
+        return projectService.connectSQLDB(projectId,uriRequest);
+    }
+
+    @PostMapping("{projectId}/database-rag-by-uri")
+    @ResponseStatus(HttpStatus.OK)
+    public StatementRunableResponse connectDb(@PathVariable String projectId, @Valid @RequestBody RagUriRequest ragUriRequest){
+        return projectService.DBRagByURI(projectId,ragUriRequest);
+    }
+
+    @GetMapping("{projectId}/generate-structure")
+    @ResponseStatus(HttpStatus.OK)
+    public StatementResponse generateDBStructure(@PathVariable String projectId, @RequestParam String database){
+        return projectService.generateDBStructure(projectId, database);
+    }
+
+    @PostMapping("{projectId}/database-rag")
+    @ResponseStatus(HttpStatus.OK)
+    public DatabaseStatementResponse databaseRAG(@PathVariable String projectId, @RequestBody DBRagRequest dbRagRequest){
+        return projectService.databaseRAG(projectId,dbRagRequest);
     }
 
     @PostMapping("{projectId}/move/listcard")
@@ -119,39 +173,23 @@ public class ProjectController {
         projectService.deleteProject(projectId);
     }
 
-    @GetMapping("{projectId}/assets/{assetId}")
+    @PutMapping("{projectId}")
     @ResponseStatus(HttpStatus.OK)
-    public byte[] viewProjectImageAssets(@PathVariable String projectId, @PathVariable String assetId){
-        return projectService.viewImage(projectId,assetId);
+    public ProjectGeneralResponse editProject(@PathVariable String projectId,
+                                              @Valid @RequestBody ProjectRequest projectRequest){
+        return projectService.editProject(projectId, projectRequest);
     }
 
-    @GetMapping("{projectId}/document")
-    @ResponseStatus(HttpStatus.OK)
-    public byte[] getProjectDocument(@PathVariable String projectId){
-        return projectService.getProjectDocument(projectId);
+    @PostMapping("{projectId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ListCardResponse createListCard(@PathVariable String projectId,
+                                           @Valid @RequestBody ListCardCreationRequest listCardCreationRequest){
+        return projectService.createListCard(projectId, listCardCreationRequest);
     }
 
-    @PostMapping("{projectId}/document")
+    @GetMapping("{projectId}")
     @ResponseStatus(HttpStatus.OK)
-    public String putProjectDocument(@PathVariable String projectId, @RequestPart MultipartFile file){
-        return projectService.putProjectDocument(projectId,file);
-    }
-
-    @GetMapping("{projectId}/generate-task")
-    @ResponseStatus(HttpStatus.OK)
-    public TaskGenResponse generateTask(@PathVariable String projectId){
-        return projectService.generateTask(projectId);
-    }
-
-    @PutMapping("{projectId}/background")
-    @ResponseStatus(HttpStatus.OK)
-    public ProjectResponse changeBackground(@PathVariable String projectId, @RequestParam String background){
-        return projectService.updateBackground(projectId, background);
-    }
-
-    @PostMapping("{projectId}/apply-generate")
-    @ResponseStatus(HttpStatus.OK)
-    public ProjectResponse applyProjectGenerate(@PathVariable String projectId, @Valid @RequestBody TaskGenerateRequest taskGenerateRequest){
-        return projectService.applyProjectGenerate(projectId,taskGenerateRequest);
+    public ProjectResponse getProjectById(@PathVariable String projectId){
+        return projectService.getProjectById(projectId);
     }
 }

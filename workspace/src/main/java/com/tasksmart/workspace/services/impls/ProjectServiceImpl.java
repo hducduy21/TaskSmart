@@ -1,14 +1,17 @@
 package com.tasksmart.workspace.services.impls;
 
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
-import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
-import com.tasksmart.sharedLibrary.dtos.responses.TaskGenResponse;
+import com.tasksmart.sharedLibrary.dtos.request.DBRagRequest;
+import com.tasksmart.sharedLibrary.dtos.request.RagUriRequest;
+import com.tasksmart.sharedLibrary.dtos.request.URIRequest;
+import com.tasksmart.sharedLibrary.dtos.responses.*;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.sharedLibrary.repositories.httpClients.PyHelperClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
+import com.tasksmart.workspace.dtos.response.WorkSpaceGeneralResponse;
 import com.tasksmart.workspace.models.Invitation;
 import com.tasksmart.workspace.models.Project;
 import com.tasksmart.workspace.models.UserRelation;
@@ -23,7 +26,6 @@ import com.tasksmart.workspace.services.ListCardService;
 import com.tasksmart.workspace.services.ProjectService;
 import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
 import com.tasksmart.sharedLibrary.dtos.messages.UserJoinProjectMessage;
-import com.tasksmart.sharedLibrary.dtos.responses.UserGeneralResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.exceptions.Forbidden;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
@@ -113,8 +115,6 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectGeneralResponse createProject(ProjectRequest projectRequest) {
         //Get user id from token
         String userId = authenticationUtils.getUserIdAuthenticated();
-
-
 
         //Convert dto to entity
         Project project = Project.builder()
@@ -607,6 +607,75 @@ public class ProjectServiceImpl implements ProjectService {
         project.setListCardIds(listCardIds);
         projectRepository.save(project);
         return getProjectResponse(project);
+    }
+
+    @Override
+    public DatabaseStatementResponse databaseRAG(String projectId, DBRagRequest dbRagRequest) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        projectRepository.findByProjectIdAndUserId(projectId, userId).orElseThrow(
+                () -> new ResourceNotFound("Project not found!")
+        );
+
+        if(StringUtils.isBlank(dbRagRequest.getDatabase()))
+            dbRagRequest.setDatabase("MySQL");
+        return pyHelperClient.databaseRAG(dbRagRequest);
+    }
+
+    @Override
+    public StatementResponse generateDBStructure(String projectId,String database) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project= projectRepository.findByProjectIdAndUserId(projectId, userId).orElseThrow(
+                () -> new ResourceNotFound("Project not found!")
+        );
+        if(!project.isSpeDoc())
+            throw new ResourceNotFound("Please upload the project document!");
+
+        return pyHelperClient.generateDbStructure(projectId, database);
+    }
+
+    @Override
+    public void saveDbStructure(String projectId, DBStructureRequest dbStructureRequest) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project = projectRepository.findByProjectIdAndUserId(projectId, userId).orElseThrow(
+                () -> new ResourceNotFound("Project not found!")
+        );
+        project.setDatabaseStructure(dbStructureRequest.getStatement());
+        projectRepository.save(project);
+    }
+
+    @Override
+    public StatementResponse getDBStructure(String projectId) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project = projectRepository.findByProjectIdAndUserId(projectId, userId).orElseThrow(
+                () -> new ResourceNotFound("Project not found!")
+        );
+        return StatementResponse.builder().statement(project.getDatabaseStructure()).build();
+    }
+
+    @Override
+    public DatabaseConnectResponse connectSQLDB(String projectId, URIRequest uriRequest) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        projectRepository.findByProjectIdAndUserId(projectId, userId).orElseThrow(
+                () -> new ResourceNotFound("Project not found!")
+        );
+        try {
+            return pyHelperClient.connectDB(uriRequest);
+        } catch (Exception e) {
+            throw new BadRequest("Can't connect to database! Please check your URI!");
+        }
+    }
+
+    @Override
+    public StatementRunableResponse DBRagByURI(String projectId, RagUriRequest ragUriRequest) {
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        projectRepository.findByProjectIdAndUserId(projectId, userId).orElseThrow(
+                () -> new ResourceNotFound("Project not found!")
+        );
+        try {
+            return pyHelperClient.DBRagByURI(ragUriRequest);
+        } catch (Exception e) {
+            throw new BadRequest("Can't connect to database! Please check your URI!");
+        }
     }
 
     /**
