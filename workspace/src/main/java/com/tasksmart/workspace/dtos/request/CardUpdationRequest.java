@@ -42,4 +42,6 @@ public class CardUpdationRequest {
     @Future(message = "The estimate must be in the future")
     public LocalDateTime estimate;
 
+    public LocalDateTime startTime;
+
 }

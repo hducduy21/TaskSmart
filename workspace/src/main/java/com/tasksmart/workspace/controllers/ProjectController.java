@@ -24,7 +24,7 @@ public class ProjectController {
     @GetMapping("/recent")
     @ResponseStatus(HttpStatus.OK)
     public List<ProjectGeneralResponse> getAllProjectRecent(){
-        return null;
+        return projectService.getRecentProjects();
     }
 
     @GetMapping

@@ -55,8 +55,34 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public CardResponse createCard(String projectId, CardCreationRequest cardCreationRequest){
-        Card card = modelMapper.map(cardCreationRequest, Card.class);
+        Card card = Card.builder().name(cardCreationRequest.getName()).build();
         card.setProjectId(projectId);
+
+        if(StringUtils.isNotBlank(cardCreationRequest.getColor())){
+            card.setColor(cardCreationRequest.getColor());
+        }
+        if(StringUtils.isNotBlank(cardCreationRequest.getDescription())){
+            card.setDescription(cardCreationRequest.getDescription());
+        }
+        if(cardCreationRequest.getStatus() != null){
+            card.setStatus(cardCreationRequest.getStatus());
+        }
+        if(cardCreationRequest.getRisk() != null){
+            card.setRisk(cardCreationRequest.getRisk());
+        }
+        if(cardCreationRequest.getPriority() != null){
+            card.setPriority(cardCreationRequest.getPriority());
+        }
+        if(cardCreationRequest.getEffort() != null){
+            card.setEffort(cardCreationRequest.getEffort());
+        }
+        if(cardCreationRequest.getEstimate() != null){
+            card.setEstimate(cardCreationRequest.getEstimate());
+        }
+        if(cardCreationRequest.getStartTime() != null){
+            card.setStartTime(cardCreationRequest.getStartTime());
+        }
+
         cardRepository.save(card);
         return getCardResponse(card);
     }
@@ -124,6 +150,9 @@ public class CardServiceImpl implements CardService {
         }
         if(cardUpdationRequest.getEstimate() != null){
             card.setEstimate(cardUpdationRequest.getEstimate());
+        }
+        if(cardUpdationRequest.getStartTime() != null){
+            card.setStartTime(cardUpdationRequest.getStartTime());
         }
 
         cardRepository.save(card);

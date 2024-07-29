@@ -5,6 +5,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Document("activities")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +21,7 @@ public class Activity {
 
     private String workspaceId;
 
-    private String projectId;
+    private ProjectActivity project;
 
     private String listCardId;
 
@@ -28,5 +30,20 @@ public class Activity {
     private EActivityType type;
 
     private String content;
+
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    @Builder
+    public static class ProjectActivity{
+        private String id;
+        private String name;
+    }
 
 }

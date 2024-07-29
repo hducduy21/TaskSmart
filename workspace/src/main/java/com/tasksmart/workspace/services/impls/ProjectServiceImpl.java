@@ -1,11 +1,13 @@
 package com.tasksmart.workspace.services.impls;
 
+import com.tasksmart.sharedLibrary.dtos.messages.ProjectAccess;
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.request.DBRagRequest;
 import com.tasksmart.sharedLibrary.dtos.request.RagUriRequest;
 import com.tasksmart.sharedLibrary.dtos.request.URIRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.*;
 import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
+import com.tasksmart.sharedLibrary.repositories.httpClients.ActivityTrackerClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.PyHelperClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.sharedLibrary.services.AwsS3Service;
@@ -42,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -80,6 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final AwsS3Service awsS3Service;
     private final UnsplashClient unsplashClient;
     private final PyHelperClient pyHelperClient;
+    private final ActivityTrackerClient activityTrackerClient;
 
     /**
      * {@inheritDoc}
@@ -87,6 +91,24 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectGeneralResponse> getAllProject() {
         return projectRepository.findAll().stream().map(this::getProjectGeneralResponse).toList();
+    }
+
+    @Override
+    public List<ProjectGeneralResponse> getRecentProjects() {
+        List<ProjectAccessResponse> projectAccessResponses = activityTrackerClient.getProjectRecent();
+        if (CollectionUtils.isEmpty(projectAccessResponses)) {
+            return new ArrayList<>();
+        }
+        return projectAccessResponses.stream().map(projectAccessResponse -> {
+            Optional<Project> projectOptional = projectRepository.findById(projectAccessResponse.getId());
+            if(projectOptional.isPresent()) {
+                Project project = projectOptional.get();
+                ProjectGeneralResponse projectGeneralResponse = getProjectGeneralResponse(project);
+                projectGeneralResponse.setLastAccessed(projectAccessResponse.getUpdatedAt());
+                return projectGeneralResponse;
+            }
+            return null;
+        }).toList();
     }
 
     /**
@@ -102,9 +124,17 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     public ProjectResponse getProjectById(String projectId) {
-        Project project = projectRepository.findById(projectId).orElseThrow(
+        String userId = authenticationUtils.getUserIdAuthenticated();
+        Project project = projectRepository.findByProjectIdAndUserId(projectId, userId).orElseThrow(
                 () -> new ResourceNotFound("Project not found!")
         );
+
+        ProjectAccess projectAccess = ProjectAccess.builder()
+                .userId(userId)
+                .projectId(projectId)
+                .projectName(project.getName())
+                .build();
+        kafkaTemplate.send("project-access", projectAccess);
         return getProjectResponse(project);
     }
 

@@ -17,6 +17,7 @@ public class KafkaMessageConverter extends JsonMessageConverter {
         typeMapper.setIdClassMapping(Collections.singletonMap("user", UserMessage.class));
         typeMapper.setIdClassMapping(Collections.singletonMap("workspace", WorkSpaceMessage.class));
         typeMapper.setIdClassMapping(Collections.singletonMap("project", ProjectMessage.class));
+        typeMapper.setIdClassMapping(Collections.singletonMap("projectAccess", ProjectAccess.class));
         typeMapper.setIdClassMapping(Collections.singletonMap("userJoinWorkSpace", UserJoinWorkSpaceMessage.class));
         typeMapper.setIdClassMapping(Collections.singletonMap("userJoinProject", UserJoinProjectMessage.class));
         this.setTypeMapper(typeMapper);

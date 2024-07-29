@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
         GoogleUserResponse googleUserResponse = googleAuthClient.tokenInfo(exchangeGoogleTokenResponse.getId_token());
         User user;
         if(!userRepository.existsByEmail(googleUserResponse.getEmail())){
-            user = userService.createUserOAuth(googleUserResponse.getEmail(), googleUserResponse.getName(), googleUserResponse.getPicture(), "");
+            user = userService.createUserOAuth(googleUserResponse.getName(), googleUserResponse.getEmail(), googleUserResponse.getPicture(), "");
         }else{
             user = userRepository.findByEmail(googleUserResponse.getEmail()).orElseThrow(
                     () -> new ResourceNotFound("User not found!")
@@ -132,7 +132,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user;
         if(!userRepository.existsByEmail(email)){
-            user = userService.createUserOAuth(email, gitHubUserResponse.getName(), gitHubUserResponse.getAvatar_url(), gitHubUserResponse.getLogin());
+            user = userService.createUserOAuth(gitHubUserResponse.getName(), email, gitHubUserResponse.getAvatar_url(), gitHubUserResponse.getLogin());
         }else{
             user = userRepository.findByEmail(email).orElseThrow(
                     () -> new ResourceNotFound("User not found!")

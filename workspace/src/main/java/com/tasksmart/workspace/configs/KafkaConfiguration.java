@@ -36,4 +36,9 @@ public class KafkaConfiguration {
     public NewTopic projectAddMemberTopic() {
         return TopicBuilder.name("project-add-member").build();
     }
+
+    @Bean
+    public NewTopic projectAccess() {
+        return TopicBuilder.name("project-access").build();
+    }
 }

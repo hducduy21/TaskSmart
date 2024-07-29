@@ -42,13 +42,18 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     }
 
     public void sendWelcomeEmail(UserMessage userMessage) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("tasksmart2d@gmail.com");
-        message.setTo(userMessage.getEmail());
-        message.setSubject("Welcome to TaskSmart - from Double2D Corp");
-        message.setText("Welcome " + userMessage.getName() + " to TaskSmart. We are excited to have you on board.");
-
-        mailSender.send(message);
-        log.info("Welcome email sent to " + userMessage.getName());
+        System.out.println("Sending welcome email to " + userMessage.getEmail());
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("tasksmart2d@gmail.com");
+            message.setTo(userMessage.getEmail());
+            message.setSubject("Welcome to TaskSmart - from Double2D Corp");
+            message.setText("Welcome  "+ userMessage.getName() + " to TaskSmart. We are excited to have you on board.");
+            mailSender.send(message);
+            log.info("Welcome email sent to " + userMessage.getName());
+        }catch (Exception e) {
+            log.error("Error sending welcome email to " + userMessage.getEmail());
+            throw new InternalServerError("Error sending welcome email to " + userMessage.getEmail());
+        }
     }
 }

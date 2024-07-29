@@ -131,4 +131,6 @@ public interface ProjectService {
     DatabaseConnectResponse connectSQLDB(String projectId, URIRequest uriRequest);
 
     StatementRunableResponse DBRagByURI(String projectId, RagUriRequest ragUriRequest);
+
+    List<ProjectGeneralResponse> getRecentProjects();
 }

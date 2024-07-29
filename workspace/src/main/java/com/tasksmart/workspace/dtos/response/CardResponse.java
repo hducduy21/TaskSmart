@@ -40,6 +40,9 @@ public class CardResponse {
     /** The estimated completion time for the Card. */
     public LocalDateTime estimate;
 
+    /** The start time of the Card. */
+    public LocalDateTime startTime;
+
     /** The list of CheckLists associated with the Card. */
     public List<CheckListGroupResponse> checkLists;
 

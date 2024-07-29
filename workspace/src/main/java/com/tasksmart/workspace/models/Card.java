@@ -58,6 +58,10 @@ public class Card {
     /** The estimated completion time for Card. */
     public LocalDateTime estimate;
 
+    /** The start time of Card. */
+    @Builder.Default
+    public LocalDateTime startTime = LocalDateTime.now();
+
     /** The list of CheckLists associated with Card. */
     @Builder.Default
     public List<CheckListGroup> checkLists = new ArrayList<>();
@@ -67,8 +71,10 @@ public class Card {
     @Builder.Default
     public List<Attachment> attachments = new ArrayList<>();
 
+    @Builder.Default
     public Set<String> implementerIds = new HashSet<>();
 
+    @Builder.Default
     public List<Comment> comments = new ArrayList<>();
 
     public Card copyWithoutProject(){

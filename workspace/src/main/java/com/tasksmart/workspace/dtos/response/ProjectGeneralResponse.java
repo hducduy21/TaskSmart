@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * The ProjectGeneralResponse class is used to represent the general information of a project.
  * This class is used to send the general information of a project to the client.
@@ -29,5 +31,7 @@ public class ProjectGeneralResponse {
 
     private String backgroundColor;
     private UnsplashResponse backgroundUnsplash;
+
+    private LocalDateTime lastAccessed;
 
 }
