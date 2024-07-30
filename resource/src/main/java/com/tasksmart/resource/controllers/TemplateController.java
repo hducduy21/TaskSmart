@@ -42,6 +42,12 @@ public class TemplateController {
         return templateService.searchTemplate(query);
     }
 
+    @GetMapping("/search-only")
+    @ResponseStatus(HttpStatus.OK)
+    public List<TemplateGeneralResponse> searchTemplatesOnly(@RequestParam String query){
+        return templateService.searchTemplatesOnly(query);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TemplateResponse createTemplate(@Valid @RequestBody TemplateRequest templateRequest){

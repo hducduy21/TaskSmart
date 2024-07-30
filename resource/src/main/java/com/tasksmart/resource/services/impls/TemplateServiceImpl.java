@@ -96,6 +96,11 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
+    public List<TemplateGeneralResponse> searchTemplatesOnly(String keyword) {
+        return templateRepository.findAllByNameContainsIgnoreCaseAndEnabledTrue(keyword).stream().map(this::getTemplateGeneralResponse).toList();
+    }
+
+    @Override
     public TemplateResponse getTemplateById(String id) {
         Template template = templateRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFound("Template not found")

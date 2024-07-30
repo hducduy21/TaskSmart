@@ -12,6 +12,8 @@ import java.util.List;
 public interface TemplateService {
     List<TemplateGeneralResponse> getALlTemplates(String categoryId, String category);
     SearchAllResponse searchTemplate(String keyword);
+    List<TemplateGeneralResponse> searchTemplatesOnly(String keyword);
+
     TemplateResponse getTemplateById(String id);
     TemplateResponse createTemplate(TemplateRequest templateRequest);
     TemplateResponse updateTemplate(String id, TemplateRequest templateRequest);

@@ -12,6 +12,5 @@ public interface TemplateRepository extends MongoRepository<Template, String> {
     List<Template> findAllByEnabledFalse();
     List<Template> findAllByCategoryIdAndEnabledTrue(String categoryId);
     List<Template> findAllByCategoryIdInAndEnabledTrue(List<String> categoryIds);
-    @Query("{'name': {$regex: ?0, $options: 'i'}, 'enabled': true}")
-    List<Template> findByNameContaining(String keyword);
+
 }
