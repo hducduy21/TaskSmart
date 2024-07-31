@@ -39,7 +39,7 @@ public class CardCreationRequest {
     public ELevel effort;
 
     /** The estimated completion time for Card. */
-    @Future(message = "The estimate must be in the future")
+//    @Future(message = "The estimate must be in the future")
     public LocalDateTime estimate;
 
     public LocalDateTime startTime;
