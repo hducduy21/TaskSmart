@@ -33,6 +33,7 @@ public class Project {
 
     /** The background of the Project. */
     private String backgroundColor;
+
     private UnsplashResponse backgroundUnsplash;
 
     /** The description of the Project. */

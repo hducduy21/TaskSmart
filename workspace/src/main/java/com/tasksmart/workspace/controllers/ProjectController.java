@@ -7,12 +7,14 @@ import com.tasksmart.sharedLibrary.dtos.responses.*;
 import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.*;
 import com.tasksmart.workspace.services.ProjectService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -79,8 +81,13 @@ public class ProjectController {
 
     @GetMapping("{projectId}/generate-task")
     @ResponseStatus(HttpStatus.OK)
+    @CircuitBreaker(name = "pyService", fallbackMethod = "generateTaskFallback")
     public TaskGenResponse generateTask(@PathVariable String projectId){
         return projectService.generateTask(projectId);
+    }
+
+    public TaskGenResponse generateTaskFallback(String projectId, Throwable throwable){
+        return TaskGenResponse.builder().listCards(new ArrayList<>()).build();
     }
 
     @PutMapping("{projectId}/background")

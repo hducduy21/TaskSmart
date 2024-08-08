@@ -1,15 +1,16 @@
 package com.tasksmart.sharedLibrary.repositories.httpClients;
 
 import com.tasksmart.sharedLibrary.configs.UnsplashInterceptor;
-import com.tasksmart.sharedLibrary.configs.interceptors.FeignRequestInterceptor;
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.UnsplashPagination;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @FeignClient(name = "unsplash", url = "https://api.unsplash.com", configuration = {UnsplashInterceptor.class})

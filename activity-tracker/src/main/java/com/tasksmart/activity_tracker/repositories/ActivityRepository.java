@@ -11,7 +11,7 @@ public interface ActivityRepository extends MongoRepository<Activity, String> {
     @Query(value = "{ 'initiatorId': ?0, 'type': ?1 }", sort = "{ 'updatedAt' : -1 }")
     List<Activity> getRecentProject(String userId, String type);
 
-    @Query("{ 'initiatorId': ?0, 'project.id': ?1, 'type': ?2 }")
+    @Query("{ 'initiatorId': ?0, 'project._id': ?1, 'type': ?2 }")
     Optional<Activity> findByInitiatorIdAndProjectIdAndType(String initiatorId, String projectId, String type);
 
     void deleteAllByWorkspaceId(String workspaceId);

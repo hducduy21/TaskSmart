@@ -1,20 +1,18 @@
-from langchain_openai import ChatOpenAI
-from langchain_community .document_loaders import PyPDFLoader, S3FileLoader,DirectoryLoader
+from langchain_community .document_loaders import S3FileLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.vectorstores.chroma import Chroma
-from langchain_community.embeddings.gpt4all import GPT4AllEmbeddings
-from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain_core.output_parsers import JsonOutputParser
 from src.utils.outputParser import Project, DBCreateStatement, DBRAGStatement, IsSelectQuery, FileHanler, StatementRunable, DBRAGStatementRunable
 from src.utils.RequestDTO import DBRagRequest
 from langchain_core.runnables import RunnablePassthrough
-from fastapi import UploadFile, File
 from langchain_community.utilities.sql_database import SQLDatabase
-
 from langchain_core.runnables import RunnablePassthrough
 
+from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
+
+from src.utils.Prompts import TSMPromt
 
 
 AWS_S3_ACCESS_KEY = "AKIAY42F3KJNL5JRGJMD"
@@ -23,14 +21,13 @@ AWS_S3_BUCKET_NAME = "tasksmart-development"
 AWS_REGION = "ap-southeast-2"
 seperators= ['\n','\n\n' ,'\r\n', '\r', ' ', '']
 
-
 def entry_db(project_id: str):
     loader = S3FileLoader("tasksmart-development",
                           key="projects/"+project_id+"/spe.pdf",
                           aws_access_key_id=AWS_S3_ACCESS_KEY,
                           aws_secret_access_key=AWS_S3_SECRET_ACCESS_KEY)
     document = loader.load()
-    embedding_model = GPT4AllEmbeddings()
+    embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key="AIzaSyBRmzrMqjc-FvOlPhHT_sFm1O1fbUme8Ec")
     text = ""
     for page in document:
         text += page.page_content
@@ -52,63 +49,6 @@ def load_llm():
     llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyBRmzrMqjc-FvOlPhHT_sFm1O1fbUme8Ec")
     return llm
 
-def create_prompt_create_statement(parser):
-    template = """You are an AI Database Bot. Your task is give user the query statements based on the following database: {context}. 
-    SQL language: {question}
-    Answer the user query.\n{format_instructions}\n."""
-    
-    prompt = PromptTemplate(
-        template=template,
-        input_variables=['context','question'],
-        partial_variables={"format_instructions": parser.get_format_instructions()}
-    )
-    return prompt
-
-
-def create_prompt(parser):
-    template = "You are an AI bot managing the project, requires at least 15 tasks, assigning tasks to groups based on the software development process (do not assign to groups such as in progress or in review,... because no tasks have started yet). Use this information: {context}. Answer the user query.\n{format_instructions}\n{question}\n."
-    prompt = PromptTemplate(
-        template=template,
-        input_variables=['context','question'],
-        partial_variables={"format_instructions": parser.get_format_instructions()}
-    )
-    return prompt
-
-def create_prompt_db_rag(parser):
-    template = """Based on the table schema below:
-    {schema}
-    Answer the user query with {database} database language
-    .\n{format_instructions}\n{question}\n"""
-    prompt = PromptTemplate(
-            template=template, 
-            input_variables=['schema','question','database'],
-            partial_variables={"format_instructions": parser.get_format_instructions()}
-            )
-    return prompt
-
-def create_prompt_handler_file(parser):
-    template = """Based on the SQL statements below:
-    {statements}
-    Let's shorten it to only statements related to table structure such as creating tables, editing table structures
-    .\n{format_instructions}\n"""
-    prompt = PromptTemplate(
-            template=template, 
-            input_variables=['statements'],
-            partial_variables={"format_instructions": parser.get_format_instructions()}
-            )
-    return prompt
-
-def create_prompt_query_statement(parser):
-    template = """You are an AI Database Bot. Your task is give user the query statements based on the following database: {context}. 
-    Answer the user query.\n{format_instructions}\n{question}\n."""
-    
-    prompt = PromptTemplate(
-        template=template,
-        input_variables=['context','question'],
-        partial_variables={"format_instructions": parser.get_format_instructions()}
-    )
-    return prompt
-
 
 def create_simple_chain(prompt, llm, db):
     chain = RetrievalQA.from_chain_type(
@@ -120,47 +60,13 @@ def create_simple_chain(prompt, llm, db):
     )
     return chain
 
-def get_RAG_URI_Prompt_Template(parser1, parser2,parser3):
-    template1 = """Based on the table schema below:
-    {schema}
-    Answer the user query
-    .\n{format_instructions}\n{question}\n"""
-    prompt1 = PromptTemplate(
-            template=template1, 
-            input_variables=['schema','question'],
-            partial_variables={"format_instructions": parser1.get_format_instructions()}
-            )
-    
-    template2 = """Based on the query below:
-    {query}
-    Answer the user query
-    .\n{format_instructions}\n"""
-    prompt2 = PromptTemplate(
-            template=template2, 
-            input_variables=['query'],
-            partial_variables={"format_instructions": parser2.get_format_instructions()}
-            )
-    
-    template3 = """Based on the table schema below, question, sql query, and sql response, write a natural language response:
-    {schema}
-    
-    SQL Query: {validate_query}
-    SQL Response: {response}
-    Answer the user query
-    .\n{format_instructions}\n{question}\n"""
-    prompt3 = PromptTemplate(
-            template=template3, 
-            input_variables=['schema','question', 'validate_query', 'response'],
-            partial_variables={"format_instructions": parser3.get_format_instructions()}
-            )
-    return [prompt1, prompt2, prompt3]
 
 class LLMChain:
-    def generate_task(project_id:str):
+    def generate_task(project_id: str):
         parser = JsonOutputParser(pydantic_object=Project)
         db = entry_db(project_id)
         llm = load_llm()
-        prompt = create_prompt(parser=parser)
+        prompt = TSMPromt.create_prompt(parser=parser)
         llm_chain = create_simple_chain(prompt, llm, db)
 
         project_query = "Requirements"
@@ -173,7 +79,7 @@ class LLMChain:
         
         db = entry_db(project_id)
         llm = load_llm()
-        prompt = create_prompt_create_statement(parser)
+        prompt = TSMPromt.create_prompt_create_statement(parser)
         
         project_query = "Requirements"
         llm_chain = create_simple_chain(prompt, llm, db)
@@ -186,7 +92,7 @@ class LLMChain:
         parser = JsonOutputParser(pydantic_object=DBRAGStatement)
         
         llm = load_llm()
-        prompt = create_prompt_db_rag(parser)
+        prompt = TSMPromt.create_prompt_db_rag(parser)
     
         sql_chain = (
             prompt
@@ -202,7 +108,7 @@ class LLMChain:
         parser = JsonOutputParser(pydantic_object=FileHanler)
         
         llm = load_llm()
-        prompt = create_prompt_handler_file(parser)
+        prompt = TSMPromt.create_prompt_handler_file(parser)
     
         sql_chain = prompt | llm | parser
         
@@ -233,7 +139,7 @@ class LLMChain:
         parser1 = JsonOutputParser(pydantic_object=StatementRunable)
         parser2 = JsonOutputParser(pydantic_object=IsSelectQuery)
         parser3 = JsonOutputParser(pydantic_object=DBRAGStatementRunable)
-        prompts = get_RAG_URI_Prompt_Template(parser1,parser2,parser3)
+        prompts = TSMPromt.get_RAG_URI_Prompt_Template(parser1,parser2,parser3)
         
         def get_schema(_):
             schema = db.get_table_info()

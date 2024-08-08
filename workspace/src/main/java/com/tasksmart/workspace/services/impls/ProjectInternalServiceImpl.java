@@ -1,6 +1,7 @@
 package com.tasksmart.workspace.services.impls;
 
 import com.tasksmart.sharedLibrary.dtos.messages.ProjectMessage;
+import com.tasksmart.sharedLibrary.dtos.messages.UserMessage;
 import com.tasksmart.sharedLibrary.dtos.request.ProjectTemplateRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.ListCardTemplateResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
@@ -103,6 +104,21 @@ public class ProjectInternalServiceImpl implements ProjectInternalService {
         kafkaTemplate.send("project-creation",modelMapper.map(project, ProjectMessage.class));
 
         return project.getId()  ;
+    }
+
+    @Override
+    public void updateUsersInProject(UserMessage userMessage) {
+        List<Project> projects = projectRepository.findProjectByUserId(userMessage.getId());
+        projects.forEach(project -> {
+            project.getUsers().forEach(userRelation -> {
+                if(StringUtils.equals(userRelation.getUserId(), userMessage.getId())){
+                    userRelation.setName(userMessage.getName());
+                    userRelation.setProfileImagePath(userMessage.getProfileImagePath());
+                    userRelation.setUsername(userMessage.getUsername());
+                }
+            });
+            projectRepository.save(project);
+        });
     }
 
     private ProjectTemplateResponse getProjectTemplateResponse(Project project){

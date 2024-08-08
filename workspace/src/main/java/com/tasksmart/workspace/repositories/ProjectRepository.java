@@ -17,6 +17,10 @@ public interface ProjectRepository extends MongoRepository<Project, String> {
     @Query("{ 'id': ?0, 'users.userId': ?1 }")
     Optional<Project> findByProjectIdAndUserId(String projectId, String userId);
 
+    @Query("{ 'users.userId': ?0}")
+    List<Project> findProjectByUserId(String userId);
+
+
     @Query("{ 'users.userId': ?0, 'name': { $regex: ?1, $options: 'i' } }")
     List<Project> findByUserIdAndNameContain(String userId, String name);
 

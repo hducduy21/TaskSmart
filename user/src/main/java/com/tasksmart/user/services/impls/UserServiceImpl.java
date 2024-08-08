@@ -234,6 +234,8 @@ public class UserServiceImpl implements UserService {
         user.setPosition(userInformationUpdateRequest.getPosition());
         user.setOrganization(userInformationUpdateRequest.getOrganization());
 
+        user.getPersonalWorkSpace().setName(userInformationUpdateRequest.getName() + "'s workspace");
+
         userRepository.save(user);
 
         kafkaTemplate.setMessageConverter(new KafkaMessageConverter());

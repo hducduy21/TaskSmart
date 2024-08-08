@@ -5,10 +5,12 @@ import com.tasksmart.resource.services.UnsplashService;
 import com.tasksmart.sharedLibrary.dtos.responses.UnsplashPagination;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +25,7 @@ public class UnsplashServiceImpl implements UnsplashService {
     private final UnsplashClient unsplashClient;
 
     @Override
+//    @CircuitBreaker(name = "unsplash", fallbackMethod = "fallbackGetPhotos")
     public List<UnsplashResponse> getPhotos(String query, int page, int per_page) {
         if(StringUtils.isBlank(query)){
             return this.getRandomPhotos(page*per_page);
@@ -31,6 +34,15 @@ public class UnsplashServiceImpl implements UnsplashService {
         return unsplashPagination.getResults();
 
     }
+
+//    private List<UnsplashResponse> fallbackGetPhotos(
+//            String query,
+//            int page,
+//            int per_page,
+//            Throwable throwable
+//    ) {
+//        return new ArrayList<>();
+//    }
 
     @Override
     public UnsplashResponse getPhotoById(String unsplashId) {

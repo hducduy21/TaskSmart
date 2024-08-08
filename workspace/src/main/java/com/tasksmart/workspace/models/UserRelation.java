@@ -26,7 +26,7 @@ public class UserRelation {
     private String username;
 
     /** This is the storage field for the image background. */
-    private String profileImageId;
+    private String profileImagePath;
 
     /** The role of the User. */
     private EUserRole role;

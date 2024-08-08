@@ -1,5 +1,6 @@
 package com.tasksmart.workspace.listeners;
 
+import com.tasksmart.workspace.services.ProjectInternalService;
 import com.tasksmart.workspace.services.WorkSpaceInternalService;
 import com.tasksmart.sharedLibrary.dtos.messages.UserMessage;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 @KafkaListener(id = "user-updation-group",topics = {"user-updation"})
 public class UserUpdatedListener {
     private final WorkSpaceInternalService workSpaceInternalService;
+    private final ProjectInternalService projectInternalService;
 
     /**
      *
@@ -20,6 +22,7 @@ public class UserUpdatedListener {
     @KafkaHandler
     public void handleUserMessageUpdatedMessage(UserMessage userMessage) {
         workSpaceInternalService.updateUsersInWorkSpace(userMessage);
+        projectInternalService.updateUsersInProject(userMessage);
     }
 
 }

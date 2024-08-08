@@ -13,6 +13,7 @@ public class UnsplashResponse {
 
     @Getter
     @Setter
+    @Builder
     public static class UnsplashUrls{
         private String raw;
         private String full;

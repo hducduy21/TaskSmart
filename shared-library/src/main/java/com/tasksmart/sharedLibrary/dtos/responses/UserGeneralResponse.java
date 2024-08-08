@@ -25,7 +25,7 @@ public class UserGeneralResponse {
     private String username;
 
     /** This is the storage field for the user's role. */
-    private String profileImageId;
+    private String profileImagePath;
 
     private String relation;
 

@@ -55,10 +55,18 @@ public class WorkSpaceInternalServiceImpl implements WorkSpaceInternalService {
 
     @Override
     public void updateUsersInWorkSpace(UserMessage userMessage) {
+        WorkSpace workSpace = workSpaceRepository.findByUserIdAndType(userMessage.getId(), EWorkSpaceType.Personal.name())
+                .orElseThrow(() -> new RuntimeException("Personal workspace not found for user-" + userMessage.getId()));
+
+        workSpace.setName(userMessage.getName() + "'s workspace");
+        workSpaceRepository.save(workSpace);
+
         String workSpacePersonal = userMessage.getPersonalWorkSpace().getId();
         this.updateUserInfomation(workSpacePersonal,userMessage);
 
-        userMessage.getWorkspaces().forEach(workSpace -> this.updateUserInfomation(workSpace.getId(), userMessage));
+        userMessage.getWorkspaces().forEach(wsp -> this.updateUserInfomation(wsp.getId(), userMessage));
+
+
     }
 
     public void updateUserInfomation(String workSpaceId,UserMessage userMessage){
@@ -69,7 +77,7 @@ public class WorkSpaceInternalServiceImpl implements WorkSpaceInternalService {
                     {
                         if(StringUtils.equals(userRelation.getUserId(), userMessage.getId())){
                             userRelation.setName(userMessage.getName());
-                            userRelation.setUsername(userMessage.getProfileImagePath());
+                            userRelation.setProfileImagePath(userMessage.getProfileImagePath());
                             userRelation.setUsername(userMessage.getUsername());
                         }
                     });
