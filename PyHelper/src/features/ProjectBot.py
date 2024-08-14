@@ -154,8 +154,8 @@ class LLMChain:
 
         def get_statement(result):
             return result['statement']
-        def get_runable(result):
-            return result['runable']
+        # def get_runable(result):
+        #     return result['runable']
         
         sql_chain = (
             RunnablePassthrough.assign(schema=get_schema)
@@ -164,12 +164,12 @@ class LLMChain:
             | parser1
         )
         
-        checkquery_chain = (
-            RunnablePassthrough.assign(query=get_schema)
-            | prompts[1]
-            | llm
-            | parser2
-        )
+        # checkquery_chain = (
+        #     RunnablePassthrough.assign(query=get_schema)
+        #     | prompts[1]
+        #     | llm
+        #     | parser2
+        # )
         
         full_chain = (
             RunnablePassthrough.assign(query=sql_chain)

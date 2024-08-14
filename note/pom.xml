@@ -6,14 +6,12 @@
 		<groupId>com.tasksmart</groupId>
 		<artifactId>TaskSmart</artifactId>
 		<version>1.0-SNAPSHOT</version>
-		<relativePath/> <!-- lookup parent from repositories -->
 	</parent>
-
 
 	<artifactId>note</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>note</name>
-	<description>TaskSmart: Note Application</description>
+	<description>Task Smart Note</description>
 
 	<properties>
 		<java.version>22</java.version>

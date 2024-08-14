@@ -9,11 +9,11 @@ eureka_server = "http://localhost:8761/eureka"
 app_name = "PyHelper"
 app_port = 8807
 
-# @app.on_event("startup")
-# async def startup_event():
-#     print("Registering with Eureka")
-#     await eureka_client.init_async(eureka_server=eureka_server,
-#                                        app_name=app_name)
+@app.on_event("startup")
+async def startup_event():
+    print("Registering with Eureka")
+    await eureka_client.init_async(eureka_server=eureka_server,
+                                       app_name=app_name)
 
 @app.get("/read-s3/{file_name}")
 async def read_from_s3(file_name: str):
