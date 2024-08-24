@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
-    private static final String[] PERMIT_ALL_ENDPOINTS = {"/api/verify/**", "/api/internal/verify/**"};
+    private static final String[] PERMIT_ALL_ENDPOINTS = {"/api/verify/**", "/api/internal/verify/**", "/actuator/**", "/actuator/prometheus"};
 //    private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PUT_ENDPOINTS = {};

@@ -24,9 +24,7 @@ import java.util.Collections;
 public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
-    private static final String[] PERMIT_ALL_ENDPOINTS = {
-            "/api/auth/**"
-    };
+    private static final String[] PERMIT_ALL_ENDPOINTS = {"/api/auth/**", "/actuator/**", "/actuator/prometheus"};
 
     private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {
             "/api/users"

@@ -24,7 +24,9 @@ public class SecurityConfig {
         "/api/img/**",
     "/api/categories/**",
     "/api/unsplash/**",
-        "/api/image/**"
+        "/api/image/**",
+            "/actuator/**",
+            "/actuator/prometheus"
     };
 
     private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {"/api/categories/**", "/api/templates/**", "/api/avatars/**"};

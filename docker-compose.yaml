@@ -28,6 +28,68 @@ services:
     networks:
       - monitoring
       - tasksmart-network
+  user-service:
+    image: hducduy21/tsm-user:latest
+    hostname: user-service
+    container_name: user-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
+    ports:
+      - "8801:8801"
+    networks:
+      - monitoring
+      - tasksmart-network
+  resource-service:
+    image: hducduy21/tsm-resource:latest
+    hostname: resource-service
+    container_name: resource-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
+    ports:
+      - "8805:8805"
+    networks:
+      - monitoring
+      - tasksmart-network
+  notification-service:
+    image: hducduy21/tsm-notification:latest
+    hostname: notification-service
+    container_name: notification-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
+    ports:
+      - "8803:8803"
+    networks:
+      - monitoring
+      - tasksmart-network
+  note-service:
+    image: hducduy21/tsm-note:latest
+    hostname: note-service
+    container_name: note-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
+    ports:
+      - "8804:8804"
+    networks:
+      - monitoring
+      - tasksmart-network
+  gateway-service:
+    image: hducduy21/tsm-gateway:latest
+    hostname: gateway-service
+    container_name: gateway-service
+    ports:
+      - "8888:8888"
+    networks:
+      - monitoring
+      - tasksmart-network
+  activity-service:
+    image: hducduy21/tsm-activity-tracker:latest
+    hostname: activity-service
+    container_name: activity-service
+    ports:
+      - "8806:8806"
+    networks:
+      - monitoring
+      - tasksmart-network
 
   prometheus:
     image: prom/prometheus:v2.37.1
@@ -39,6 +101,14 @@ services:
       - "9090:9090"
     depends_on:
       - workspace-service
+      - user-service
+      - resource-service
+      - notification-service
+      - note-service
+      - gateway-service
+      - activity-service
+      - config-service
+      - eureka-service
 
   grafana:
     image: grafana/grafana-oss:8.5.2

@@ -9,3 +9,51 @@ scrape_configs:
       - targets: ['host.docker.internal:8802']
         labels:
           application: 'Workspace Service'
+  - job_name: 'user_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8801' ]
+        labels:
+          application: 'User Service'
+  - job_name: 'eureka_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8761' ]
+        labels:
+          application: 'Eureka Service'
+  - job_name: 'config_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8808' ]
+        labels:
+          application: 'Config Service'
+  - job_name: 'resource_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8805' ]
+        labels:
+          application: 'Resource Service'
+  - job_name: 'notification_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8803' ]
+        labels:
+          application: 'Notification Service'
+  - job_name: 'note_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8804' ]
+        labels:
+          application: 'Note Service'
+  - job_name: 'gatewayservice'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8888' ]
+        labels:
+          application: 'Gateway Service'
+  - job_name: 'activity_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8806' ]
+        labels:
+          application: 'Activity Service'
