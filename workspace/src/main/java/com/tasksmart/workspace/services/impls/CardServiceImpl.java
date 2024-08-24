@@ -32,11 +32,11 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
-    private final CardRepository cardRepository;
-    private final ListCardRepository listCardRepository;
     private final ModelMapper modelMapper;
     private final ProjectRepository projectRepository;
     private final AuthenticationUtils authenticationUtils;
+    private final CardRepository cardRepository;
+    private final ListCardRepository listCardRepository;
     private final AwsS3Service awsS3Service;
     private final FileUtil fileUtil;
 

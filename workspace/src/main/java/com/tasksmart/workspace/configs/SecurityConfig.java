@@ -19,7 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 public class SecurityConfig {
     private final JWTUtil jwtUtil;
 
-    private static final String[] PERMIT_ALL_ENDPOINTS = {"/api/internal/workspaces/personal"};
+    private static final String[] PERMIT_ALL_ENDPOINTS = {"/api/internal/workspaces/personal", "/actuator/**", "/actuator/prometheus"};
     private static final String[] PERMIT_ONLY_GET_ENDPOINTS = {"/api/internal/projects/**"};
 //    private static final String[] PERMIT_ONLY_POST_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_PUT_ENDPOINTS = {};

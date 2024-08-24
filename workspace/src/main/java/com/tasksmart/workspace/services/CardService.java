@@ -6,6 +6,7 @@ import com.tasksmart.workspace.dtos.request.*;
 import com.tasksmart.workspace.dtos.response.AttachmentResponse;
 import com.tasksmart.workspace.dtos.response.CardResponse;
 import com.tasksmart.workspace.dtos.response.CheckListGroupResponse;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

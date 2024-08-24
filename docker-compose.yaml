@@ -1,12 +1,58 @@
 version: '3.7'
 
 services:
+  eureka-service:
+    image: hducduy21/tsm-eureka-server:latest
+    hostname: eureka-service
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    networks:
+      - monitoring
+  config-service:
+    image: hducduy21/tsm-cloud-config:latest
+    hostname: config-service
+    container_name: config-service
+    ports:
+      - "8808:8808"
+    networks:
+      - monitoring
   workspace-service:
-    image: hducduy21/tsm-workspace:0.1
+    image: hducduy21/tsm-workspace:latest
+    hostname: workspace-service
+    container_name: workspace-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka
     ports:
       - "8802:8802"
     networks:
       - monitoring
+      - tasksmart-network
+
+  prometheus:
+    image: prom/prometheus:v2.37.1
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - workspace-service
+
+  grafana:
+    image: grafana/grafana-oss:8.5.2
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3303:3000"
+    links:
+      - prometheus:prometheus
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
 
   zookeeper-01:
     image: confluentinc/cp-zookeeper:7.5.3
@@ -95,40 +141,40 @@ services:
       - zookeeper-01
       - zookeeper-02
       - zookeeper-03
-
-  kafka-broker-02:
-    image: confluentinc/cp-kafka:7.5.3
-    hostname: kafka-broker-02
-    container_name: kafka-broker-02
-    ports:
-      - "9093:9093" #Cho phep truy cap giao tiep client -> kafka : 9092
-      - "29093:29093" #Cho phep giao tiep giua cac broker kafka trong cluster
-    environment:
-      #Dinh nghia cac listener cho kafka
-      #INTERNAL: kafka-broker-01:19092: cho phep cac broker kafka container noi bo giao tiep voi nhau
-      #EXTERNAL: ${DOCKER_HOST_IP:-127.0.1}:9092: cho phep cac client ben ngoai giao tiep voi kafka qua port 9092
-      #DOCKER: host.docker.internal:29092:
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-broker-01:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.1}:9093,DOCKER://host.docker.internal:29093
-
-      #Thiet lap giai thuc bao mat cho tung listener, dung plantext => ko ma hoa
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
-
-      #Thiet lap listener dung cho giao tiep giua cac broker trong kafka
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper-01:2181,zookeeper-02:2182,zookeeper-03:2183
-      KAFKA_BROKER_ID: 1
-
-      #Cau hinh log level
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
-    networks:
-      - tasksmart-network
-    depends_on:
-      - zookeeper-01
-      - zookeeper-02
-      - zookeeper-03
+#
+#  kafka-broker-02:
+#    image: confluentinc/cp-kafka:7.5.3
+#    hostname: kafka-broker-02
+#    container_name: kafka-broker-02
+#    ports:
+#      - "9093:9093" #Cho phep truy cap giao tiep client -> kafka : 9092
+#      - "29093:29093" #Cho phep giao tiep giua cac broker kafka trong cluster
+#    environment:
+#      #Dinh nghia cac listener cho kafka
+#      #INTERNAL: kafka-broker-01:19092: cho phep cac broker kafka container noi bo giao tiep voi nhau
+#      #EXTERNAL: ${DOCKER_HOST_IP:-127.0.1}:9092: cho phep cac client ben ngoai giao tiep voi kafka qua port 9092
+#      #DOCKER: host.docker.internal:29092:
+#      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-broker-01:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.1}:9093,DOCKER://host.docker.internal:29093
+#
+#      #Thiet lap giai thuc bao mat cho tung listener, dung plantext => ko ma hoa
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+#
+#      #Thiet lap listener dung cho giao tiep giua cac broker trong kafka
+#      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+#
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper-01:2181,zookeeper-02:2182,zookeeper-03:2183
+#      KAFKA_BROKER_ID: 1
+#
+#      #Cau hinh log level
+#      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+#      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+#      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+#    networks:
+#      - tasksmart-network
+#    depends_on:
+#      - zookeeper-01
+#      - zookeeper-02
+#      - zookeeper-03
 networks:
     tasksmart-network:
         driver: bridge
