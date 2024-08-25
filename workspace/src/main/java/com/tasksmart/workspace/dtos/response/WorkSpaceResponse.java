@@ -35,6 +35,9 @@ public class WorkSpaceResponse {
 
     private CategoryResponse category;
 
+    @Builder.Default
+    private String inviteCode = "";
+
     private UnsplashResponse backgroundUnsplash;
 
     /** This is the storage field for the workspace's projects. */

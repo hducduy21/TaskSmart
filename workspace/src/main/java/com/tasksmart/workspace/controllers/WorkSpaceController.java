@@ -34,13 +34,13 @@ public class WorkSpaceController {
         return workSpaceService.search(query);
     }
 
-    @GetMapping("/invite/{projectId}/{inviteCode}")
+    @GetMapping("/invite/{workspaceId}/{inviteCode}")
     @ResponseStatus(HttpStatus.OK)
     public WorkSpaceResponse joinWorkSpace(@PathVariable String workspaceId, @PathVariable String inviteCode){
         return workSpaceService.joinWorkSpaceByInviteCode(workspaceId, inviteCode);
     }
 
-    @PatchMapping("/invite/{projectId}")
+    @PatchMapping("/invite/{workspaceId}")
     @ResponseStatus(HttpStatus.OK)
     public InviteCodeResponse updateInviteCode(@PathVariable String workspaceId,
                                                @RequestParam(required = false) Boolean isPublic,
