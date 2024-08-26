@@ -11,6 +11,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
+
+/**
+ * Security configuration class for the project.
+ * This class provides security configurations for the project.
+ * It configures the security filter chain and the JWT decoder.
+ *
+ * @author Duy Hoang
+ * //  * @see JWTUtil
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

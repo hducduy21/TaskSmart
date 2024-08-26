@@ -12,9 +12,25 @@ import java.util.List;
  * @author Duc Nguyen
  */
 public interface NoteRepository extends MongoRepository<Note, String> {
+    /**
+     * Find all notes by userId
+     * @param userId The userId of the notes
+     * @return A list of notes with the given userId
+     */
     List<Note> findByUserId(String userId);
+
+    /**
+     * Find all notes by userId and title containing keyword
+     * @param keyword The keyword to search for in the title
+     * @return A list of notes with the given userId and title containing the keyword
+     */
     @Query("{'title': {$regex: ?0, $options: 'i'}}")
     List<Note> findByTitleContaining(String keyword);
 
+    /**
+     * Find all notes by userId and content containing keyword
+     * @param keyword The keyword to search for in the content
+     * @return A list of notes with the given userId and content containing the keyword
+     */
     List<Note> findAllByUserIdAndTitleContainingIgnoreCaseOrContentContainingIgnoreCase(String userId, String title, String content);
 }

@@ -86,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
         return modelMapper.map(user, UserGeneralResponse.class);
     }
 
+    /** {@inheritDoc} */
     public AuthResponse googleAuthenticate(String code){
         ExchangeGoogleTokenResponse exchangeGoogleTokenResponse = googleAuthClient.exchangeToken(ExchangeGoogleTokenRequest
                 .builder()
@@ -116,6 +117,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    /** {@inheritDoc} */
     public AuthResponse githubAuthenticate(String code){
         ExchangeGithubTokenResponse exchange = gitHubAuthClient.exchangeToken(ExchangeGitHubTokenRequest
                 .builder()
@@ -185,6 +187,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    /** {@inheritDoc} */
     @Override
     public AuthResponse refresh(String refresh){
         if (refresh == null || !refresh.startsWith("Bearer"))
@@ -206,9 +209,20 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    /**
+     * Converts a User object to a UserGeneralResponse object.
+     * @param user
+     * @return
+     */
     private UserGeneralResponse getUserResponse(User user){
         return modelMapper.map(user, UserGeneralResponse.class);
     }
+
+    /**
+     * Get primary email from list of emails
+     * @param emails
+     * @return
+     */
     private String getEmailPrimary(List<GitHubUserEmailResponse> emails){
         for(GitHubUserEmailResponse email : emails){
             if(email.isPrimary())

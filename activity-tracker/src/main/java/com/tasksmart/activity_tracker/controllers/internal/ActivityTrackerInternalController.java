@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Controller for internal activity tracker endpoints
+ *
+ * @author Duy Hoang
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/${url_base}/internal/${url_activity}")
@@ -17,6 +22,11 @@ import java.util.List;
 public class ActivityTrackerInternalController {
     private final ActivityTrackerService activityTrackerService;
 
+    /**
+     * Get recent projects
+     *
+     * @return List of ProjectAccessResponse
+     */
     @GetMapping("/recent/projects")
     public List<ProjectAccessResponse> getProjectRecent(){
         return activityTrackerService.getProjectRecent();

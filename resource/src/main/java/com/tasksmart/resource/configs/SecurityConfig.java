@@ -13,6 +13,27 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * The security configuration for the project.
+ * This class configures the security settings for the project.
+ * It allows certain endpoints to be accessed without authentication.
+ * It also configures the JWT authentication for the project.
+ * @see JWTUtil
+ * @see SecurityFilterChain
+ * @see EnableWebSecurity
+ * @see EnableMethodSecurity
+ * @see Configuration
+ * @see Bean
+ * @see HttpSecurity
+ * @see HttpMethod
+ * @see Customizer
+ * @see AbstractHttpConfigurer
+ * @see SecurityFilterChain
+ * @see JWTUtil
+ *
+ *
+ * @author Duy Hoang
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

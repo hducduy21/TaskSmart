@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Implementation of the UserInternalService interface.
+ *
+ * @author Duy Hoang
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,6 +30,7 @@ public class UserInternalServiceImpl implements UserInternalService {
     private final ModelMapper modelMapper;
     private final AuthenticationUtils authenticationUtils;
 
+    /** {@inheritDoc} */
     @Override
     public UserGeneralResponse getUserGeneralById(String id) {
         return userRepository.findById(id)
@@ -32,12 +38,14 @@ public class UserInternalServiceImpl implements UserInternalService {
                 .orElseThrow(() -> new ResourceNotFound("User not found!"));
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<UserGeneralResponse> getUsersGeneralByListId(List<String> userIds) {
         List<User> users = userRepository.findAllByIdIn(userIds);
         return users.stream().map(this::getUserGeneralResponse).toList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void createWorkSpace(WorkSpaceMessage workSpaceMessage) {
         Optional<UserRelation> userRelation = workSpaceMessage.getUsers().stream()
@@ -68,6 +76,7 @@ public class UserInternalServiceImpl implements UserInternalService {
         log.error("User-{} not found to create workspace-{}",userId, workSpaceMessage.getId());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void createProject(ProjectMessage projectMessage) {
         Optional<UserRelation> userRelation = projectMessage.getUsers().stream()
@@ -99,6 +108,7 @@ public class UserInternalServiceImpl implements UserInternalService {
         log.error("User-{} not found to create project-{}",userId, projectMessage.getId());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void updateWorkSpace(WorkSpaceMessage workSpaceMessage) {
         List<UserRelation> userRelations = workSpaceMessage.getUsers();
@@ -107,6 +117,7 @@ public class UserInternalServiceImpl implements UserInternalService {
         });
     }
 
+    /** {@inheritDoc} */
     @Override
     public void updateProject(ProjectMessage projectMessage) {
         List<UserRelation> userRelations = projectMessage.getUsers();
@@ -115,6 +126,7 @@ public class UserInternalServiceImpl implements UserInternalService {
         });
     }
 
+    /** {@inheritDoc} */
     @Override
     public void joinWorkSpace(UserJoinWorkSpaceMessage userJoinWorkSpaceMessage) {
         Optional<User> userOptional = userRepository.findById(userJoinWorkSpaceMessage.getUserId());
@@ -151,6 +163,7 @@ public class UserInternalServiceImpl implements UserInternalService {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public void joinProject(UserJoinProjectMessage userJoinProjectMessage) {
         Optional<User> userOptional = userRepository.findById(userJoinProjectMessage.getUserId());
@@ -171,6 +184,11 @@ public class UserInternalServiceImpl implements UserInternalService {
         }
     }
 
+    /**
+     * Update workspace of user
+     * @param userId
+     * @param workSpaceMessage
+     */
     private void updateWorkSpaceUser(String userId, WorkSpaceMessage workSpaceMessage){
         Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isPresent()){
@@ -187,6 +205,11 @@ public class UserInternalServiceImpl implements UserInternalService {
         log.error("User-{} not found to update workspace-{}",userId, workSpaceMessage.getId());
     }
 
+    /**
+     * Update project of user
+     * @param userId
+     * @param projectMessage
+     */
     private void updateProjectUser(String userId, ProjectMessage projectMessage){
         Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isPresent()){
@@ -204,6 +227,11 @@ public class UserInternalServiceImpl implements UserInternalService {
         log.error("User-{} not found to update project-{}",userId, projectMessage.getId());
     }
 
+    /**
+     * Get UserGeneralResponse from User
+     * @param user
+     * @return UserGeneralResponse
+     */
     private UserGeneralResponse getUserGeneralResponse(User user){
         UserGeneralResponse userGeneralResponse = modelMapper.map(user, UserGeneralResponse.class);
         userGeneralResponse.setPersonalWorkSpace(user.getPersonalWorkSpace().getId());

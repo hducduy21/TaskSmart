@@ -9,12 +9,18 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementation of EmailSenderService
+ * This class provides methods to send emails.
+ * @author Duy Hoang
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class EmailSenderServiceImpl implements EmailSenderService {
     private final JavaMailSender mailSender;
 
+    /** {@inheritDoc} */
     @Override
     public void sendVerificationEmail(String toEmail, String code) {
         try {
@@ -30,6 +36,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         }
     }
 
+    /** {@inheritDoc} */
     public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("tasksmart2d@gmail.com");
@@ -41,6 +48,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         log.info("Email sent to " + to);
     }
 
+    /** {@inheritDoc} */
     public void sendWelcomeEmail(UserMessage userMessage) {
         System.out.println("Sending welcome email to " + userMessage.getEmail());
         try {

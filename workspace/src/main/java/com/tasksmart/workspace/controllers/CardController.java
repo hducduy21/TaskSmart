@@ -13,30 +13,60 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ * This class is the controller for the Card.
+ * This class is used to manage the operations of Card.
+ *
+ * @author Duy Hoang
+ */
 @RestController
 @RequestMapping("${url_base}/${url_card}")
 @RequiredArgsConstructor
 public class CardController {
     private final CardService cardService;
 
+    /**
+     * Create a new card.
+     *
+     * @param cardId
+     * @return CardResponse
+     */
     @GetMapping("{cardId}")
     @ResponseStatus(HttpStatus.OK)
     public CardResponse getCardById(@PathVariable String cardId) {
         return cardService.getCardById(cardId);
     }
 
+    /**
+     * Create a new card.
+     *
+     * @param cardUpdationRequest
+     * @return CardResponse
+     */
     @PatchMapping("{cardId}")
     @ResponseStatus(HttpStatus.OK)
     public CardResponse updateCard(@PathVariable String cardId, @Valid @RequestBody CardUpdationRequest cardUpdationRequest) {
         return cardService.updateCard(cardId, cardUpdationRequest);
     }
 
+    /**
+     * Create a new card.
+     *
+     * @param cardId
+     * @return CardResponse
+     */
     @DeleteMapping("{cardId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteCard(@PathVariable String cardId) {
         cardService.deleteCard(cardId);
     }
 
+    /**
+     * Create a new card.
+     *
+     * @param files
+     * @return CardResponse
+     */
     @PostMapping("{cardId}/attachment")
     @ResponseStatus(HttpStatus.OK)
     public List<AttachmentResponse> uploadAttachmentFile(@PathVariable String cardId, @RequestPart("files") MultipartFile[] files) {

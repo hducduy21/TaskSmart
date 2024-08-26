@@ -19,20 +19,25 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * WorkSpaceInternalServiceImpl class for managing Work Space operations.
+ * This class is used to manage the internal operations of Work Space.
+ *
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class WorkSpaceInternalServiceImpl implements WorkSpaceInternalService {
     private final WorkSpaceRepository workSpaceRepository;
     private final ModelMapper modelMapper;
-    private final ProjectService projectService;
-    private final UserClient userClient;
 
+    /** {@inheritDoc} */
     @Override
     public WorkSpaceGeneralResponse getWorkSpaceById(String workspaceId) {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public WorkSpaceGeneralResponse createPersonalWorkSpace(String userId, String name, String Username) {
         UserRelation userRelation = UserRelation.builder()
@@ -53,6 +58,7 @@ public class WorkSpaceInternalServiceImpl implements WorkSpaceInternalService {
         return getWorkSpaceGeneralResponse(workSpace);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void updateUsersInWorkSpace(UserMessage userMessage) {
         WorkSpace workSpace = workSpaceRepository.findByUserIdAndType(userMessage.getId(), EWorkSpaceType.Personal.name())
@@ -69,6 +75,11 @@ public class WorkSpaceInternalServiceImpl implements WorkSpaceInternalService {
 
     }
 
+    /**
+     * Update user information in workspace
+     * @param workSpaceId workspace id
+     * @param userMessage user message
+     */
     public void updateUserInfomation(String workSpaceId,UserMessage userMessage){
         Optional<WorkSpace> workSpaceOptional = workSpaceRepository.findById(workSpaceId);
         if(workSpaceOptional.isPresent()){
@@ -94,6 +105,12 @@ public class WorkSpaceInternalServiceImpl implements WorkSpaceInternalService {
         }
     }
 
+    /**
+     * Get WorkSpaceGeneralResponse from WorkSpace.
+     *
+     * @param workSpace the WorkSpace.
+     * @return the WorkSpaceGeneralResponse.
+     */
     private WorkSpaceGeneralResponse getWorkSpaceGeneralResponse(WorkSpace workSpace) {
         return modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
     }

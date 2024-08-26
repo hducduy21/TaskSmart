@@ -8,6 +8,13 @@ import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class is the listener for the User Updated message.
+ * This class listens to the User Updated message and updates the user in the workspace and project.
+ * This class is used to listen to the User Updated message.
+ *
+ * @author Duy Hoang
+ */
 @Component
 @RequiredArgsConstructor
 @KafkaListener(id = "user-updation-group",topics = {"user-updation"})
