@@ -1,4 +1,3 @@
-
 # Ứng Dụng Mô Hình Ngôn Ngữ Lớn Để Khởi Tạo Danh Mục Công Việc và Lệnh SQL Dựa Trên Đặc Tả
 
 ## Mục Lục
@@ -10,17 +9,20 @@
     3. [Cài Đặt Các Gói Cần Thiết](#3-cài-đặt-các-gói-cần-thiết)
     4. [Khởi Chạy Dự Án](#4-khởi-chạy-dự-án)
     5. [Truy Cập Giao Diện](#5-truy-cập-giao-diện)
-4. [Cài Đặt Môi Trường - Backend](cài-đặt-môi-trường-backend)
+3. [Cài Đặt Môi Trường - Backend](cài-đặt-môi-trường-backend)
     1. [Clone Dự Án Về Máy](#1-clone-dự-án-về-máy)
     2. [Di Chuyển Đến Thư Mục Vừa Clone](#2-di-chuyển-đến-thư-mục-vừa-clone)
     3. [Cài Đặt Môi Trường Cho Dự Án](#3-cài-đặt-môi-trường-cho-dự-án)
     4. [Khởi Chạy Dự Án](#4-khởi-chạy-dự-án)
     5. [Truy Cập Giao Diện](#5-truy-cập-giao-diện)
-5. [Cấu hình dự án - Backend](cấu-hình-dự-án)
+4. [Cấu hình dự án - Backend](cấu-hình-dự-án)
 
 ## Mô Tả
 
-Dự án này sử dụng mô hình ngôn ngữ lớn để tự động khởi tạo danh mục công việc và lệnh SQL dựa trên đặc tả yêu cầu. Với các tính năng mạnh mẽ và giao diện thân thiện, ứng dụng giúp người dùng dễ dàng quản lý và theo dõi công việc cũng như sinh các lệnh SQL một cách hiệu quả.
+Dự án này sử dụng mô hình ngôn ngữ lớn để tự động khởi tạo danh mục công việc và
+lệnh SQL dựa trên đặc tả yêu cầu. Với các tính năng mạnh mẽ và giao diện thân
+thiện, ứng dụng giúp người dùng dễ dàng quản lý và theo dõi công việc cũng như
+sinh các lệnh SQL một cách hiệu quả.
 
 ## Cài Đặt Môi Trường - Frontend
 
@@ -87,8 +89,10 @@ Tiến hành cài đặt các môi trường cần thiết và khởi chạy cá
 ```bash
 docker compose up
 ```
-Các container cần thiết để chạy dự án bao gồm kafka và zookeeper
-Để chạy monitoring, cần chạy các container có đuôi -service (lưu ý, chạy container config-service đầu tiên)
+
+Các container cần thiết để chạy dự án bao gồm kafka và zookeeper Để chạy
+monitoring, cần chạy các container có đuôi -service (lưu ý, chạy container
+config-service đầu tiên)
 
 ### 4. Khởi Chạy Dự Án
 
@@ -98,9 +102,10 @@ Khởi chạy từng service lần lượt theo thứ tự như sau:
 2. eureka-server
 3. api-gateway
 4. Các service còn lại  
-   *Lưu ý:* Service `activity-tracker` nên được khởi chạy sau cùng.
+   _Lưu ý:_ Service `activity-tracker` nên được khởi chạy sau cùng.
 
-Đối với PyHelper service, di chuyển terminal đến thư mục `PyHelper` và thực hiện các bước sau:
+Đối với PyHelper service, di chuyển terminal đến thư mục `PyHelper` và thực hiện
+các bước sau:
 
 ```bash
 pip install -r requirements.txt
@@ -114,7 +119,9 @@ python.exe -m uvicorn main:app --reload --port 8807
 
 ### 5. Truy Cập Giao Diện
 
-Sau khi các service đã được khởi chạy thành công, hệ thống sẽ sẵn sàng hoạt động. Truy cập vào giao diện người dùng thông qua trình duyệt để bắt đầu sử dụng ứng dụng.
+Sau khi các service đã được khởi chạy thành công, hệ thống sẽ sẵn sàng hoạt
+động. Truy cập vào giao diện người dùng thông qua trình duyệt để bắt đầu sử dụng
+ứng dụng.
 
 ## Cấu hình dự án - Backend
 
