@@ -6,6 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * The controller for the internal verifycation service.
+ *
+ * @author Duy Hoang
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/${url_base}/internal/verify")

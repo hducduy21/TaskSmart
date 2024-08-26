@@ -8,6 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 import java.util.Random;
 
+/**
+ * Represents a TokenVerifycation in the project.
+ * A TokenVerifycation is a card that contains a code, email, and other information.
+ * @author Duy Hoang
+ */
 @Document("TokenVerifycation")
 @NoArgsConstructor
 @AllArgsConstructor

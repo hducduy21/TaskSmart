@@ -12,6 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ * This class is the controller for the avatars.
+ * It handles the requests related to the avatars.
+ *
+ * @author Duy Hoang
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/${url_base}/${url_avatar}")

@@ -12,11 +12,18 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * This class is responsible for configuring the security of the application.
+ * @author Duy Hoang
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    /**
+     * The JWTUtil object to be used for JWT operations.
+     */
     private final JWTUtil jwtUtil;
 
 //    private static final String[] PERMIT_ALL_ENDPOINTS = {};
@@ -26,6 +33,12 @@ public class SecurityConfig {
 //    private static final String[] PERMIT_ONLY_PATCH_ENDPOINTS = {};
 //    private static final String[] PERMIT_ONLY_DELETE_ENDPOINTS = {};
 
+    /**
+     * This method is responsible for configuring the security of the application.
+     * @param httpSecurity the HttpSecurity object to be configured
+     * @return the SecurityFilterChain object
+     * @throws Exception if an error occurs
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity

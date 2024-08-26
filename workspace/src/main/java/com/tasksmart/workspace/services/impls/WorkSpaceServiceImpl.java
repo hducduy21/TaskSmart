@@ -4,7 +4,6 @@ import com.tasksmart.sharedLibrary.dtos.messages.UserJoinWorkSpaceMessage;
 import com.tasksmart.sharedLibrary.dtos.responses.CategoryResponse;
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
-import com.tasksmart.sharedLibrary.repositories.httpClients.CategoryClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.workspace.dtos.request.ProjectRequest;
 import com.tasksmart.workspace.dtos.request.WorkSpaceRequest;
@@ -28,6 +27,7 @@ import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.exceptions.UnauthenticateException;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UserClient;
 import com.tasksmart.sharedLibrary.utils.AuthenticationUtils;
+import com.tasksmart.workspace.services.impls.clients.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +38,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * WorkSpaceServiceImpl class for managing Work Space operations.
+ * This class implements the WorkSpaceService interface.
+ *
+ * @author Duy Hoang
+ */
 @RequiredArgsConstructor
 @Service
 public class WorkSpaceServiceImpl implements WorkSpaceService {
@@ -47,15 +53,16 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     private final UserClient userClient;
     private final AuthenticationUtils authenticationUtils;
     private final KafkaTemplate<String,Object> kafkaTemplate;
-    private final CategoryClient categoryClient;
-    private final UnsplashClient unsplashClient;
+    private final CategoryService categoryService;
 
+    /** {@inheritDoc} */
     @Override
     public List<WorkSpaceGeneralResponse> getAllWorkSpace() {
         String userId = authenticationUtils.getUserIdAuthenticated();
         return workSpaceRepository.findByUserId(userId).stream().map(this::getWorkSpaceGeneralResponse).toList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public WorkSpaceResponse getWorkSpaceById(String Id) {
         WorkSpace workSpace = workSpaceRepository.findById(Id).orElseThrow(
@@ -64,6 +71,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return getWorkSpaceResponse(workSpace);
     }
 
+    /** {@inheritDoc} */
     @Override
     public WorkSpaceGeneralResponse createWorkSpace(WorkSpaceRequest workSpaceRequest) {
         String userId = authenticationUtils.getUserIdAuthenticated();
@@ -88,6 +96,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return getWorkSpaceGeneralResponse(workspace);
     }
 
+    /** {@inheritDoc} */
     @Override
     public ProjectGeneralResponse createProject(String workSpaceId, ProjectRequest projectRequest) {
         if (!workSpaceRepository.existsById(workSpaceId)){
@@ -114,6 +123,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return projectGeneralResponse;
     }
 
+    /** {@inheritDoc} */
     @Override
     public WorkSpaceGeneralResponse editWorkSpace(String workSpaceId,WorkSpaceRequest workSpaceRequest) {
         WorkSpace workSpace = workSpaceRepository.findById(workSpaceId).orElseThrow(
@@ -139,6 +149,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return getWorkSpaceGeneralResponse(workSpace);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteWorkSpace(String workSpaceId) {
         WorkSpace workSpace = workSpaceRepository.findById(workSpaceId).orElseThrow(
@@ -157,11 +168,13 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         workSpaceRepository.deleteById(workSpaceId);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isWorkSpaceExist(String workSpaceId) {
         return workSpaceRepository.existsById(workSpaceId);
     }
 
+    /** {@inheritDoc} */
     @Override
     public WorkSpaceResponse joinWorkSpaceByInviteCode(String workspaceId, String inviteCode) {
         //Get user id from token
@@ -204,6 +217,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return getWorkSpaceResponse(workSpace);
     }
 
+    /** {@inheritDoc} */
     @Override
     public InviteCodeResponse updateInviteCode(String projectId, Boolean isPublic, Boolean refresh) {
         if(ObjectUtils.allNull(isPublic, refresh)){
@@ -239,6 +253,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return InviteCodeResponse.builder().inviteCode(invitation.getCode()).build();
     }
 
+    /** {@inheritDoc} */
     @Override
     public WorkSpaceGeneralResponse setUnsplashBackground(String workSpaceId, WorkspaceUpdateImage unsplash) {
         String userId = authenticationUtils.getUserIdAuthenticated();
@@ -256,6 +271,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return getWorkSpaceGeneralResponse(workSpace);
     }
 
+    /** {@inheritDoc} */
     @Override
     public SearchAllResponse search(String query) {
         String userId = authenticationUtils.getUserIdAuthenticated();
@@ -271,26 +287,43 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         return searchAllProjectResponse;
     }
 
+    /** {@inheritDoc} */
     public WorkSpaceGeneralResponse getWorkSpaceGeneralResponse(WorkSpace workSpace){
         return modelMapper.map(workSpace, WorkSpaceGeneralResponse.class);
     }
 
+    /** {@inheritDoc} */
     public WorkSpaceResponse getWorkSpaceResponse(WorkSpace workSpace){
         WorkSpaceResponse workSpaceResponse = modelMapper.map(workSpace, WorkSpaceResponse.class);
         workSpaceResponse.setProjects(projectService.getAllProjectByWorkSpace(workSpace.getId()));
 
         if(!StringUtils.isBlank(workSpace.getCategoryId())){
-            CategoryResponse categoryResponse = categoryClient.getCategory(workSpace.getCategoryId());
+            CategoryResponse categoryResponse = getCategory(workSpace.getCategoryId());
             workSpaceResponse.setCategory(categoryResponse);
         }
         return workSpaceResponse;
     }
 
+    /** {@inheritDoc} */
+    public CategoryResponse getCategory(String categoryId){
+        return categoryService.getCategory(categoryId);
+    }
+
+    /**
+     * Get UserRelation by userId
+     * @param userId
+     * @return
+     */
     private UserRelation getUserRelation(String userId){
         UserGeneralResponse userGeneralResponse = userClient.getUserGeneralResponse(userId);
         return modelMapper.map(userGeneralResponse, UserRelation.class);
     }
 
+    /**
+     * Get ProjectGeneralResponse by Project
+     * @param project
+     * @return
+     */
     public ProjectGeneralResponse getProjectGeneralResponse(Project project){
         return modelMapper.map(project, ProjectGeneralResponse.class);
     }

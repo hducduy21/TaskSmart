@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Controller for activity tracker endpoints
+ *
+ * @author Duy Hoang
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/${url_base}/${url_activity}")
@@ -18,6 +23,11 @@ import java.util.List;
 public class ActivityTrackerController {
     private final ActivityTrackerService activityTrackerService;
 
+    /**
+     * Get recent projects
+     *
+     * @return List of ProjectAccessResponse
+     */
     @GetMapping("/recent/projects")
     public List<ProjectAccessResponse> getProjectRecent(){
         return activityTrackerService.getProjectRecent();

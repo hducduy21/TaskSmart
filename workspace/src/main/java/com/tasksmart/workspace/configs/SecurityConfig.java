@@ -12,6 +12,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
+/**
+ * SecurityConfig class for managing Security operations.
+ * This class is used to manage the Security operations.
+ *
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

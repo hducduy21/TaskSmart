@@ -10,28 +10,23 @@ import com.tasksmart.resource.models.Template;
 import com.tasksmart.resource.repositories.CategoryRepository;
 import com.tasksmart.resource.repositories.TemplateRepository;
 import com.tasksmart.resource.services.TemplateService;
-import com.tasksmart.sharedLibrary.configs.AppConstant;
+import com.tasksmart.resource.services.impls.clients.WorkSpaceService;
 import com.tasksmart.sharedLibrary.dtos.messages.UnsplashResponse;
 import com.tasksmart.sharedLibrary.dtos.request.ProjectTemplateRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.ProjectTemplateResponse;
 import com.tasksmart.sharedLibrary.dtos.responses.SearchAllResponse;
 import com.tasksmart.sharedLibrary.exceptions.BadRequest;
-import com.tasksmart.sharedLibrary.exceptions.InternalServerError;
 import com.tasksmart.sharedLibrary.exceptions.ResourceNotFound;
 import com.tasksmart.sharedLibrary.repositories.httpClients.UnsplashClient;
 import com.tasksmart.sharedLibrary.repositories.httpClients.WorkSpaceClient;
-import com.tasksmart.sharedLibrary.services.AwsS3Service;
-import com.tasksmart.sharedLibrary.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +36,8 @@ public class TemplateServiceImpl implements TemplateService {
     private final ModelMapper modelMapper;
     private final WorkSpaceClient workSpaceClient;
     private final CategoryRepository categoryRepository;
-    private final AwsS3Service awsS3Service;
-    private final FileUtil fileUtil;
     private final UnsplashClient unsplashClient;
+    private final WorkSpaceService workSpaceService;
 
 
     @Override
@@ -215,7 +209,7 @@ public class TemplateServiceImpl implements TemplateService {
         );
         CategoryResponse categoryResponse = modelMapper.map(category, CategoryResponse.class);
 
-        ProjectTemplateResponse projectTemplateResponse = workSpaceClient.getProjectTemplate(template.getProjectId());
+        ProjectTemplateResponse projectTemplateResponse = workSpaceService.getProjectTemplate(template.getProjectId());
 
         templateResponse.setCategory(categoryResponse);
         templateResponse.setProject(projectTemplateResponse);

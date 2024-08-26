@@ -28,7 +28,6 @@ public class AvatarServiceImpl implements AvatarService {
     private final AvatarRepository avatarRepository;
     private final AwsS3Service awsS3Service;
     private final FileUtil fileUtil;
-    private final ModelMapper modelMapper;
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")

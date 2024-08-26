@@ -8,12 +8,25 @@ import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * Listener for project access events
+ *
+ * @author Duy Hoang
+ */
 @Component
 @RequiredArgsConstructor
 @KafkaListener(id = "project-access-group",topics = {"project-access"})
 public class ProjectAccessListener {
+    /**
+     * Activity service
+     */
     private final ActivityTrackerService activityService;
 
+    /**
+     * Handle project access event
+     *
+     * @param projectAccess Project access event
+     */
     @KafkaHandler
     public void handleProjectAccess(ProjectAccess projectAccess) {
         System.out.println("Listen event project "+ projectAccess.getProjectId() +" from user-" + projectAccess.getUserId());

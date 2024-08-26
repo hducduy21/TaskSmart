@@ -7,6 +7,12 @@ import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class listens for user registration events.
+ * When a user is registered, this class sends a welcome email to the user.
+
+ *@author Duy Hoang
+ */
 @Component
 @RequiredArgsConstructor
 @KafkaListener(id = "user-registration-group",topics = {"user-registration"})

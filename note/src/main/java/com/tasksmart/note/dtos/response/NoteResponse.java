@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * This is a dto indicate for note response
+ *
+ * @author Duc Nguyen
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

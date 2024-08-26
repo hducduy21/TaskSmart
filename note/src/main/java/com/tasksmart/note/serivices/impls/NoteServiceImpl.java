@@ -24,10 +24,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoteServiceImpl implements NoteService{
 
+    /**
+     * NoteRepository instance for interacting with the database.
+     */
     private final NoteRepository noteRepository;
+    /**
+     * ModelMapper instance for mapping objects.
+     */
     private final ModelMapper modelMapper;
+    /**
+     * AuthenticationUtils instance for getting the authenticated user's id.
+     */
     private final AuthenticationUtils authenticationUtils;
 
+    /** {@inheritDoc} */
     @Override
     public NoteResponse createNote(NoteRequest noteRequest) {
         System.out.println("NoteRequest: " + noteRequest.getTitle());
@@ -42,6 +52,7 @@ public class NoteServiceImpl implements NoteService{
         return getNoteResponse(note);
     }
 
+    /** {@inheritDoc} */
     @Override
     public NoteResponse getNoteById(String noteId) {
         return noteRepository.findById(noteId).map(this::getNoteResponse).orElseThrow(
@@ -49,6 +60,7 @@ public class NoteServiceImpl implements NoteService{
         );
     }
 
+    /** {@inheritDoc} */
     @Override
     public NoteResponse editNote(NoteRequest noteRequest, String noteId) {
         Note note = noteRepository.findById(noteId).orElseThrow(
@@ -73,6 +85,7 @@ public class NoteServiceImpl implements NoteService{
         return getNoteResponse(note);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteNote(String noteId) {
         Note note = noteRepository.findById(noteId).orElseThrow(
@@ -81,6 +94,7 @@ public class NoteServiceImpl implements NoteService{
         noteRepository.delete(note);
     }
 
+    /** {@inheritDoc} */
     @Override
     public SearchAllResponse searchNotes(String keyword) {
         String userId = authenticationUtils.getUserIdAuthenticated();

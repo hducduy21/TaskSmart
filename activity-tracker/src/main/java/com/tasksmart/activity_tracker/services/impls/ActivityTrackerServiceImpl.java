@@ -18,13 +18,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for activity tracker to handle activity related operations
+ *
+ * @author Duy Hoang
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ActivityTrackerServiceImpl implements ActivityTrackerService {
+    /**
+     * Activity repository to handle activity related operations
+     */
     private final ActivityRepository activityRepository;
+
+    /**
+     * Authentication utils to get user id logged in
+     */
     private final AuthenticationUtils authenticationUtils;
 
+    /** {@inheritDoc} */
     @Override
     public List<ProjectAccessResponse> getProjectRecent() {
         String userId = authenticationUtils.getUserIdAuthenticated();
@@ -42,6 +55,7 @@ public class ActivityTrackerServiceImpl implements ActivityTrackerService {
                 .toList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void createProjectAccessActivity(ProjectAccess projectAccess) {
         Optional<Activity> activityOptional = activityRepository.findByInitiatorIdAndProjectIdAndType(
@@ -69,6 +83,7 @@ public class ActivityTrackerServiceImpl implements ActivityTrackerService {
         log.info("Event listen access activity: {}", activity);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void createWorkSpaceActivity(String userId, String workSpaceId, EActivityType activityType) {
         Activity activity = Activity.builder()
@@ -81,6 +96,7 @@ public class ActivityTrackerServiceImpl implements ActivityTrackerService {
         activityRepository.save(activity);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteWorkSpaceActivity(WorkSpaceMessage workSpaceMessage) {
         activityRepository.deleteAllByWorkspaceId(workSpaceMessage.getId());
