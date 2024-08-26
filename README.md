@@ -4,12 +4,19 @@
 ## Mục Lục
 
 1. [Mô Tả](#mô-tả)
-2. [Cách Cài Đặt](#cách-cài-đặt)
+2. [Cài Đặt Môi Trường - Frontend](cài-đặt-môi-trường-frontend)
     1. [Clone Dự Án Về Máy](#1-clone-dự-án-về-máy)
     2. [Di Chuyển Đến Thư Mục Vừa Clone](#2-di-chuyển-đến-thư-mục-vừa-clone)
     3. [Cài Đặt Các Gói Cần Thiết](#3-cài-đặt-các-gói-cần-thiết)
     4. [Khởi Chạy Dự Án](#4-khởi-chạy-dự-án)
     5. [Truy Cập Giao Diện](#5-truy-cập-giao-diện)
+4. [Cài Đặt Môi Trường - Backend](cài-đặt-môi-trường-backend)
+    1. [Clone Dự Án Về Máy](#1-clone-dự-án-về-máy)
+    2. [Di Chuyển Đến Thư Mục Vừa Clone](#2-di-chuyển-đến-thư-mục-vừa-clone)
+    3. [Cài Đặt Môi Trường Cho Dự Án](#3-cài-đặt-môi-trường-cho-dự-án)
+    4. [Khởi Chạy Dự Án](#4-khởi-chạy-dự-án)
+    5. [Truy Cập Giao Diện](#5-truy-cập-giao-diện)
+5. [Cấu hình dự án - Backend](cấu-hình-dự-án)
 
 ## Mô Tả
 
@@ -19,8 +26,6 @@ Dự án này sử dụng mô hình ngôn ngữ lớn để tự động khởi 
 
 Clone dự án frontend tại:  
 [https://github.com/annhducit/TaskSmart_UI.git](https://github.com/annhducit/TaskSmart_UI.git)
-
-## Cách Cài Đặt Dự Án
 
 ### 1. Clone Dự Án Về Máy
 
@@ -61,8 +66,6 @@ Truy cập http://localhost:3000/ để vào giao diện hệ thống TaskSmart.
 Clone dự án backend tại:  
 [https://github.com/hducduy21/TaskSmart](https://github.com/hducduy21/TaskSmart)
 
-## Cách Cài Đặt Dự Án
-
 ### 1. Clone Dự Án Về Máy
 
 ```bash
@@ -77,13 +80,15 @@ Di chuyển terminal đến thư mục dự án vừa clone về:
 cd TaskSmart
 ```
 
-### 3. Cài Đặt Các Gói Cần Thiết
+### 3. Cài đặt môi trường cho dự án
 
-Tiến hành cài đặt các gói cần thiết và khởi chạy các container:
+Tiến hành cài đặt các môi trường cần thiết và khởi chạy các container:
 
 ```bash
 docker compose up
 ```
+Các container cần thiết để chạy dự án bao gồm kafka và zookeeper
+Để chạy monitoring, cần chạy các container có đuôi -service (lưu ý, chạy container config-service đầu tiên)
 
 ### 4. Khởi Chạy Dự Án
 
@@ -110,3 +115,8 @@ python.exe -m uvicorn main:app --reload --port 8807
 ### 5. Truy Cập Giao Diện
 
 Sau khi các service đã được khởi chạy thành công, hệ thống sẽ sẵn sàng hoạt động. Truy cập vào giao diện người dùng thông qua trình duyệt để bắt đầu sử dụng ứng dụng.
+
+## Cấu hình dự án - Backend
+
+Cấu hình cho từng service của dự án backend tại:  
+[https://github.com/hducduy21/TaskSmart_Configuration](https://github.com/hducduy21/TaskSmart_Configuration)
