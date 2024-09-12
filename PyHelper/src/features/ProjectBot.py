@@ -46,7 +46,7 @@ def entry_db(project_id: str):
 
 def load_llm():
     # llm = ChatOpenAI(api_key="sk-proj-hgdE6s8Y9IS9sYnDzUELT3BlbkFJfrswtg4SAWNnZwLL7Wve")
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyBRmzrMqjc-FvOlPhHT_sFm1O1fbUme8Ec")
+    llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyCcbrg-dNAAnYk8gxwmqqQvRlv3PL6Cnn4")
     return llm
 
 
