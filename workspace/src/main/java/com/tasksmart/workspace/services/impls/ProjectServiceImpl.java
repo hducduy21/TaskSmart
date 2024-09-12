@@ -660,6 +660,8 @@ public class ProjectServiceImpl implements ProjectService {
         if(!project.isSpeDoc())
             throw new ResourceNotFound("Please upload the project document!");
 
+        TaskGenResponse taskGenResponse = pyHelperClient.generateTask(projectId);
+
         return pyHelperClient.generateDbStructure(projectId, database);
     }
 

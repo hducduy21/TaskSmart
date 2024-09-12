@@ -81,13 +81,8 @@ public class ProjectController {
 
     @GetMapping("{projectId}/generate-task")
     @ResponseStatus(HttpStatus.OK)
-    @CircuitBreaker(name = "pyService", fallbackMethod = "generateTaskFallback")
     public TaskGenResponse generateTask(@PathVariable String projectId){
         return projectService.generateTask(projectId);
-    }
-
-    public TaskGenResponse generateTaskFallback(String projectId, Throwable throwable){
-        return TaskGenResponse.builder().listCards(new ArrayList<>()).build();
     }
 
     @PutMapping("{projectId}/background")

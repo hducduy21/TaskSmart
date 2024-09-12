@@ -1,10 +1,15 @@
 package com.tasksmart.sharedLibrary.dtos.responses;
 
+import com.tasksmart.sharedLibrary.models.CheckListGroup;
+import com.tasksmart.sharedLibrary.models.enums.ELevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +51,13 @@ public class TaskGenResponse {
 
         private String name;
         private String description;
+        private String reference;
+        private ELevel priority;
+        private ELevel risk;
+        private ELevel effort;
+        private String startTime;
+        private String estimate;
+
         private List<CheckList> checkLists;
     }
 

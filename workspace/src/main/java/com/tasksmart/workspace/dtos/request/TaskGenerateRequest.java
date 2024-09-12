@@ -2,12 +2,15 @@ package com.tasksmart.workspace.dtos.request;
 
 import com.tasksmart.sharedLibrary.dtos.request.CardTemplateRequest;
 import com.tasksmart.sharedLibrary.dtos.responses.TaskGenResponse;
+import com.tasksmart.sharedLibrary.models.enums.ELevel;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -34,8 +37,13 @@ public class TaskGenerateRequest {
     public static class CardGenerateRequest {
         @NotBlank(message = "Card name is required")
         private String name;
-
         private String description;
+        private String reference;
+        private ELevel priority;
+        private ELevel risk;
+        private ELevel effort;
+        private LocalDateTime startTime;
+        private LocalDateTime estimate;
 
 
         private List<CheckListGroupGenerateRequest> checkLists;

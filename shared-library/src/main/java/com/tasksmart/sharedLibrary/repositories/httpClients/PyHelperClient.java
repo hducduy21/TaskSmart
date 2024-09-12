@@ -1,6 +1,7 @@
 package com.tasksmart.sharedLibrary.repositories.httpClients;
 
 import com.tasksmart.sharedLibrary.configs.interceptors.FeignRequestInterceptor;
+import com.tasksmart.sharedLibrary.configs.interceptors.PythonRequestInterceptor;
 import com.tasksmart.sharedLibrary.dtos.request.DBRagRequest;
 import com.tasksmart.sharedLibrary.dtos.request.RagUriRequest;
 import com.tasksmart.sharedLibrary.dtos.request.URIRequest;
@@ -11,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@FeignClient(name = "py-helper", url = "http://localhost:8807")
+@FeignClient(name = "py-helper", url = "http://localhost:8807", configuration = {PythonRequestInterceptor.class})
 public interface PyHelperClient {
     @GetMapping(value = "api/pyhelper/projects/{project_id}/generate-task", produces = MediaType.APPLICATION_JSON_VALUE)
     TaskGenResponse generateTask(@PathVariable String project_id);

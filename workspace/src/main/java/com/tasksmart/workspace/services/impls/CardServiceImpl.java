@@ -27,6 +27,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -538,6 +540,7 @@ public class CardServiceImpl implements CardService {
         List<String> cardIds = new ArrayList<>();
         for(TaskGenerateRequest.CardGenerateRequest cardGenerateRequest: cards){
             Card card = modelMapper.map(cardGenerateRequest, Card.class);
+            card.setDescription(cardGenerateRequest.getDescription()+ "( mentioned in "+cardGenerateRequest.getReference()+" )");
             card.setProjectId(projectId);
             if(cardGenerateRequest.getCheckLists() != null){
                 List<CheckListGroup> checkListGroup = card.getCheckLists().stream().map(checkListGroupGenerateRequest -> {

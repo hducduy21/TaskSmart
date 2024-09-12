@@ -1,4 +1,13 @@
 from langchain_core.pydantic_v1 import BaseModel, Field
+from enum import Enum
+from datetime import date
+
+class PriorityEnum(str, Enum):
+    Highest = "Highest"
+    High = "High"
+    Medium = "Medium"
+    Low = "Low"
+    Lowest = "Lowest"
 
 class CheckList(BaseModel):
     name: str = Field(description="The name of the to-do")
@@ -9,7 +18,13 @@ class CheckListGroup(BaseModel):
 
 class Card(BaseModel):
     name: str = Field(description="The title of the card/task")
+    reference: str = Field(description="In which section or section is this task listed?")
     description: str = Field(description="The description of the card/task")
+    priority: PriorityEnum = Field(description="The priority of the card/task")
+    risk: PriorityEnum = Field(description="The risk of the card/task")
+    effort: PriorityEnum = Field(description="The effort of the card/task")
+    startTime: date = Field(description="Estimated date this work can start, from "+date.today().strftime("%Y-%m-%d") +". Calculate appropriately to perform other tasks. Response type: YYYY-mm-dd")
+    estimate: date = Field(description="Estimated date to complete from "+date.today().strftime("%Y-%m-%d") +", Estimated per day. Response type: YYYY-mm-dd")
     checkLists: list[CheckList] = Field(description="The checklists in the card, a group to do in task, card")
 
 class ListCard(BaseModel):
