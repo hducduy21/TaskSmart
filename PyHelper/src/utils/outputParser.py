@@ -52,7 +52,7 @@ class DBCreateStatement(BaseModel):
     database: str = Field(description="Type of database")
     
 class DBRAGStatement(BaseModel):
-    statements: list[Statement] = Field(description="List of database statement used to execute user requests")
+    statements: list[Statement] = Field(description="List of database statement used to execute user requests, If the question is not relevant, please return a comment: please ask database related questions")
     database: str = Field(description="Type of database")
     
 class FileHanler(BaseModel):

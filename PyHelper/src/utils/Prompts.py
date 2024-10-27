@@ -26,7 +26,7 @@ class TSMPromt:
     def create_prompt_db_rag(parser):
         template = """Based on the table schema below:
         {schema}
-        Answer the user query with {database} database language
+        Answer the user query with {database} database language. If the question is not relevant, please return a comment: please ask database related questions.
         .\n{format_instructions}\n{question}\n"""
         prompt = PromptTemplate(
                 template=template, 
@@ -71,7 +71,7 @@ class TSMPromt:
         
         template2 = """Based on the query below:
         {query}
-        Answer the user query
+        Answer the user query. If the question is not relevant, please return a comment: please ask database related questions.
         .\n{format_instructions}\n"""
         prompt2 = PromptTemplate(
                 template=template2, 
